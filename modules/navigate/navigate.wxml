@@ -1,0 +1,6 @@
+
+<view class="box-bg">
+  <image class="bg" src="../../images/bg-0.png"></image>
+  <view wx:if="{{isIpx}}" class="isIpx"></view>
+  <view class="box-title"></view>
+</view>

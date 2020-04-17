@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/game/game",
+    "pages/mine/mine"
+  ],
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#4a5fe2",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "images/home-off.png",
+        "selectedIconPath": "images/home-on.png",
+        "text": "式神录"
+      },
+      {
+        "pagePath": "pages/game/game",
+        "iconPath": "images/game-off.png",
+        "selectedIconPath": "images/game-on.png",
+        "text": "游戏"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "iconPath": "images/mine-off.png",
+        "selectedIconPath": "images/mine-on.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "window": {
+    "backgroundColor": "#4a5fe2",
+    "navigationStyle": "custom",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "white"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

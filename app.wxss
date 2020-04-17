@@ -1,0 +1,16 @@
+page{
+  padding-top: 140rpx;
+}
+.isIpx{
+  border-top: 1rpx solid rebeccapurple;
+  height: 60rpx;
+  background: transparent;
+}
+.container {
+  border-top: 1rpx solid red;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}

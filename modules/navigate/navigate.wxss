@@ -1,0 +1,34 @@
+
+.box-bg{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 750rpx;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  overflow: hidden;
+  border: 1rpx solid red;
+}
+.box-bg .bg{
+  position: absolute;
+  top: 0;
+  width: 750rpx;
+  height: 300rpx;
+  z-index: 20;
+}
+
+.box-title{
+  height: 140rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx dotted black;
+  z-index: 30;
+}
+
+.isIpx{
+  height: 60rpx;
+  background: transparent;
+}
