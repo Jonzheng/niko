@@ -1,3 +1,109 @@
+.top-bg{
+  position: relative;
+  width: 750rpx;
+  height: 280rpx;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.box{
+  position: relative;
+  top: -164rpx;
+}
+
+.top-mine{
+  height: 140rpx;
+  display: flex;
+  align-items: center;
+  padding: 10rpx 20rpx;
+}
+
+.top-mine .avatar{
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+}
+
+.top-mine .relation{
+  width: 432rpx;
+  padding: 0 20rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.profile{
+  width: 750rpx;
+  padding: 20rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+
+.mine-name {
+  height: 50rpx;
+  margin: 8rpx 0;
+  font-size: 34rpx;
+  color: #666666;
+}
+
+.mine-coin {
+  height: 32rpx;
+  font-size: 24rpx;
+  color: #888888;
+}
+
+.mine-right{
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  width: 120rpx;
+}
+
+.icon-arrow{
+  width: 30rpx;
+  height: 30rpx;
+  transform: rotate(0.5turn);
+}
+
+.btn-follow{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid #4a5fe2;
+  width: 100rpx;
+  height: 48rpx;
+  color: #4a5fe2;
+  background: rgba(bb,bb,bb,0.1);
+  border-radius: 8rpx;
+}
+
+.mine-menu{
+  margin: 0;
+  padding: 10rpx 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.mine-menu .menu{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.menu-num{
+  color: rgba(91,92,110,0.8)
+}
+
+.menu-label{
+  color: rgba(91,92,110,0.9)
+}
+
 .userinfo {
   display: flex;
   flex-direction: column;
@@ -16,5 +122,5 @@
 }
 
 .usermotto {
-  margin-top: 200px;
+  margin-top: 20px;
 }

@@ -1,4 +1,11 @@
-//app.js
+const COS = require('./lib/cos-sdk.js')
+const Cos = new COS({
+  SecretId: 'AKIDtfGm8pIo1Ur57BCE7vJ9tgVFVdaab45x',
+  SecretKey: 'AOSVQEvvpaFl8OU3Yv8B5pPo0SDzfFi2',
+})
+const AvatarBucket = 'avatar-1256378396'
+const Region = 'ap-guangzhou'
+
 App({
   onLaunch: function () {
     // 展示本地存储能力
@@ -41,6 +48,38 @@ App({
   setIpx() {
     this.globalData.sysInfo = wx.getSystemInfoSync();
     this.globalData.isIpx = this.globalData.sysInfo.model.includes('iPhone 11') || this.globalData.sysInfo.model.includes('iPhone X') || this.globalData.sysInfo.model.includes('unknown<iPhone')
+  },
+  uploadToCos(filename, filePath) {
+    return Cos.postObject({
+      Bucket: AvatarBucket,
+      Region: Region,
+      Key: filename,
+      FilePath: filePath,
+      onProgress: function (info) {
+        console.log(JSON.stringify(info));
+      }
+    }, function (err, data) {
+      console.log(err || data);
+    })
+  },
+  uploadAvatar(filename, filePath) {
+    return new Promise((resolve, reject) =>{
+      Cos.postObject({
+        Bucket: AvatarBucket,
+        Region: Region,
+        Key: filename,
+        FilePath: filePath,
+        onProgress: function (info) {
+          // console.log(JSON.stringify(info))
+        }
+      }, function (err, data) {
+        if (err){
+          reject(err)
+        }else{
+          resolve(data)
+        }
+      })
+    })
   },
   globalData: {
     isIpx: false,

@@ -1,21 +1,72 @@
+.tab-wrap {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: #ffffff;
+  z-index: 99;
+  box-shadow: 0 6rpx 6rpx #ffffff;
+}
 
-.userinfo {
+.todo{
+  background: #4a5fe2;
+  color: #7c44e2;
+}
+
+.item-cover{
+  height: 320rpx;
+  width: 320rpx;
+}
+
+
+.cells {
+  background: #ffffff;
+  margin-top: 20rpx; }
+
+.cell {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 20rpx;
+}
+.cell:not(:last-child) {
+  border-bottom: 1rpx solid #ebedf0;
+}
+.cell__hd {
+  font-size: 0;
+}
+.cell__hd image {
+  width: 160rpx;
+  height: 160rpx;
+  margin-right: 20rpx;
+  border-radius: 12rpx;
+}
+.cell__bd {
+  position: relative;
+  flex: 1;
+}
+.cell__bd .name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-break: break-all;
+  font-size: 28rpx;
+  margin-bottom: 12rpx;
+  color: #4a5fe2;
+}
+.cell__bd .des {
+  color: #666666;
+  font-size: 24rpx;
+
+  height: 36rpx;
+  width: 500rpx;
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow: ellipsis;
 }
 
-.userinfo-avatar {
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
-}
-
-.userinfo-nickname {
-  color: #aaa;
-}
-
-.usermotto {
-  margin-top: 200px;
+.cell__bd .arrow {
+  position: absolute;
+  bottom: 0;
+  right: 10rpx;
+  height: 24rpx;
+  opacity: 0.2;
 }

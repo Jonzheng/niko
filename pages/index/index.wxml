@@ -1,31 +1,76 @@
 
-<navigate></navigate>
-<scroll-view style="{{isIpx ? 'padding-top:60rpx;':''}}">
-  <view class="container">
-    <view class="userinfo">
-      <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+<view class="tab-wrap">
+  <tab tab-cur="{{tabCur}}"
+      tab-data="{{tabData}}"
+      color="{{color}}"
+      size="{{size}}"
+      bindchange="tabChange">
+  </tab>
+</view>
+
+<scroll id="scroll"
+		requesting="{{requesting}}"
+		empty-show="{{emptyShow}}"
+		end="{{end}}"
+		listCount="{{list.length}}"
+    scrollTop="{{scrollTop}}"
+    scrollAnimation="{{scrollAnimation}}"
+		has-top="{{hasTop}}"
+    enable-back-to-top="{{enableBackToTop}}"
+		refresh-size="{{refreshSize}}"
+		top-size="{{topSize}}"
+		bottom-size="{{bottomSize}}"
+		color="{{color}}"
+		bind:refresh="refresh"
+		bind:more="more">
+	<view class="cells">
+
+    <block wx:for="{{spList}}" wx:key="index">
+      <view hidden="{{level != 'sp'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
+        <template is="an-list" data="{{item}}"/>
+      </view>
+    </block>
+    <block wx:for="{{ssrList}}" wx:key="index">
+      <view hidden="{{level != 'ssr'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
+        <template is="an-list" data="{{item}}"/>
+      </view>
+    </block>
+    <block wx:for="{{srList}}" wx:key="index">
+      <view hidden="{{level != 'sr'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
+        <template is="an-list" data="{{item}}"/>
+      </view>
+    </block>
+    <block wx:for="{{rList}}" wx:key="index">
+      <view hidden="{{level != 'r'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
+        <template is="an-list" data="{{item}}"/>
+      </view>
+    </block>
+    <block wx:for="{{nList}}" wx:key="index">
+      <view hidden="{{level != 'n'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
+        <template is="an-list" data="{{item}}"/>
+      </view>
+    </block>
+    <block wx:for="{{mList}}" wx:key="index">
+      <view hidden="{{level != 'm'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
+        <template is="an-list" data="{{item}}"/>
+      </view>
+    </block>
+
+	</view>
+  
+</scroll>
+
+<template name="an-list">
+  
+    <view class="cell__hd">
+      <image class="item-cover" mode="aspectFill" src="{{item.src_image}}" alt=""/>
+    </view>
+    <view class="cell__bd">
+      <view class="name">{{item.c_name}}</view>
+      <block wx:for="{{item.sers}}" wx:key="index">
+        <view class="des">{{item}}</view>
       </block>
+      <image class="arrow" src="../../images/right.png" mode="heightFix"></image>
     </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
-    </view>
-  </view>
-</scroll-view>
+
+</template>

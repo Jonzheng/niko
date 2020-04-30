@@ -1,5 +1,15 @@
 const app = getApp()
+const { trim, host } = require('../../utils/util')
 
+const pageStart = 1
+const tabData = [
+  { value: "sp", name:"SP"},
+  { value: "ssr",name: "SSR"},
+  { value: "sr",name: "SR"},
+  { value: "r",name: "R"},
+  { value: "n",name: "N"},
+  { value: "m",name: "阴阳师"}
+]
 Page({
 
   /**
@@ -7,10 +17,25 @@ Page({
    */
   data: {
     isIpx: app.globalData.isIpx,
-    motto: 'Index',
     userInfo: {},
     hasUserInfo: false,
-    canIUse: wx.canIUse('button.open-type.getUserInfo')
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    tabData: tabData,
+    tabCur: 0,
+    size: 90,
+    color: "#4a5fe2",
+    icon_loading: "../../images/loading1.gif",
+    requesting: true,
+    end: false,
+    emptyShow: false,
+    pageNo: pageStart,
+    level: 'sp',
+    list: [],
+    scrollTop: null,
+    enableBackToTop: true,
+    refreshSize: 0,
+    topSize: 90,
+    bottomSize: 0,
   },
 
   /**
@@ -18,6 +43,9 @@ Page({
    */
   onLoad: function (options) {
     this.init()
+    this.getList('refresh', pageStart);
+    console.log(app.globalData)
+    this._indexTab = true
   },
 
   /**
@@ -38,9 +66,20 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
+    this._indexTab = false
   },
 
+  /**
+   * 生命周期函数--当前是 tab 页时，点击 tab 时触发
+   */
+  onTabItemTap: function (e) {
+    if (this._indexTab){
+      this.toTop();
+      wx.vibrateShort();
+    }
+    console.log(e)
+    this._indexTab = true
+  },
   /**
    * 生命周期函数--监听页面卸载
    */
@@ -66,7 +105,10 @@ Page({
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-
+    return {
+      title: '阴阳师·式神台词语音',
+      path: '/pages/index/index',
+    }
   },
 
   /**
@@ -101,8 +143,137 @@ Page({
       })
     }
   },
+  
+  // 刷新数据
+  refresh() {
+    this.setData({
+      requesting: true,
+      empty: false,
+      end: false,
+    })
+    this.getList('refresh', pageStart);
+  },
+  // 加载更多
+  more() {
+    this.setData({
+      requesting: true
+    })
+    let { level } = this.data
+    let pageNo = this.data[`${level}Page`]
+    this.getList('more', pageNo, level);
+  },
 
-  getUserInfo: function (e) {
+  getList(type, pageNo, level='') {
+    const that = this
+    wx.showNavigationBarLoading()
+    level = level ? level : this.data.level
+    console.log({ level: level, pageNo: pageNo })
+    wx.request({
+      url: `${host}/queryList/merge`,
+      method: 'post',
+      data: { level: level, pageNo: pageNo},
+      complete(res) {
+        setTimeout(()=>{
+          wx.hideNavigationBarLoading()
+        }, 600)
+        if (res && res.data){
+          let data = res.data
+          data['type'] = type
+          data['pageNo'] = pageNo
+          data['level'] = level
+          that.initList(data)
+        }
+        // 请求完成都会执行
+        that.setData({
+          requesting: false,
+        })
+      }
+    })
+  },
+
+  initItem(list, names) {
+    let items = []
+    for (let name of names) {
+      let item = {}
+      let sers = []
+      for (let v of list) {
+        if (v.s_name == name) {
+          item = v
+          sers.push(trim(v.serifu))
+        }
+      }
+      item['c_name'] = item.title.split('_')[0]
+      sers = Array.from(new Set(sers))
+      sers.sort((a, b) => b.length - a.length)
+      item['sers'] = sers
+      items.push(item)
+    }
+    return items
+  },
+
+  initList(data){
+    let { total, list, names, type, pageNo, level } = data
+    let items = this.initItem(list, names)
+    if ('sp' == level){
+      let spList = type === 'more' ? this.data.spList.concat(items) : items
+      this.setData({
+        spPage: pageNo + 1,
+        end: spList.length >= total,
+        list: spList,
+        spList
+      })
+      console.log(this.data)
+      this._spEnd = spList.length >= total
+    } else if('ssr' == level){
+      let ssrList = type === 'more' ? this.data.ssrList.concat(items) : items
+      this.setData({
+        ssrPage: pageNo + 1,
+        end: ssrList.length >= total,
+        list: ssrList,
+        ssrList
+      })
+      this._ssrEnd = ssrList.length >= total
+    } else if('sr' == level){
+      let srList = type === 'more' ? this.data.srList.concat(items) : items
+      this.setData({
+        srPage: pageNo + 1,
+        end: srList.length >= total,
+        list: srList,
+        srList
+      })
+      this._srEnd = srList.length >= total
+    } else if('r' == level){
+      let rList = type === 'more' ? this.data.rList.concat(items) : items
+      this.setData({
+        rPage: pageNo + 1,
+        end: rList.length >= total,
+        list: rList,
+        rList
+      })
+      this._rEnd = rList.length >= total
+    } else if('n' == level){
+      let nList = type === 'more' ? this.data.nList.concat(items) : items
+      this.setData({
+        nPage: pageNo + 1,
+        end: nList.length >= total,
+        list: nList,
+        nList
+      })
+      this._nEnd = nList.length >= total
+    } else if('m' == level){
+      let mList = type === 'more' ? this.data.mList.concat(items) : items
+      this.setData({
+        mPage: pageNo + 1,
+        end: mList.length >= total,
+        list: mList,
+        mList
+      })
+      this._mEnd = mList.length >= total
+    }
+    console.log('====', this.data.spList)
+  },
+
+  getUserInfo(e) {
     console.log(e)
     app.globalData.userInfo = e.detail.userInfo
     this.setData({
@@ -110,4 +281,42 @@ Page({
       hasUserInfo: true
     })
   },
+
+  toDetail(e){
+    let fileId = e.currentTarget.dataset.id
+    // fileId = fileId.replace(/\d/g, '0')
+    wx.navigateTo({
+      url: `../detail/detail?fileId=${fileId}`,
+    })
+  },
+  tabChange: function (e) {
+    let { index, value } = e.detail
+    let level = value
+    if (level == this._level) {
+      wx.vibrateShort()
+      this.toTop()
+      return;
+    }
+    let end = this[`_${level}End`]
+    console.log(index, level, end)
+    this.setData({
+      empty: false,
+      end,
+      level
+    })
+    this._level = level
+    if (!this.data[`${level}List`]){
+      this.getList('refresh', pageStart, level);
+    }
+  },
+  toTop() {
+    this.setData({
+      scrollAnimation: true
+    })
+    setTimeout(() => {
+      this.setData({
+        scrollTop: 0,
+      })
+    }, 0)
+  }
 })

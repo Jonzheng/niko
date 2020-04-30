@@ -2,8 +2,5 @@
   "navigationBarTitleText": "式神录",
   "disableScroll": true,
   "enablePullDownRefresh": false,
-  "usingComponents": {
-    "tab": "/modules/tab/tab",
-    "scroll": "/modules/scroll/scroll"
-  }
+  "usingComponents": {}
 }

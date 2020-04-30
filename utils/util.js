@@ -1,3 +1,5 @@
+const host = 'https://omoz.club/api'
+
 const formatTime = date => {
   const year = date.getFullYear()
   const month = date.getMonth() + 1
@@ -14,6 +16,12 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
+const trim = (str) => {
+  return str.replace(/\(.*?\)/g, '').replace('　', '')
+}
+
 module.exports = {
+  host: host,
+  trim: trim,
   formatTime: formatTime
 }

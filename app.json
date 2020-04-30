@@ -1,8 +1,9 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/mine/mine",
     "pages/game/game",
-    "pages/mine/mine"
+    "pages/detail/detail"
   ],
   "tabBar": {
     "color": "#7A7E83",
@@ -31,12 +32,11 @@
     ]
   },
   "window": {
-    "backgroundColor": "#4a5fe2",
-    "navigationStyle": "custom",
+    "backgroundColor": "#eeeeee",
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "WeChat",
-    "navigationBarTextStyle": "white"
+    "navigationBarTextStyle": "black"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

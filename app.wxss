@@ -1,5 +1,5 @@
 page{
-  padding-top: 140rpx;
+  background: #f5f5f5;
 }
 .isIpx{
   border-top: 1rpx solid rebeccapurple;

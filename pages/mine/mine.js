@@ -6,9 +6,16 @@ Page({
    * 页面的初始数据
    */
   data: {
+    isIpx: app.globalData.isIpx,
+    bg: '../../images/bg-0.png',
+    detaultAvatar: '../../images/mine-off',
     motto: 'Hello Mine',
     userInfo: {},
+    moto: '',
     hasUserInfo: false,
+    hasLogin: true,
+    isMine: false,
+    avatarUrl: 'https://avatar-1256378396.cos.ap-guangzhou.myqcloud.com/n_cm_0.png',
     canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
 
@@ -17,6 +24,7 @@ Page({
    */
   onLoad: function (options) {
     this.init()
+    // this.setBgColor()
   },
 
   /**
@@ -37,7 +45,7 @@ Page({
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
+    // this.setBgColor()
   },
 
   /**
@@ -107,6 +115,43 @@ Page({
     this.setData({
       userInfo: e.detail.userInfo,
       hasUserInfo: true
+    })
+  },
+
+  toDetail() {
+    wx.navigateTo({
+      url: '../detail/detail',
+    })
+  },
+  setBgColor() {
+    let frontColor = !this._black ? '#ffffff' : '#000000'
+    this._black = !this._black
+    wx.setNavigationBarColor({
+      frontColor: frontColor,
+      backgroundColor: '',
+      animation: { duration: 300, timingFunc: 'easeOut' }
+    })
+  },
+  setMoto() {
+    let moto = !this._moto ? '纵然疾风起、人生不言弃' : ''
+    this._moto = !this._moto
+    this.setData({
+      isMine: !this.data.isMine,
+      moto
+    })
+  },
+  uploadAvatar() {
+    let avatar = this.data.userInfo.avatarUrl
+    console.log(avatar)
+    wx.downloadFile({
+      url: avatar,
+      success(res) {
+        let { tempFilePath } = res
+        app.uploadAvatar("demo.png", tempFilePath).then((data)=>{
+          console.log(data)
+        })
+      }
+      
     })
   },
 })
