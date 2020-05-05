@@ -1,2 +1,0 @@
-# niko
-niko desu
