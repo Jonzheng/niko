@@ -51,6 +51,7 @@
   font-size: 28rpx;
   margin-bottom: 12rpx;
   color: #4a5fe2;
+  font-weight: bold;
 }
 .cell__bd .des {
   color: #666666;

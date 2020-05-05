@@ -7,10 +7,63 @@ page{
   background: transparent;
 }
 .container {
-  border-top: 1rpx solid red;
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   box-sizing: border-box;
+}
+
+.btn-circle{
+  display: flex;
+  flex-shrink: 0; /*固定大小*/
+  background-color: #fff;
+  width:105rpx;
+  height:105rpx;
+  z-index: -1px;
+  border: 1px solid #fff;
+  box-shadow: 0px 0px 10rpx #eee;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+}
+
+.sound-play{
+  position: relative;
+  left: 6rpx;
+  width: 0;
+  height: 0;
+  border-left: 40rpx solid #999;
+  border-top: 30rpx solid transparent;
+  border-bottom: 30rpx solid transparent;
+  transition: all 0.2s ease-in;
+}
+
+.sound-stop{
+  position: relative;
+  left:0;
+  width: 0;
+  height: 0;
+  border: 20rpx solid #999;
+  border-radius: 6rpx;
+  transition: all 0.3s ease-out;
+}
+
+.black-hover{
+  transform:scale(1.02, 1.02);
+  box-shadow: 0 0 20rpx rgba(0, 0, 0, 0.2);
+}
+
+.sm-icon{
+  flex-shrink: 0;
+  width:26px;
+  height:26px;
+  margin-left: 10rpx;
+  margin-right:8rpx;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease-in;
+}
+
+.rt-90{
+  transform: rotate(270deg);
+  transition: transform 0.3s ease-in;
 }

@@ -20,8 +20,8 @@ const src_zan_fu = "../../images/zan-on.png"
 const userId = 'ocVQY4-dF2m4IiYTTJZFo6k-NZbE'
 
 function _next() {
-  var that = this;
-  var _progress = this.data.progress_record
+  let that = this;
+  let _progress = this.data.progress_record
   if (!this.data.isRecording) {
     return true;
   }
@@ -41,10 +41,13 @@ Page({
   data: {
     loged: false,
     slider: 'bar-ori',
+    cname: '* * *',
+    cv: '* * * *',
+    skill: '* * *',
     oriPlaying: false,
     show_video: false,
     an_in: false,
-    res_records: [],
+    recordList: [],
     record_map: {},
     icon_trash: "../../images/trash.png",
     icon_upload: "../../images/upload.png",
@@ -64,29 +67,39 @@ Page({
     tempFile: '',
 
   },
+
+  onLoad: function (options) {
+    //页面初始参数
+    let { fileId } = options
+    this.initPageData(fileId)
+    this.setData({
+      fileId,
+      loged: App.globalData.userInfo,
+    })
+    setTimeout(() => { this.setData({ an_in: true, show_other: false }) }, 300)
+  },
+
+  onPullDownRefresh: function () {
+    const fileId = this.data.fileId
+    const option = { fileId }
+    this.onLoad(option)
+    wx.stopPullDownRefresh()
+  },
+
   onUnload: function () {
     console.log("onUnload")
-    var audioContextOri = this.data.audioContextOri
-    var audioContextMaster = this.data.audioContextMaster
-    var audioContextMine = this.data.audioContextMine
-    audioContextOri.stop()
-    audioContextMine.stop()
-    audioContextMaster.stop()
+    this._audioContextOri.stop()
+    this._audioContextMine.stop()
+    this._audioContextMaster.stop()
   },
+
   onReady: function () {
-    this.videoContext = wx.createVideoContext('myVideo')
+    this._videoContext = wx.createVideoContext('myVideo')
+    this._audioContextOri = wx.createInnerAudioContext()
+    this._audioContextMaster = wx.createInnerAudioContext()
+    this._audioContextMine = wx.createInnerAudioContext()
 
-    const audioContextOri = wx.createInnerAudioContext()
-    const audioContextMaster = wx.createInnerAudioContext()
-    const audioContextMine = wx.createInnerAudioContext()
-
-    this.setData({
-      audioContextOri,
-      audioContextMaster,
-      audioContextMine,
-    })
-
-    audioContextOri.onPlay(() => {
+    this._audioContextOri.onPlay(() => {
       console.log("audioContextOri...")
       this.setData({
         slider: 'bar-end',
@@ -94,23 +107,23 @@ Page({
       });
     });
 
-    audioContextOri.onEnded(() => {
+    this._audioContextOri.onEnded(() => {
       this.setOriStop();
     });
 
-    audioContextOri.onStop(() => {
+    this._audioContextOri.onStop(() => {
       this.setOriStop();
     });
 
-    audioContextMaster.onEnded(() => {
+    this._audioContextMaster.onEnded(() => {
       this.setMasterStop();
     });
 
-    audioContextMine.onEnded(() => {
+    this._audioContextMine.onEnded(() => {
       this.setMineStop();
     });
 
-    audioContextMine.onStop(() => {
+    this._audioContextMine.onStop(() => {
       this.setMineStop();
     });
 
@@ -127,7 +140,7 @@ Page({
 
     recorderManager.onStop((res) => {
       console.log(res)
-      var progress_record = res.duration / options.duration * 100
+      let progress_record = res.duration / options.duration * 100
       this.setData({
         progress_record,
         tempFile: res,
@@ -137,13 +150,24 @@ Page({
     })
   },
 
+  onShareAppMessage() {
+    return {
+      title: '阴阳师·式神台词语音',
+      path: '/pages/index/index',
+    }
+  },
+
+  /**
+   * 自定义函数
+   */
+
   toLogin: function (e) {
-    var userInfo = e.detail.userInfo
+    let userInfo = e.detail.userInfo
     console.log("toLogin:")
     if (userInfo) {
       App.globalData.hasLogin = true
       App.globalData.userInfo = userInfo
-      var gender = 1
+      let gender = 1
       if (userInfo.gender != "" && userInfo.gender != undefined) gender = userInfo.gender
       App.globalData.gender = gender
       this.setData({
@@ -165,46 +189,106 @@ Page({
       })
     }
   },
-  //卍解-coin-1?
-  unlock: function () {
-    console.log("unlock")
+
+  stopAllMedia() {
+    this._audioContextOri.stop()
+    this._audioContextMine.stop()
+  },
+
+  nextSerifu() {
+    if (this._loading) return
+    this.stopAllMedia()
+    let fileId = this.data.fileId
+    let list = this.data.list
+    let idx = list.findIndex( item=> item.file_id == fileId)
+    let nidx = (idx+1) % list.length
+    console.log(nidx, fileId, list)
+    let curList = list[nidx]
+    // this.initSerifu(curList)
+    this.initPageData(curList.file_id)
+  },
+
+  playVideo() {
     this.setData({
-      show_video: true
+      showVideo: true
     })
   },
 
-  initSerifu: function (list_zero) {
-    var serifu = list_zero.serifu
-    var koner = list_zero.koner
-    var roma = list_zero.roma
+  initSerifu(curList) {
+    let { title, serifu, koner, roma } = curList
+    let fileId = curList.file_id
+    let ts = title.split('_')
+    let cname = ts[0]
+    let skill = ts[1]
 
-    var serifuList = []
-    serifu = serifu.replace(new RegExp('[)(]+', 'g'), "#")
-    var serifu_sp = serifu.split("#")
+    let serifuList = []
+    let words = []
+    serifu = serifu.replace(/[)(]+/g, "#")
+    let serifu_sp = serifu.split("#")
+    let pre = ''
     for (let [idx, word] of serifu_sp.entries()) {
       if (idx % 2 == 0) {
-        var cs = ""
-        var sm = { word, cs }
-        serifuList.push(sm)
+        if (word.length > 1){
+          let value = word.substr(0, word.length - 1)
+          value = idx == serifu_sp.length - 1 ? word : value
+          for (let w of value){
+            words.push({value:w})
+          }
+          pre = word.substr(word.length - 1, word.length)
+        } else{
+          pre = word
+        }
       } else { //平假注音
-        var cs = "dc-word left-" + word.length
-        var sm = { word, cs }
-        serifuList.push(sm)
+        words.push({value: pre, desc: word})
       }
     }
     this.setData({
-      serifuList,
+      fileId,
+      cname,
+      skill,
       koner,
       roma,
+    })
+    for (let [i, v] of words.entries()) {
+      setTimeout(()=>{
+        serifuList.push(v)
+        this.setData({
+          serifuList
+        })
+      }, i * 30)
+    }
+  },
+  initRecords(recordList) {
+    for (let record of recordList) {
+      record["listenStatus"] = "listen-off"
+      record["boxStyle"] = "btn-play-box"
+      record["btnDelStyle"] = "btn-red-hidden"
+      record["btnPoiStyle"] = "btn-red-hidden"
+      record["btnRt"] = ""
+      record["mon"] = "comment-hide"
+      record["comm_word"] = record.comm
+      record["holder"] = "输入文字"
+      if (record.heart_ud) {
+        record["heartShape"] = src_heart_full
+        record["heartStatus"] = 1
+      } else {
+        record["heartShape"] = src_heart
+        record["heartStatus"] = 0
+      }
+      record["isListen"] = false
+    }
+    this.setData({
+      recordList: recordList,
     })
   },
 
   initPageData: function (fileId) {
-    var that = this
-    var openid = App.globalData.openid
-    var user_id = openid ? openid : ''
+    let that = this
+    let openid = App.globalData.openid
+    let user_id = openid ? openid : ''
     console.log(fileId, '#', user_id)
     wx.showNavigationBarLoading()
+    that._loading = true
     // 查询阴阳师detail
     wx.request({
       url: `${host}/queryDetail`,
@@ -213,16 +297,32 @@ Page({
       complete(res) {
         console.log(res)
         setTimeout(() => {
+          that._loading = false
           wx.hideNavigationBarLoading()
-        }, 600)
+        }, 300)
         if (res && res.data) {
           let data = res.data
           let { list, audio, record } = data
           console.log(list)
           console.log(audio)
           console.log(record)
-          let curList = list.filter(i=>i.file_id == fileId)
-          that.initSerifu(curList[0])
+          let curList = list.filter(i=>i.file_id == fileId)[0]
+          let curAudio = audio[0]
+          let recordList = record
+          that.initSerifu(curList)
+          that.initRecords(recordList)
+          let shadow = curAudio.shadow.split(",").map((item) => { return item + 'rpx' })
+          that.setData({
+            curAudio,
+            list,
+            shadow
+          })
+
+        }else{
+          wx.showToast({
+            icon: 'none',
+            title: '数据加载失败...',
+          })
         }
         // 请求完成都会执行
         that.setData({
@@ -238,67 +338,14 @@ Page({
     //     wx.hideLoading()
     //     const data = res.result
     //     if (!data) return
-    //     var list_zero = data["res_list"][0]
-    //     var audio_zero = data["res_audio"][0]
-    //     var res_records = data["res_records"]
-    //     var res_others = data["res_others"]
-    //     that.initSerifu(list_zero)
+    //     let curList = data["res_list"][0]
+    //     let curAudio = data["res_audio"][0]
+    //     let recordList = data["recordList"]
+    //     let res_others = data["res_others"]
+    //     that.initSerifu(curList)
     //     // 初始化-record
-    //     for (let record of res_records) {
-    //       record["listenStatus"] = "listen-off"
-    //       record["boxStyle"] = "btn-play-box"
-    //       record["btnDelStyle"] = "btn-red-hidden"
-    //       record["btnPoiStyle"] = "btn-red-hidden"
-    //       record["btnRt"] = ""
-    //       record["mon"] = "comment-hide"
-    //       record["comm_word"] = record.comm
-    //       record["holder"] = "输入文字"
-    //       if (record.hearts.includes(openid)) {
-    //         record["heartShape"] = src_heart_full
-    //         record["heartStatus"] = 1
-    //       } else {
-    //         record["heartShape"] = src_heart
-    //         record["heartStatus"] = 0
-    //       }
-
-    //       record["isListen"] = false
-    //     }
-    //     var other_lst = []
-    //     for (let ot of res_others) {
-    //       if (ot.fileId == fileId) continue
-    //       other_lst.push(ot)
-    //     }
-    //     var shadow = audio_zero.shadow.split(",").map((item) => { return item + 'rpx' })
-    //     var video_size = list_zero.video_size / 1048576
-    //     that.setData({
-    //       other_lst,
-    //       list_zero,
-    //       audio_zero,
-    //       res_records: res_records,
-    //       video_size: video_size.toFixed(2),
-    //       shadow
-    //     })
-
     //   }
     // })
-  },
-
-  onLoad: function (options) {
-    //页面初始参数
-    let { fileId } = options
-    this.initPageData(fileId)
-    this.setData({
-      fileId,
-      loged: App.globalData.userInfo,
-    })
-    setTimeout(() => { this.setData({ an_in: true, show_other: false }) }, 300)
-  },
-
-  onPullDownRefresh: function () {
-    const fileId = this.data.fileId
-    const option = { fileId }
-    this.onLoad(option)
-    wx.stopPullDownRefresh()
   },
 
   setOriStop: function () {
@@ -309,17 +356,16 @@ Page({
   },
 
   setMasterStop: function () {
-    var index = this.data.listenIndex
-    var audioContextMaster = this.data.audioContextMaster
+    let index = this.data.listenIndex
     //console.log("setMasterStop:", index)
-    var res_records = this.data.res_records
-    if (index != null && res_records[index]["isListen"]) {
-      res_records[index]["isListen"] = false
-      res_records[index]["listenStatus"] = "listen-off"
-      res_records[index]["anListen"] = ""
-      audioContextMaster.stop()
+    let recordList = this.data.recordList
+    if (index != null && recordList[index]["isListen"]) {
+      recordList[index]["isListen"] = false
+      recordList[index]["listenStatus"] = "listen-off"
+      recordList[index]["anListen"] = ""
+      this._audioContextMaster.stop()
       this.setData({
-        res_records,
+        recordList,
         listenIndex: null
       })
     }
@@ -333,50 +379,48 @@ Page({
   },
 
   playOri: function () {
-    var audioContextOri = this.data.audioContextOri
-    var audio_zero = this.data.audio_zero
-    audioContextOri.src = audio_zero.src_audio
+    let curAudio = this.data.curAudio
+    this._audioContextOri.src = curAudio.src_audio
     if (!this.data.oriPlaying) {
-      audioContextOri.play()
+      this._audioContextOri.play()
     } else {
       this.stopOri()
     }
   },
 
   stopOri: function () {
-    var audioContextOri = this.data.audioContextOri
-    audioContextOri.stop()
+    this._audioContextOri.stop()
   },
 
   showMore: function (e) {
-    var that = this
-    var currData = e.currentTarget.dataset
-    var index = currData.idx
-    var res_records = this.data.res_records
-    var master_id = res_records[index]["master_id"]
-    var isSelf = false
+    let that = this
+    let currData = e.currentTarget.dataset
+    let index = currData.idx
+    let recordList = this.data.recordList
+    let master_id = recordList[index]["master_id"]
+    let isSelf = false
     if (master_id == App.globalData.openid) isSelf = true
     //console.log(isSelf)
-    //console.log(res_records[index])
-    if (res_records[index]["btnRt"] == "rt-90") {
-      res_records[index]["boxStyle"] = "btn-play-box"
-      res_records[index]["btnRt"] = ""
+    //console.log(recordList[index])
+    if (recordList[index]["btnRt"] == "rt-90") {
+      recordList[index]["boxStyle"] = "btn-play-box"
+      recordList[index]["btnRt"] = ""
       if (isSelf) {
-        res_records[index]["btnDelStyle"] = "btn-red-hidden"
+        recordList[index]["btnDelStyle"] = "btn-red-hidden"
       } else {
-        res_records[index]["btnPoiStyle"] = "btn-red-hidden"
+        recordList[index]["btnPoiStyle"] = "btn-red-hidden"
       }
     } else {
-      res_records[index]["boxStyle"] = "btn-play-box-sm"
-      res_records[index]["btnRt"] = "rt-90"
+      recordList[index]["boxStyle"] = "btn-play-box-sm"
+      recordList[index]["btnRt"] = "rt-90"
       if (isSelf) {
-        res_records[index]["btnDelStyle"] = "btn-red"
+        recordList[index]["btnDelStyle"] = "btn-red"
       } else {
-        res_records[index]["btnPoiStyle"] = "btn-red"
+        recordList[index]["btnPoiStyle"] = "btn-red"
       }
     }
     that.setData({
-      res_records
+      recordList
     })
   },
 
@@ -411,19 +455,18 @@ Page({
     if (this.data.isRecording) {
       return false
     }
-    var audioContextMine = this.data.audioContextMine
-    var tempFile = this.data.tempFile
+    let tempFile = this.data.tempFile
     if (tempFile != undefined) {
       console.log(tempFile.tempFilePath)
-      audioContextMine.src = tempFile.tempFilePath
+      this._audioContextMine.src = tempFile.tempFilePath
       if (!this.data.isPlaying) {
-        audioContextMine.play()
+        this._audioContextMine.play()
         this.setData({
           isPlaying: true,
           recordFile: tempFile.tempFilePath
         })
       } else {
-        audioContextMine.stop()
+        this._audioContextMine.stop()
       }
 
     }
@@ -440,10 +483,10 @@ Page({
   },
 
   delConfirm: function (e) {
-    var that = this
-    var currData = e.currentTarget.dataset
-    var record_id = currData.record_id
-    var index = currData.idx
+    let that = this
+    let currData = e.currentTarget.dataset
+    let record_id = currData.record_id
+    let index = currData.idx
     wx.showModal({
       title: '删除录音?',
       content: '不可逆操作,请再次确认',
@@ -452,9 +495,9 @@ Page({
       success: function (res) {
         //console.log(res);
         if (res.confirm) {
-          var res_records = that.data.res_records
-          res_records.splice(index, 1)
-          that.setData({ res_records })
+          let recordList = that.data.recordList
+          recordList.splice(index, 1)
+          that.setData({ recordList })
           that.delMine(record_id)
         } else {
           //console.log('用户点击辅助操作')
@@ -464,10 +507,10 @@ Page({
   },
 
   delCommConfirm: function (e) {
-    var that = this
-    var currData = e.currentTarget.dataset
-    var comm_id = currData.cid
-    var index = currData.idx
+    let that = this
+    let currData = e.currentTarget.dataset
+    let comm_id = currData.cid
+    let index = currData.idx
     wx.showModal({
       title: '删除评论?',
       content: '不可逆操作,请再次确认',
@@ -486,47 +529,46 @@ Page({
 
 
   listen: function (e) {
-    var that = this
-    var currData = e.currentTarget.dataset
-    var record_id = currData.record_id
-    var index = currData.idx
-    var res_records = this.data.res_records
-    var src_record = res_records[index]["src_record"]
-    var audioContextMaster = this.data.audioContextMaster
+    let that = this
+    let currData = e.currentTarget.dataset
+    let record_id = currData.record_id
+    let index = currData.idx
+    let recordList = this.data.recordList
+    let src_record = recordList[index]["src_record"]
     if (!src_record) return
-    if (res_records[index]["isListen"]) {
-      res_records[index]["isListen"] = false
-      res_records[index]["listenStatus"] = "listen-off"
-      res_records[index]["anListen"] = ""
-      audioContextMaster.stop()
+    if (recordList[index]["isListen"]) {
+      recordList[index]["isListen"] = false
+      recordList[index]["listenStatus"] = "listen-off"
+      recordList[index]["anListen"] = ""
+      this._audioContextMaster.stop()
     } else {
       that.setMasterStop()
-      res_records[index]["isListen"] = true
-      res_records[index]["listenStatus"] = "listen-on"
-      res_records[index]["anListen"] = "an-listen-on"
+      recordList[index]["isListen"] = true
+      recordList[index]["listenStatus"] = "listen-on"
+      recordList[index]["anListen"] = "an-listen-on"
       console.log(index, src_record)
-      audioContextMaster.src = src_record
+      this._audioContextMaster.src = src_record
       that.setData({
         listenIndex: index
       })
-      audioContextMaster.play()
+      this._audioContextMaster.play()
     }
     this.setData({
-      res_records
+      recordList
     })
   },
 
   //--点心--
   updateHeart: function (e) {
-    var that = this
-    var currData = e.currentTarget.dataset
-    var status = currData.status
-    var openid = App.globalData.openid
-    var user_id = openid
-    var type = ""
-    var index = currData.idx
-    var res_records = this.data.res_records
-    var curr_master = res_records[index]
+    let that = this
+    let currData = e.currentTarget.dataset
+    let status = currData.status
+    let openid = App.globalData.openid
+    let user_id = openid
+    let type = ""
+    let index = currData.idx
+    let recordList = this.data.recordList
+    let curr_master = recordList[index]
     if (status == 0) {
       type = 'push'
       curr_master["heartShape"] = src_heart_full
@@ -539,25 +581,25 @@ Page({
       let idx = curr_master["hearts"].indexOf(user_id)
       curr_master["hearts"].splice(idx, 1)
     }
-    var record_id = curr_master["record_id"]
+    let record_id = curr_master["record_id"]
     wx.cloud.callFunction({
       name: 'updateHeart',
       data: { record_id, user_id, type },
       success: res => {
         console.log(res)
-        that.setData({ res_records })
+        that.setData({ recordList })
       }
     })
   },
 
   // 上传录音
   uploadRecord: function () {
-    var that = this
-    var recordFile = this.data.recordFile
+    let that = this
+    let recordFile = this.data.recordFile
     console.log("recordFile:")
     console.log(recordFile)
-    var master_id = App.globalData.openid
-    var fileId = this.data.fileId
+    let master_id = App.globalData.openid
+    let fileId = this.data.fileId
     const record_id = fileId + new Date().getTime()
     const path = 'records/' + record_id + '.mp3'
     wx.cloud.uploadFile({
@@ -579,21 +621,21 @@ Page({
     })
   },
   showComment: function (e) {
-    var openid = App.globalData.openid
-    var user_id = openid
-    var that = this
-    var currData = e.currentTarget.dataset
-    var index = currData.idx
-    var res_records = this.data.res_records
+    let openid = App.globalData.openid
+    let user_id = openid
+    let that = this
+    let currData = e.currentTarget.dataset
+    let index = currData.idx
+    let recordList = this.data.recordList
     this.clearInput()
-    if (res_records[index]["mon"] == "comment-show") {
-      res_records[index]["mon"] = "comment-hide"
-      res_records[index]["comm_word"] = res_records[index]["comm"]
-      that.setData({ res_records })
+    if (recordList[index]["mon"] == "comment-show") {
+      recordList[index]["mon"] = "comment-hide"
+      recordList[index]["comm_word"] = recordList[index]["comm"]
+      that.setData({ recordList })
     } else {
-      res_records[index]["mon"] = "comment-show"
-      res_records[index]["comm_word"] = "收起"
-      const record_id = res_records[index]["record_id"]
+      recordList[index]["mon"] = "comment-show"
+      recordList[index]["comm_word"] = "收起"
+      const record_id = recordList[index]["record_id"]
       wx.showLoading({ title: '加载中...' })
       wx.cloud.callFunction({
         name: 'getComment',
@@ -608,28 +650,28 @@ Page({
             v["zanShape"] = zid ? src_zan_fu : src_zan_em
             v["self"] = v.user_id === user_id
           }
-          res_records[index]["comments"] = comments
-          that.setData({ res_records })
+          recordList[index]["comments"] = comments
+          that.setData({ recordList })
         }
       })
     }
   },
   addComment: function (e) {
-    var that = this
+    let that = this
     const content = e.detail.value
-    var currData = e.currentTarget.dataset
-    var index = currData.idx
-    var res_records = this.data.res_records
-    for (let v of res_records) {
+    let currData = e.currentTarget.dataset
+    let index = currData.idx
+    let recordList = this.data.recordList
+    for (let v of recordList) {
       v["focus"] = false
       v["holder"] = "输入文字"
     }
-    const master = res_records[index]
+    const master = recordList[index]
     const record_id = master.record_id
     const master_id = master.master_id
     const fileId = master.fileId
-    var openid = App.globalData.openid
-    var user_id = openid
+    let openid = App.globalData.openid
+    let user_id = openid
     const re_id = this.data.re_id
     const re_name = this.data.re_name
     const re_content = this.data.re_content
@@ -646,47 +688,47 @@ Page({
           v["zanShape"] = zid ? src_zan_fu : src_zan_em
           v["self"] = v.user_id === user_id
         }
-        res_records[index]["comments"] = comments
-        res_records[index]["comm"] = comments.length
-        res_records[index]["inputValue"] = ""
+        recordList[index]["comments"] = comments
+        recordList[index]["comm"] = comments.length
+        recordList[index]["inputValue"] = ""
         wx.hideLoading()
-        that.setData({ res_records })
+        that.setData({ recordList })
       }
     })
 
   },
   reply: function (e) {
-    var that = this
-    var currData = e.currentTarget.dataset
+    let that = this
+    let currData = e.currentTarget.dataset
     const index = currData["idx"]
     const re_id = currData["cid"]
     const re_name = currData["name"]
     const re_content = currData["content"]
-    var res_records = this.data.res_records
+    let recordList = this.data.recordList
     this.clearInput()
-    res_records[index]["holder"] = "回复:" + re_name
-    res_records[index]["focus"] = true
-    that.setData({ res_records, re_id, re_name, re_content })
+    recordList[index]["holder"] = "回复:" + re_name
+    recordList[index]["focus"] = true
+    that.setData({ recordList, re_id, re_name, re_content })
 
   },
   clearInput: function () {
-    var res_records = this.data.res_records
-    for (let v of res_records) {
+    let recordList = this.data.recordList
+    for (let v of recordList) {
       v["focus"] = false
       v["holder"] = "输入文字"
     }
     const re_id = ''
     const re_name = ''
     const re_content = ''
-    this.setData({ res_records, re_id, re_name, re_content })
+    this.setData({ recordList, re_id, re_name, re_content })
   },
   delComment: function (index, comm_id) {
-    var openid = App.globalData.openid
-    var user_id = openid
-    var that = this
-    var res_records = this.data.res_records
+    let openid = App.globalData.openid
+    let user_id = openid
+    let that = this
+    let recordList = this.data.recordList
     this.clearInput()
-    const record_id = res_records[index]["record_id"]
+    const record_id = recordList[index]["record_id"]
     wx.showLoading({ title: '...' })
     wx.cloud.callFunction({
       name: 'deleteComment',
@@ -699,69 +741,63 @@ Page({
           v["zanShape"] = zid ? src_zan_fu : src_zan_em
           v["self"] = v.user_id === user_id
         }
-        res_records[index]["comments"] = comments
-        res_records[index]["comm"] = comments.length
+        recordList[index]["comments"] = comments
+        recordList[index]["comm"] = comments.length
         wx.hideLoading()
-        that.setData({ res_records })
+        that.setData({ recordList })
       }
     })
   },
 
   //--留言点赞--
   updateZan: function (e) {
-    var that = this
-    var currData = e.currentTarget.dataset
+    let that = this
+    let currData = e.currentTarget.dataset
     const idx = currData["idx"]
     const midx = currData["midx"]
     const id = currData["cid"]
-    var openid = App.globalData.openid
-    var user_id = openid
-    var res_records = this.data.res_records
-    var zans = res_records[idx]["comments"][midx]["zans"]
-    var zid = zans.includes(user_id)
-    var type = ''
+    let openid = App.globalData.openid
+    let user_id = openid
+    let recordList = this.data.recordList
+    let zans = recordList[idx]["comments"][midx]["zans"]
+    let zid = zans.includes(user_id)
+    let type = ''
     if (zid) {
       type = 'pull'
-      res_records[idx]["comments"][midx]["zanShape"] = src_zan_em
-      let dx = res_records[idx]["comments"][midx]["zans"].indexOf(user_id)
-      res_records[idx]["comments"][midx]["zans"].splice(dx, 1)
+      recordList[idx]["comments"][midx]["zanShape"] = src_zan_em
+      let dx = recordList[idx]["comments"][midx]["zans"].indexOf(user_id)
+      recordList[idx]["comments"][midx]["zans"].splice(dx, 1)
     } else {
       type = 'push'
-      res_records[idx]["comments"][midx]["zanShape"] = src_zan_fu
-      res_records[idx]["comments"][midx]["zans"].push(user_id)
+      recordList[idx]["comments"][midx]["zanShape"] = src_zan_fu
+      recordList[idx]["comments"][midx]["zans"].push(user_id)
     }
     wx.cloud.callFunction({
       name: 'updateZan',
       data: { id, user_id, type },
       success: res => {
         console.log(res)
-        that.setData({ res_records })
+        that.setData({ recordList })
       }
     })
   },
 
   showOther: function () {
-    var show_other = !this.data.show_other
+    let show_other = !this.data.show_other
     this.setData({
       show_other
     })
   },
 
   reload: function (e) {
-    var currData = e.currentTarget.dataset
-    var fileId = currData.fid
+    let currData = e.currentTarget.dataset
+    let fileId = currData.fid
     console.log(fileId)
 
-    var _url = '../detail/detail?fileId=' + fileId
+    let _url = '../detail/detail?fileId=' + fileId
     wx.redirectTo({
       url: _url
     })
   },
-  onShareAppMessage() {
-    return {
-      title: '阴阳师·式神台词语音',
-      path: '/pages/index/index',
-    }
-  }
 
 })

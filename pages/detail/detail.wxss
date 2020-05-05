@@ -1,37 +1,79 @@
 
-video {
-  width:700rpx;
-  display:inline-block;
-  line-height:0;
-  overflow:hidden;
+.box-head{
+  margin-top: 10rpx;
+  padding: 10rpx 20rpx;
+  display: flex;
+  width: 750rpx;
+  min-height: 120rpx;
+  background: #ffffff;
 }
 
-.box-head{
-  padding:20rpx 30rpx;
+.box-avatar{
   display: flex;
   flex-direction: column;
 }
 
-.box-curr{
-  padding: 20rpx 0;
+.box-profile{
+  margin: 10rpx 20rpx;
   display: flex;
-  border-bottom: 3rpx solid #bbb;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.box-profile .name{
+  width: 500rpx;
+  font-size: 32rpx;
+  color: #4a5fe2;
+}
+.box-profile .cv{
+  margin: 0 20rpx;
+  display: inline-flex;
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.box-line{
+  min-height: 36rpx;
+  display: flex;
+  align-items: center;
+}
+
+.btn-share{
+  width: 40rpx;
+  height: 40rpx;
+  padding: 0 20rpx;
+}
+
+.btn-next, .btn-video{
+  border: 1rpx solid #cccccc;
+  border-radius: 8rpx;
+  width: 36rpx;
+  height: 36rpx;
+  padding: 0 20rpx;
+  margin: 0 20rpx;
+  opacity: 0.8;
+}
+
+.sk-avatar{
+  width: 120rpx;
+  height: 120rpx;
 }
 
 .curr-title{
+  width: 180rpx;
   display: flex;
-  width: 60%;
-  color:#337ab7;
-  font-weight: bold;
+  align-items: center;
+  color: #888888;
 }
 
-.curr-vsize{
-  width: 40%;
-  color:#999;
-  text-align: right;
+.curr-title .text{
+  display: flex;
+  align-items: center;
 }
 
 .text-more{
+  display: flex;
+  align-items: center;
   position: relative;
   top: 0;
   margin-left: 10rpx;
@@ -43,7 +85,7 @@ video {
   top: 10rpx;
   transform: rotate(-270deg);
   transition: all 0.3s ease-in;
-  }
+}
 
 .box-other{
   display: flex;
@@ -74,286 +116,67 @@ video {
 }
 
 .sk-serifu{
-  color:#999;
+  color:#888888;
   font-size: 22rpx;
   white-space: nowrap; 
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.box-video{
+.box-body{
+  padding: 20rpx;
   display: flex;
-  align-items: center; /*中轴对齐*/
-  justify-content: center;
-  z-index: -1px;
-  overflow: visible;
-}
-
-.an-show{
-  opacity: 1;
-  height: 360rpx;
-  transition: all 0.2s ease-in;
-}
-
-.an-hide{
-  display: none;
-  opacity: 0;
-  height: 0;
-  transition: all 0.2s ease-in;
-}
-
-.warning-black{
-  position: relative;
-  text-transform: uppercase;
-  flex-grow: 0;
-  border: 6rpx double rgba(255,255,255,.25);
-  border-width: 6rpx 0;
-  width:700rpx;
-  background: #aaa;
-  text-align: center;
-  overflow: visible;
-  opacity: 1;
-  height: 360rpx;
-  transition: all 0.2s ease-out;
-}
-
-@keyframes an-slide {
-  0% { background-position: 0%}
-  100% { background-position: 88%}
-}
-
-@keyframes an-slide-alt {
-  0% { background-position: 88%}
-  100% { background-position: 0%}
-}
-
-.fuin-unlock{
-  position: absolute;
-  top:5%;
-  left:-12%;
-  width:220rpx;
-  font-size: 0.9em;
-  font-weight: bold;
-  background-color: #666;
-  border: 8rpx double #fff;
-  border-width: 8rpx 0;
-  transform: rotate(-45deg);
-  color: #eee;
-  letter-spacing: 12rpx;
-}
-
-.fuin-1{
-  position: absolute;
-  top:66%;
-  right:-22%;
-  width:999rpx;
-  font-size: 0.8em;
-  background-color: black;
-  border: 8rpx double #fff;
-  border-width: 8rpx 0;
-  text-align: center;
-  font-weight: bold;
-  letter-spacing: 7rpx;
-  text-shadow: 0 0 300rpx #eee;
-  opacity: 0;
-}
-
-.an-first{
-  animation: ke-first 0.3s ease-in;
-  animation-fill-mode: forwards;
-}
-
-@keyframes ke-first{
-  0% { transform: rotate(0deg);}
-  30% {opacity: 0;}
-  100% { transform: rotate(10deg);opacity: 1;}
-}
-
-.fuin-2{
-  position: absolute;
-  top:45%;
-  right:-22%;
-  width:999rpx;
-  font-size: 0.8em;
-  background-color: black;
-  border: 8rpx double #fff;
-  border-width: 8rpx 0;
-  text-align: center;
-  font-weight: bold;
-  letter-spacing: 10rpx;
-  text-shadow: 0 0 300rpx #eee;
-  opacity: 0;
-
-  transform: rotate(-20deg);
-}
-
-.an-second{
-  animation: ke-second 0.7s ease-in;
-  animation-fill-mode: forwards;
-}
-
-@keyframes ke-second{
-  0% {opacity: 0;}
-  79% {opacity: 0;}
-  80% {opacity: 1;}
-  90% {opacity: 0.6;}
-  100% {opacity: 1;}
-}
-
-.video-size {
-  padding-top: 60rpx;
-  font-size: 1.5em;
-  font-weight: bold;
-
-  color: #ddd;
-  letter-spacing: 6rpx;
-}
-
-/* 渐变背景,旋转角度45*/
-.spin-1{
-  padding: 0px 6rpx 0px 6rpx;
-  background-image: linear-gradient(
-    -45deg,
-    rgba(255,88,0,1) 25%,
-    #eee 25%,#eee 50%
-    ,rgba(255,88,0,1) 50%,
-    rgba(255,88,0,1) 75%,
-    #eee 75%,#eee
-  );
-  background-size: 160rpx 160rpx;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: an-flow 20s linear infinite;
-}
-
-.spin-2{
-  padding: 0px 6rpx 0px 6rpx;
-  background-image: linear-gradient(
-    -45deg,
-    rgba(255,88,0,1) 25%,
-    #eee 25%,#eee 50%
-    ,rgba(255,88,0,1) 50%,
-    rgba(255,88,0,1) 75%,
-    #eee 75%,#eee
-  );
-  background-size: 160rpx 160rpx;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: an-flow-alt 20s linear infinite;
-}
-
-@keyframes an-flow {
-  0% { background-position: 0%; }
-  100% { background-position: 95%; }
-}
-
-@keyframes an-flow-alt {
-  0% { background-position: 95%; }
-  100% { background-position: 0%; }
-}
-
-.text-kai{
-  display: inline-block;
-  animation: an-kai 10s linear infinite;
-}
-
-.text-inline{
-  display: inline-block;
-}
-
-@keyframes an-kai{
-  0%{transform: rotate(0deg)}
-  24.5%{transform: rotate(0deg)}
-  25%{transform: rotate(90deg)}
-  49.5%{transform: rotate(90deg)}
-  50%{transform: rotate(180deg)}
-  74.5%{transform: rotate(180deg)}
-  75%{transform: rotate(270deg)}
-  99.5%{transform: rotate(270deg)}
-  100%{transform: rotate(360deg)}
-}
-
-.get-user{
-  position: absolute;
-  margin: 0 0;
-  width:100%;
-  height:110rpx;
-  border: 1px red solid;
-  opacity: 0;
-}
-
-.hina{
-  display: ruby-base-container;
-  ruby-position: over;
-}
-
-.box-text{
-  display:flex;
   flex-direction: column;
-  padding:20rpx 30rpx;
-  border-top: 3rpx #bbb solid;
-  border-bottom: 3rpx #ccc solid;
+  position: relative;
+  background: #ffffff;
 }
 
 .box-serifu{
-  margin-top: 20rpx;
-  font-size: 1.1em;
-  position:relative;
-  border-bottom: 3rpx #bbb solid;
-}
-
-.text-serifu{
+  border-top: 1rpx solid #cccccc;
+  border-bottom: 1rpx solid #337ab7;
   display: flex;
-  flex: none;
-  flex-wrap: wrap;
-  color:#337ab7;
-  font-size: 36rpx;
+  flex-direction: column;
+  padding: 20rpx 0;
 }
 
-.dc-word{
-  position: relative;
-  top:-16rpx;
-  width: 0px;
-  white-space: nowrap;
-  font-size: 20rpx;
-  color:#888;
+.box-serifu .serifu{
+  min-height: 80rpx;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.serifu-items{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.serifu-items .value{
+  font-size: 36rpx;
+  color:#337ab7;
+  letter-spacing: -3rpx;
+}
+
+.serifu-items .desc{
+  font-size: 24rpx;
+  color: rgb(222, 111, 44);
   letter-spacing: -1rpx;
 }
 
-.left-1{
-  left:-28rpx;
-}
-
-.left-2{
-  left:-38rpx;
-}
-
-.left-3{
-  left:-50rpx;
-}
-
-.left-4{
-  left:-78rpx;
-}
-
-.left-5{
-  left:-90rpx;
-}
-
-.left-6{
-  left:-110rpx;
-}
-
 .text-ron{
-  font-size: 0.8em;
-  color:#999;
+  min-height: 30rpx;
+  padding: 3rpx 0;
+  font-size: 28rpx;
+  color:#888888;
 }
 
 .record-list{
-  margin-top:0;
-  margin-bottom: 96px;
+  display: flex;
+  flex-direction: column;
+  min-height: 360rpx;
+  margin-bottom: 100px;
 }
 
 .inline{
@@ -431,24 +254,22 @@ video {
 
 .bar-ori{
   position: absolute;
-  left:108rpx;
-  background-color: #ccc;
-
-  width:3rpx;
-  height:108rpx;
-  opacity: 0.6;
+  left: 0rpx;
+  background-color: #337ab7;
+  width: 1rpx;
+  height: 108rpx;
+  opacity: 0.2;
   z-index: 1px;
-
   transition: left 0.3s ease;
 }
 
 .bar-end{
   position: absolute;
-  left:746rpx;
-  background-color: #666;
+  left: 746rpx;
+  background-color: #337ab7;
 
-  width:6rpx;
-  height:106rpx;
+  width: 6rpx;
+  height: 106rpx;
   opacity: 0.3;
   z-index: 1px;
 
@@ -466,7 +287,6 @@ video {
   color: #eee;
 }
 
-
 .ele-ori {
   width: 6rpx;
   background-color: #bbb;
@@ -474,13 +294,17 @@ video {
 }
 
 .box-ori{
+  margin: 10rpx 0;
+  border-top: 1rpx dotted #bbbbbb;
+  border-bottom: 1rpx dotted #bbbbbb;
   height: 110rpx;
-  display:flex; /*无敌布局*/
-  align-items:center; /*中轴对齐*/
+  display: flex;
+  align-items: center;
   overflow: hidden;
 }
 
 .shadow-ori{
+  position: relative;
   height: 110rpx;
   display:flex;
   align-items:center;
@@ -504,15 +328,27 @@ video {
   overflow: hidden;
 }
 
-.re-nickname{
-  flex-shrink: 0;
-  font-size: 0.6em;
+.box-line .nickname{
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
   color: #999;
   width: 480rpx;
-  height: 30rpx;
   overflow: hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.box-line .date{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 24rpx;
+  color: #bbbbbb;
+  width: 225rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .re-label{
@@ -520,19 +356,34 @@ video {
   color: #FFA07A;
 }
 
+.re-title{
+  padding: 10rpx 0;
+  font-size: 28rpx;
+  color: #bbbbbb;
+}
+
 .btn-center{
   margin-left: 25%;
   margin-right: 25%;
 }
 
-.master-record{
-  flex-shrink: 0;
-  margin-right: 12rpx;
-  vertical-align: middle;
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 2px;
-  box-shadow: 0px 0px 1px 1px #ddd;
+.re-avatar{
+  margin: 8rpx 0;
+  margin-right: 8rpx;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 8rpx;
+}
+
+.re-width{
+  width: 550rpx;
+  display: flex;
+  align-items: center;
+}
+
+.flex-right{
+  display: flex;
+  justify-content: flex-end;
 }
 
 .play-foo {
@@ -551,10 +402,6 @@ video {
 }
 
 .tri {
-  flex-shrink: 0;
-  margin-left:6rpx;
-  position: relative;
-  top:26rpx;
   width: 16rpx;
   height: 16rpx;
   z-index: 2px;
@@ -707,10 +554,11 @@ video {
 }
 
 .menu-comm{
+  width: 120rpx;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   color: #ccc;
-  text-decoration: underline;
 }
 
 .box-comm-zan{
@@ -786,9 +634,30 @@ video {
   color: #aaa;
 }
 
-.re-border{
+.record-label{
+  font-size: 28rpx;
+  color: #cccccc;
+}
+
+.box-record{
+  display: flex;
+  flex-direction: column;
   margin-top: 10rpx;
-  border-top: 3rpx solid rgba(0, 0, 255, 0.3);
+  border-bottom: 3rpx solid rgba(0, 0, 255, 0.3);
+}
+
+.record-left{
+  display: flex;
+  width: 340rpx;
+  height: 105rpx;
+  overflow: hidden;
+}
+
+.record-right{
+  display: flex;
+  width: 340rpx;
+  height: 105rpx;
+  overflow: hidden;
 }
 
 .comm-box{

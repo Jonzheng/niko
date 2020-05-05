@@ -21,7 +21,7 @@ Page({
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     tabData: tabData,
-    tabCur: 0,
+    tabCur: 1,
     size: 90,
     color: "#4a5fe2",
     icon_loading: "../../images/loading1.gif",
@@ -29,7 +29,7 @@ Page({
     end: false,
     emptyShow: false,
     pageNo: pageStart,
-    level: 'sp',
+    level: 'ssr',
     list: [],
     scrollTop: null,
     enableBackToTop: true,
@@ -196,12 +196,15 @@ Page({
     for (let name of names) {
       let item = {}
       let sers = []
+      let first = {}
       for (let v of list) {
         if (v.s_name == name) {
-          item = v
-          sers.push(trim(v.serifu))
+          let pure = trim(v.serifu)
+          if (!first.serifu || pure.length > trim(first.serifu).length) first = v
+          sers.push(pure)
         }
       }
+      item = first
       item['c_name'] = item.title.split('_')[0]
       sers = Array.from(new Set(sers))
       sers.sort((a, b) => b.length - a.length)

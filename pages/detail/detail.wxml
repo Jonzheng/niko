@@ -1,46 +1,58 @@
 <view class="container">
   <view class="box-head">
 
-    <view class='box-curr'>
-      <view class="curr-title" bindtap="showOther">
-        <view>{{list_element.title}}</view>
-        <view class='text-more {{show_other ? "rt-other":""}}'>〉</view>
+    <view class="box-avatar">
+      <image class="sk-avatar" src="https://avatar-sk-1256378396.cos.ap-nanjing.myqcloud.com/n_bah.png"></image>
+    </view>
+    <view class="box-profile">
+      <view class="box-line">
+        <view class="name">{{cname}}
+          <view class="cv">cv: {{cv}}</view>
+        </view>
+        <image class="btn-share" src="../../images/share.png"></image>
       </view>
-      <view class="curr-vsize">视频大小:{{video_size}}MB</view>
+      <view class="box-line">
+        <view class="curr-title" bindtap="showOther">
+          <view class="text">{{skill}}</view>
+          <view class='text-more {{show_other ? "rt-other":""}}'>〉</view>
+        </view>
+        <image class="btn-next" bindtap="nextSerifu" src="../../images/next.png"></image>
+        <image class="btn-video" bindtap="playVideo" src="../../images/video.png"></image>
+      </view>
     </view>
 
-    <view class='box-other {{show_other ? "other-show":""}}'>
+    <!-- <view class='box-other {{show_other ? "other-show":""}}'>
       <block wx:for="{{other_lst}}" wx:key="mkey">
         <view class='sk-btn' data-fid='{{item.file_id}}' bindtap="reload" hover-class="space-hover">
           <view class='sk-title'>{{item.title}}</view>
           <view class='sk-serifu'>{{item.serifu}}</view>
         </view>
       </block>
-    </view>
+    </view> -->
+
   </view>
 
-  <view class="page-body">
+  <view class="box-body">
 
     <view class="box-serifu">
-      <view class="box-text">
-        <view class='text-serifu'>
-          <block wx:for="{{serifuList}}" wx:key="mkey">
-            <view class="{{item.cs}}">{{item.word}}</view>
-          </block>
-        </view>
-        <view class='text-ron'>____</view>
-        <view class='text-ron'>{{koner}}</view>
-        <view class='text-ron'>{{roma}}</view>
+      <view class='serifu'>
+        <block wx:for="{{serifuList}}" wx:key="mkey">
+          <view class="serifu-items">
+            <view wx:if="{{item.desc}}" class="desc">{{item.desc}}</view>
+            <view class="value">{{item.value}}</view>
+          </view>
+        </block>
       </view>
+      <view class='text-ron'>____</view>
+      <view class='text-ron'>{{koner}}</view>
+      <view class='text-ron'>{{roma}}</view>
 
       <view class="box-ori">
-        <button hidden="{{loged}}" open-type="getUserInfo" class="get-user" bindgetuserinfo="toLogin">卍</button>
-        
         <view class="btn-circle" bindtap="playOri" hover-class="black-hover">
           <view class='{{oriPlaying ? "sound-stop" : "sound-play"}} '></view>
         </view>
-        <view class='{{slider}}'></view>
         <view class="shadow-ori">
+        <view class='{{slider}}'></view>
           <block wx:for="{{shadow}}" wx:key="mkey">
             <view class="ele-ori" style="height:{{item}};transition: height 0.6s ease-in;"></view>
           </block>
@@ -49,76 +61,82 @@
 
     </view>
 
-  <view class="weui-cells__title">录音:</view>
-    <view class="weui-cells record-list">
+  <view class="re-title">录音:</view>
 
-      <block wx:for="{{list_master}}" wx:key="mkey">
+    <view class="record-list">
+      <block wx:for="{{recordList}}" wx:key="mkey">
         <template is="ele-master" data="{{...item,index,icon_more,icon_comm,icon_zan_em,icon_zan_fu}}"/>
       </block>
-
     </view>
-    
-    <view class="fixed-bottom">
-      <view class="my-progress-box">
-        <view class='{{progress_record == 0 ? "" : "my-progress"}} {{isRecording ? "an-totop": ""}}' style='width:{{isRecording ? "" : progress_record}}%;'></view>
-      </view>
-      <view class="record-box">
-        <button hidden="{{loged}}" open-type="getUserInfo" class="get-user" bindgetuserinfo="toLogin">卍</button>
 
-        <view class='btn-circle {{!isRecording && hasTmp ? "" : "btn-hidden"}}' bindtap="playMyVoice" hover-class="black-hover">
-          <view class='{{isPlaying ? "sound-stop" : "sound-play"}} '></view>
-        </view>
-
-        <view class="btn-circle btn-center" bindtap="startRecord" hover-class="black-hover">
-          <view class='{{isRecording ? "sound-stop" : "btn-empty"}}'></view>
-          <image wx:if="{{hasTmp}}" src='{{icon_trash}}' class='btn-record'></image>
-          <image wx:elif="{{!isRecording}}" src='{{icon_record}}' class='btn-record'></image>
-
-        </view>
-
-        <view class='btn-circle {{isPlayed && hasTmp ? "" : "btn-hidden"}}' bindtap="uploadRecord" hover-class="black-hover">
-          <image src='{{isPlayed && hasTmp ? icon_upload : ""}}' class="btn-record"></image>
-        </view>
-
-      </view>
-    </view>
   </view>
 </view>
 
-<template name="ele-master">
-  <view class="weui-cell re-border an-fade-in">
-    <view class="re-user weui-cell__hd">
-      <view class="re-nickname">{{show_name ? show_name : nick_name}}</view>
-      <image src="{{avatar_url}}" class="master-record"></image>
-
-      <view class="tri"></view>
-      <view class="{{boxStyle}} {{anListen}}" data-idx="{{index}}"
-        bindtap="listen" data-nickName="{{show_name ? show_name : nick_name}}" data-record_id="{{record_id}}">
-        <view class='box-paly-btn'>
-          <view hidden="{{isListen}}" class="btn-one"></view>
-          <view class="btn-two {{listenStatus}}"></view>
-          <view hidden="{{isListen}}" class="btn-three"></view>
-        </view>
-        <view class='box-record-right'>
-          <block wx:for="{{isLoading}}" wx:key="mkey">
-            <view class="play-foo" style="animation: scay 2s infinite {{item}}s;"></view>
-          </block>
-        </view>
-      </view>
-      <view class="{{btnDelStyle}}" bindtap='delConfirm' data-idx="{{index}}" data-record_id="{{record_id}}" >删除</view>
-
-      <view class="{{btnPoiStyle}}" data-idx="{{index}}" data-record_id="{{record_id}}" hidden="{{true}}"></view>
+<view class="fixed-bottom">
+  <view class="my-progress-box">
+    <view class='{{progress_record == 0 ? "" : "my-progress"}} {{isRecording ? "an-totop": ""}}'
+      style='width:{{isRecording ? "" : progress_record}}%;'></view>
+  </view>
+  <view class="record-box">
+    <button hidden="{{loged}}" open-type="getUserInfo" class="get-user" bindgetuserinfo="toLogin">卍</button>
+    <view class='btn-circle {{!isRecording && hasTmp ? "" : "btn-hidden"}}' bindtap="playMyVoice" hover-class="black-hover">
+      <view class='{{isPlaying ? "sound-stop" : "sound-play"}} '></view>
     </view>
-    <view class="box-right">
+
+    <view class="btn-circle btn-center" bindtap="startRecord" hover-class="black-hover">
+      <view class='{{isRecording ? "sound-stop" : "btn-empty"}}'></view>
+      <image wx:if="{{hasTmp}}" src='{{icon_trash}}' class='btn-record'></image>
+      <image wx:elif="{{!isRecording}}" src='{{icon_record}}' class='btn-record'></image>
+    </view>
+
+    <view class='btn-circle {{isPlayed && hasTmp ? "" : "btn-hidden"}}' bindtap="uploadRecord" hover-class="black-hover">
+      <image src='{{isPlayed && hasTmp ? icon_upload : ""}}' class="btn-record"></image>
+    </view>
+
+  </view>
+</view>
+
+
+<template name="ele-master">
+  <view class="box-record">
+    <view class="box-line">
+      <view class="nickname">{{show_name ? show_name : nick_name}}</view>
+      <view class="date">2020-05-03</view>
+    </view>
+    <view class="box-line">
+      <image src="{{avatar_url ? avatar_url : '../../images/de-avatar.png'}}" class="re-avatar"></image>
+      <view class="tri"></view>
+      <view class="re-width">
+        <view class="{{boxStyle}} {{anListen}}" data-idx="{{index}}"
+          bindtap="listen" data-nickName="{{show_name ? show_name : nick_name}}" data-record_id="{{record_id}}">
+          <view class='box-paly-btn'>
+            <view hidden="{{isListen}}" class="btn-one"></view>
+            <view class="btn-two {{listenStatus}}"></view>
+            <view hidden="{{isListen}}" class="btn-three"></view>
+          </view>
+          <view class='box-record-right'>
+            <block wx:for="{{isLoading}}" wx:key="mkey">
+              <view class="play-foo" style="animation: scay 2s infinite {{item}}s;"></view>
+            </block>
+          </view>
+        </view>
+        <view class="{{btnDelStyle}}" bindtap='delConfirm' data-idx="{{index}}" data-record_id="{{record_id}}">删除</view>
+        <view class="{{btnPoiStyle}}" data-idx="{{index}}" data-record_id="{{record_id}}" hidden="{{true}}"></view>
+      </view>
+      <image src="{{icon_more}}" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
+    </view>
+    <view class="box-line flex-right">
+      <view class="menu-comm" bindtap='updateHeart' data-idx="{{index}}" data-status="{{heartStatus}}">
+        <view class="text-heart">{{heart}}</view>
+        <image src="{{heartShape}}" class="sm-icon"></image>
+      </view>
       <view class="menu-comm" bindtap='showComment' data-idx="{{index}}">
         <view class="text-heart">{{comm_word}}</view>
         <image src="{{icon_comm}}" class="icon-comm"></image>
       </view>
-      <view class="text-heart">{{heart}}</view>
-      <image src="{{heartShape}}" class="sm-icon" bindtap='updateHeart' data-idx="{{index}}" data-status="{{heartStatus}}"></image>
-      <image src="{{icon_more}}" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
     </view>
   </view>
+
   <!-- 评论 -->
   <view class="{{mon}}">
     <view class="box-comm-count {{mon}}">
@@ -141,7 +159,8 @@
         <image src="{{avatar_url}}" class="master-record"></image>
         <view class="comm-box">
           <view class="re-nickname">
-            {{show_name ? show_name : nick_name}}<view class="re-label">{{re_name ? '回复' : ''}}</view>{{re_name ? re_name+":" : ''}} {{re_name ? "「"+re_content+"」" : ''}}
+            {{show_name ? show_name : nick_name}}
+            <view class="re-label">{{re_name ? '回复' : ''}}</view>{{re_name ? re_name+":" : ''}} {{re_name ? "「"+re_content+"」" : ''}}
           </view>
           <view class="comm-content">{{content}}</view>
           <view class="box-reply">
