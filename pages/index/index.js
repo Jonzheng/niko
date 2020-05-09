@@ -1,4 +1,4 @@
-const app = getApp()
+const App = getApp()
 const { trim, host } = require('../../utils/util')
 
 const pageStart = 1
@@ -16,7 +16,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    isIpx: app.globalData.isIpx,
+    isIpx: App.globalData.isIpx,
     userInfo: {},
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
@@ -24,8 +24,8 @@ Page({
     tabCur: 1,
     size: 90,
     color: "#4a5fe2",
-    icon_loading: "../../images/loading1.gif",
-    requesting: true,
+    loadingImg: "../../images/loading1.gif",
+    requesting: false,
     end: false,
     emptyShow: false,
     pageNo: pageStart,
@@ -44,7 +44,7 @@ Page({
   onLoad: function (options) {
     this.init()
     this.getList('refresh', pageStart);
-    console.log(app.globalData)
+    console.log(App.globalData)
     this._indexTab = true
   },
 
@@ -116,15 +116,15 @@ Page({
    */
 
   init() {
-    if (app.globalData.userInfo) {
+    if (App.globalData.userInfo) {
       this.setData({
-        userInfo: app.globalData.userInfo,
+        userInfo: App.globalData.userInfo,
         hasUserInfo: true
       })
     } else if (this.data.canIUse) {
       // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
       // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = res => {
+      App.userInfoReadyCallback = res => {
         this.setData({
           userInfo: res.userInfo,
           hasUserInfo: true
@@ -134,7 +134,7 @@ Page({
       // 在没有 open-type=getUserInfo 版本的兼容处理
       wx.getUserInfo({
         success: res => {
-          app.globalData.userInfo = res.userInfo
+          App.globalData.userInfo = res.userInfo
           this.setData({
             userInfo: res.userInfo,
             hasUserInfo: true
@@ -166,6 +166,9 @@ Page({
   getList(type, pageNo, level='') {
     const that = this
     wx.showNavigationBarLoading()
+    wx.setNavigationBarTitle({
+      title: '加载中...',
+    })
     level = level ? level : this.data.level
     console.log({ level: level, pageNo: pageNo })
     wx.request({
@@ -175,6 +178,9 @@ Page({
       complete(res) {
         setTimeout(()=>{
           wx.hideNavigationBarLoading()
+          wx.setNavigationBarTitle({
+            title: '式神录',
+          })
         }, 600)
         if (res && res.data){
           let data = res.data
@@ -278,7 +284,7 @@ Page({
 
   getUserInfo(e) {
     console.log(e)
-    app.globalData.userInfo = e.detail.userInfo
+    App.globalData.userInfo = e.detail.userInfo
     this.setData({
       userInfo: e.detail.userInfo,
       hasUserInfo: true

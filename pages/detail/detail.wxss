@@ -3,7 +3,6 @@
   margin-top: 10rpx;
   padding: 10rpx 20rpx;
   display: flex;
-  width: 750rpx;
   min-height: 120rpx;
   background: #ffffff;
 }
@@ -14,16 +13,16 @@
 }
 
 .box-profile{
-  margin: 10rpx 20rpx;
+  padding: 0 20rpx;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .box-profile .name{
-  width: 500rpx;
+  width: 496rpx;
   font-size: 32rpx;
-  color: #4a5fe2;
+  color: #337ab7;
 }
 .box-profile .cv{
   margin: 0 20rpx;
@@ -33,25 +32,46 @@
 }
 
 .box-line{
+  padding: 3rpx 0;
   min-height: 36rpx;
   display: flex;
   align-items: center;
 }
 
+.out-share{
+  display: flex;
+  align-items: center;
+  background: transparent;
+  width: 50rpx;
+  height: 50rpx;
+}
 .btn-share{
-  width: 40rpx;
-  height: 40rpx;
-  padding: 0 20rpx;
+  width: 46rpx;
+  height: 46rpx;
+}
+
+.out-btn{
+  padding: 1rpx 25rpx;
+  margin: 0 20rpx;
+  border: 1rpx solid #337ab7;
+  border-radius: 8rpx;
+  width: 38rpx;
+  height: 38rpx;
 }
 
 .btn-next, .btn-video{
-  border: 1rpx solid #cccccc;
-  border-radius: 8rpx;
   width: 36rpx;
   height: 36rpx;
-  padding: 0 20rpx;
-  margin: 0 20rpx;
   opacity: 0.8;
+}
+
+.btn-login{
+  position: absolute;
+  left: 28%;
+  width: 320rpx;
+  height: 110rpx;
+  background: transparent;
+  z-index: 99;
 }
 
 .sk-avatar{
@@ -123,6 +143,128 @@
   text-overflow: ellipsis;
 }
 
+.video-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.88);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-detail{
+  width: 100%;
+  height: 440rpx;
+  z-index: 11;
+}
+
+.input-edit{
+  display: flex;
+  align-items: center;
+  margin: 10rpx 0;
+  border-bottom: 1px #eee solid;
+  font-size: 28rpx;
+  color: #666;
+  letter-spacing: 0;
+}
+
+.edit-label{
+  height: 100rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.edit-label .cur{
+  color: #337ab7;
+}
+.edit-label .title{
+  display: flex;
+  align-items: center;
+}
+.edit-label .serifu{
+  font-size: 24rpx;
+  height: 36rpx;
+  width: 660rpx;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.comm-item{
+  display: flex;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #ddd;
+}
+.comm-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 0 20rpx;
+}
+.comm-top{
+  display: flex;
+  height: 36rpx;
+  width: 560rpx;
+  justify-content: space-between;
+}
+.comm-top .name{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #999999;
+  font-size: 24rpx;
+}
+.comm-top .time{
+  color: #bbbbbb;
+  font-size: 24rpx;
+}
+.comm-author{
+  background: rgba(30, 146, 204, 0.55);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4rpx;
+  height: 24rpx;
+  width: 42rpx;
+  margin-left: 10rpx;
+
+  font-size: 18rpx;
+  color: #FFFFFF;
+  letter-spacing: 0.28rpx;
+}
+.comm-re {
+  width: 560rpx;
+  font-size: 28rpx;
+  color: #999999;
+}
+
+.comm-re::before {
+  content: '|';
+}
+.comm-content{
+  width: 560rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin: 8rpx 0;
+}
+.comm-content .content{
+  width: 520rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+.comm-content .btn{
+  font-size: 20rpx;
+  color: #337ab7;
+  width: 42rpx;
+  text-align: right;
+}
+
 .box-body{
   padding: 20rpx;
   display: flex;
@@ -133,7 +275,7 @@
 
 .box-serifu{
   border-top: 1rpx solid #cccccc;
-  border-bottom: 1rpx solid #337ab7;
+  border-bottom: 3rpx solid #337ab7;
   display: flex;
   flex-direction: column;
   padding: 20rpx 0;
@@ -150,7 +292,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .serifu-items .value{
@@ -160,6 +302,8 @@
 }
 
 .serifu-items .desc{
+  position: relative;
+  top: 10rpx;
   font-size: 24rpx;
   color: rgb(222, 111, 44);
   letter-spacing: -1rpx;
@@ -243,13 +387,16 @@
 }
 
 .record-box{
+  position: relative;
+  width: 750rpx;
+  height: 120rpx;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-around;
   padding-top: 8rpx;
   padding-bottom: 5rpx;
-  opacity: 0.85;
-  background-color: #fefefe;
+  opacity: 0.95;
+  background-color: #ffffff;
 }
 
 .bar-ori{
@@ -294,7 +441,7 @@
 }
 
 .box-ori{
-  margin: 10rpx 0;
+  margin: 20rpx 0;
   border-top: 1rpx dotted #bbbbbb;
   border-bottom: 1rpx dotted #bbbbbb;
   height: 110rpx;
@@ -362,12 +509,7 @@
   color: #bbbbbb;
 }
 
-.btn-center{
-  margin-left: 25%;
-  margin-right: 25%;
-}
-
-.re-avatar{
+.re-avatar, .comm-avatar{
   margin: 8rpx 0;
   margin-right: 8rpx;
   width: 80rpx;
@@ -470,16 +612,6 @@
   transition: all 0.1s;
 }
 
-.comment-show{
-  opacity: 1;
-  transition: all 0.3s;
-}
-
-.comment-hide{
-  height: 0;
-  opacity: 0;
-}
-
 .an-breath{
   animation: breath 2s infinite;
 }
@@ -573,11 +705,6 @@
   display: flex;
 }
 
-.box-input{
-  padding: 3rpx 0;
-  position: relative;
-}
-
 .comm-menu{
   position: absolute;
   left: 590rpx;
@@ -591,15 +718,6 @@
   width: 70rpx;
   height: 70rpx;
   opacity: 0.4;
-}
-
-.icon-comm-input{
-  position: absolute;
-  top: 3rpx;
-  left: 640rpx;
-  width: 70rpx;
-  height: 70rpx;
-  opacity: 0.2;
 }
 
 .box-reply{
@@ -618,20 +736,6 @@
 
 .comm-delete{
   width: 50rpx;
-}
-
-.my-input{
-  margin: 0 20rpx;
-  padding: 8rpx 16rpx;
-  font-size: 26rpx;
-  width: 670rpx;
-  color: #888;
-  border: 3rpx solid rgba(0, 0, 255, 0.2);
-  border-radius: 6rpx;
-}
-
-.place-holder{
-  color: #aaa;
 }
 
 .record-label{

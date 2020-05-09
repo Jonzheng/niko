@@ -2,5 +2,8 @@
   "navigationBarTitleText": "式神录",
   "disableScroll": true,
   "enablePullDownRefresh": false,
-  "usingComponents": {}
+  "usingComponents": {
+    "pull-down": "/modules/pull-down/pull-down",
+    "action-sheet": "/modules/action-sheet/action-sheet"
+  }
 }

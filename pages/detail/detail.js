@@ -1,5 +1,7 @@
 const App = new getApp()
-const { trim, host } = require('../../utils/util')
+const RecordBucket = 'record-1256378396'
+const Region = 'ap-guangzhou'
+const { trim, host, formatDate } = require('../../utils/util')
 
 const recorderManager = wx.getRecorderManager()
 const options = {
@@ -12,10 +14,10 @@ const options = {
 }
 const dura = options.duration / 1000
 
-const src_heart = "../../images/heart-off.png"
-const src_heart_full = "../../images/heart-on.png"
-const src_zan_em = "../../images/zan-off.png"
-const src_zan_fu = "../../images/zan-on.png"
+const heartOff = "../../images/heart-off.png"
+const heartOn = "../../images/heart-on.png"
+const zanOff = "../../images/zan-off.png"
+const zanOn = "../../images/zan-on.png"
 
 const userId = 'ocVQY4-dF2m4IiYTTJZFo6k-NZbE'
 
@@ -39,33 +41,32 @@ function _next() {
 
 Page({
   data: {
+    isIpx: App.globalData.isIpx,
     loged: false,
     slider: 'bar-ori',
     cname: '* * *',
     cv: '* * * *',
     skill: '* * *',
     oriPlaying: false,
-    show_video: false,
-    an_in: false,
     recordList: [],
-    record_map: {},
     icon_trash: "../../images/trash.png",
     icon_upload: "../../images/upload.png",
     icon_record: "../../images/record.png",
     icon_comm: "../../images/comm.png",
     icon_more: "../../images/more.png",
-    re_id: '',
-    re_name: '',
-    re_content: '',
-    icon_zan_em: src_zan_em,
-    icon_zan_fu: src_zan_fu,
+    reId: '',
+    reName: '',
+    reContent: '',
+    icon_zan_em: zanOff,
+    icon_zan_fu: zanOn,
     progress_record: 0,
     hasTmp: false,
     isRecording: false,
     isPlaying: false,
-    show_other: true,
-    tempFile: '',
-
+    rt90: true,
+    color: "#4a5fe2",
+    requesting: false,
+    commentList: [],
   },
 
   onLoad: function (options) {
@@ -74,9 +75,10 @@ Page({
     this.initPageData(fileId)
     this.setData({
       fileId,
-      loged: App.globalData.userInfo,
+      userId: App.globalData.openid,
+      hasLogin: App.globalData.hasLogin,
     })
-    setTimeout(() => { this.setData({ an_in: true, show_other: false }) }, 300)
+    setTimeout(() => { this.setData({ rt90: false }) }, 300)
   },
 
   onPullDownRefresh: function () {
@@ -94,11 +96,12 @@ Page({
   },
 
   onReady: function () {
-    this._videoContext = wx.createVideoContext('myVideo')
+    this.videoContext = wx.createVideoContext('myVideo')
     this._audioContextOri = wx.createInnerAudioContext()
     this._audioContextMaster = wx.createInnerAudioContext()
     this._audioContextMine = wx.createInnerAudioContext()
-
+    // wx.setInnerAudioOption({ 'obeyMuteSwitch': false })
+    // console.log('obeyMuteSwitch:',this._audioContextOri.obeyMuteSwitch)
     this._audioContextOri.onPlay(() => {
       console.log("audioContextOri...")
       this.setData({
@@ -141,9 +144,9 @@ Page({
     recorderManager.onStop((res) => {
       console.log(res)
       let progress_record = res.duration / options.duration * 100
+      this._tempFile = res
       this.setData({
         progress_record,
-        tempFile: res,
         isRecording: false,
         hasTmp: true
       })
@@ -151,9 +154,10 @@ Page({
   },
 
   onShareAppMessage() {
+    let fileId = this.data.fileId
     return {
       title: '阴阳师·式神台词语音',
-      path: '/pages/index/index',
+      path: `/pages/detail/detail?fileId=${fileId}`,
     }
   },
 
@@ -161,33 +165,30 @@ Page({
    * 自定义函数
    */
 
-  toLogin: function (e) {
+  getUserInfo: function (e) {
     let userInfo = e.detail.userInfo
-    console.log("toLogin:")
-    if (userInfo) {
-      App.globalData.hasLogin = true
-      App.globalData.userInfo = userInfo
-      let gender = 1
-      if (userInfo.gender != "" && userInfo.gender != undefined) gender = userInfo.gender
-      App.globalData.gender = gender
+    App.initAvatar(userInfo).then(data=>{
+      console.log(data)
       this.setData({
-        loged: true,
+        userInfo: data,
+        hasLogin: true
       })
-      // 云登录
-      wx.cloud.callFunction({
-        name: 'login',
-        data: { userInfo },
-        success: res => {
-          console.log(res)
-          App.globalData.openid = res.result.openid
-        }
-      })
-    } else {
-      App.globalData.hasLogin = false
-      this.setData({
-        loged: false,
-      })
-    }
+    })
+  },
+
+  // 刷新数据
+  refresh() {
+    this.setData({
+      requesting: true,
+      empty: false,
+      end: false,
+    })
+    this.initPageData(this.data.fileId)
+  },
+  // 加载更多
+  more() {
+    console.log('-the end-')
+    // this.getList();
   },
 
   stopAllMedia() {
@@ -204,14 +205,62 @@ Page({
     let nidx = (idx+1) % list.length
     console.log(nidx, fileId, list)
     let curList = list[nidx]
-    // this.initSerifu(curList)
     this.initPageData(curList.file_id)
   },
+  toSerifu(e) {
+    let { index } = e.currentTarget.dataset
+    let list = this.data.list
+    let curList = list[index]
+    if (curList.file_id != this.data.fileId){
+      this.initPageData(curList.file_id)
+    }
+    this.closeMask()
+  },
 
-  playVideo() {
+  showVideo() {
     this.setData({
       showVideo: true
     })
+  },
+  videoEnd() {
+
+  },
+  hideVideo() {
+    this.setData({
+      showVideo: false
+    })
+  },
+  fullScreenChange(e) {
+    if (e.detail.fullScreen) {
+      setTimeout(()=>{
+        this.playVideo()
+      }, 300)
+    } else {
+      setTimeout(() => {
+        this.pauseVideo()
+      }, 100)
+    }
+  },
+  videoOnPlay() {
+    this.stopAllMedia()
+    this._videoPlay = true
+  },
+  playVideo() {
+    wx.createVideoContext('thisVideo').play()
+    this._videoPlay = true
+  },
+  pauseVideo() {
+    wx.createVideoContext('thisVideo').pause()
+    this._videoPlay = false
+  },
+  togglePlay() {
+    if (!this._videoPlay){
+      this.playVideo()
+    }else{
+      this.pauseVideo()
+    }
+  },
+  pass(){
   },
 
   initSerifu(curList) {
@@ -265,14 +314,13 @@ Page({
       record["btnDelStyle"] = "btn-red-hidden"
       record["btnPoiStyle"] = "btn-red-hidden"
       record["btnRt"] = ""
-      record["mon"] = "comment-hide"
-      record["comm_word"] = record.comm
-      record["holder"] = "输入文字"
+      record["dateStr"] = formatDate(record.c_date)
+      record["isMine"] = record.master_id == App.globalData.openid
       if (record.heart_ud) {
-        record["heartShape"] = src_heart_full
+        record["heartShape"] = heartOn
         record["heartStatus"] = 1
       } else {
-        record["heartShape"] = src_heart
+        record["heartShape"] = heartOff
         record["heartStatus"] = 0
       }
       record["isListen"] = false
@@ -283,22 +331,28 @@ Page({
   },
 
   initPageData: function (fileId) {
-    let that = this
     let openid = App.globalData.openid
-    let user_id = openid ? openid : ''
-    console.log(fileId, '#', user_id)
+    console.log(fileId, ',', openid)
     wx.showNavigationBarLoading()
-    that._loading = true
+    wx.setNavigationBarTitle({
+      title: '加载中...',
+    })
+    this._loading = true
     // 查询阴阳师detail
     wx.request({
       url: `${host}/queryDetail`,
       method: 'post',
-      data: { cate: 'y', userId: userId, fileId: fileId},
-      complete(res) {
-        console.log(res)
+      data: { cate: 'y', userId: openid, fileId: fileId},
+      complete: (res)=> {
+        this.setData({
+          requesting: false
+        })
         setTimeout(() => {
-          that._loading = false
+          this._loading = false
           wx.hideNavigationBarLoading()
+          wx.setNavigationBarTitle({
+            title: '式神录',
+          })
         }, 300)
         if (res && res.data) {
           let data = res.data
@@ -309,10 +363,13 @@ Page({
           let curList = list.filter(i=>i.file_id == fileId)[0]
           let curAudio = audio[0]
           let recordList = record
-          that.initSerifu(curList)
-          that.initRecords(recordList)
+          this.initSerifu(curList)
+          this.initRecords(recordList)
           let shadow = curAudio.shadow.split(",").map((item) => { return item + 'rpx' })
-          that.setData({
+          let srcVideo = curList.src_video.trim()
+          console.log(curList.src_video.length, srcVideo.length)
+          this.setData({
+            srcVideo,
             curAudio,
             list,
             shadow
@@ -324,28 +381,8 @@ Page({
             title: '数据加载失败...',
           })
         }
-        // 请求完成都会执行
-        that.setData({
-          requesting: false,
-        })
       }
     })
-    // wx.cloud.callFunction({
-    //   name: 'getDetail',
-    //   data: { cate: 'y', fileId, user_id },
-    //   success: res => {
-    //     console.log(res)
-    //     wx.hideLoading()
-    //     const data = res.result
-    //     if (!data) return
-    //     let curList = data["res_list"][0]
-    //     let curAudio = data["res_audio"][0]
-    //     let recordList = data["recordList"]
-    //     let res_others = data["res_others"]
-    //     that.initSerifu(curList)
-    //     // 初始化-record
-    //   }
-    // })
   },
 
   setOriStop: function () {
@@ -398,6 +435,7 @@ Page({
     let index = currData.idx
     let recordList = this.data.recordList
     let master_id = recordList[index]["master_id"]
+    console.log(recordList)
     let isSelf = false
     if (master_id == App.globalData.openid) isSelf = true
     //console.log(isSelf)
@@ -431,7 +469,7 @@ Page({
       this.stopMyVoice()
     }
     if (this.data.hasTmp) {
-      this.data.tempFile = undefined
+      this._tempFile = null
       this.setData({
         hasTmp: false,
         progress_record: 0
@@ -455,15 +493,15 @@ Page({
     if (this.data.isRecording) {
       return false
     }
-    let tempFile = this.data.tempFile
-    if (tempFile != undefined) {
-      console.log(tempFile.tempFilePath)
-      this._audioContextMine.src = tempFile.tempFilePath
+    if (this._tempFile) {
+      let recordFile = this._tempFile.tempFilePath
+      console.log('recordFile:', recordFile)
+      this._audioContextMine.src = recordFile
       if (!this.data.isPlaying) {
         this._audioContextMine.play()
         this.setData({
           isPlaying: true,
-          recordFile: tempFile.tempFilePath
+          recordFile
         })
       } else {
         this._audioContextMine.stop()
@@ -489,7 +527,7 @@ Page({
     let index = currData.idx
     wx.showModal({
       title: '删除录音?',
-      content: '不可逆操作,请再次确认',
+      content: '确认删除录音',
       confirmText: "确认",
       cancelText: "取消",
       success: function (res) {
@@ -506,22 +544,19 @@ Page({
     });
   },
 
-  delCommConfirm: function (e) {
-    let that = this
-    let currData = e.currentTarget.dataset
-    let comm_id = currData.cid
-    let index = currData.idx
+  delCommConfirm(e) {
+    let { rid, cid, content } = e.currentTarget.dataset
+    console.log(rid, cid, content)
+    let pre = content.substr(0, 9)
+    pre = content.length > 9 ? pre + '...' : pre
     wx.showModal({
       title: '删除评论?',
-      content: '不可逆操作,请再次确认',
+      content: pre,
       confirmText: "确认",
       cancelText: "取消",
-      success: function (res) {
-        //console.log(res);
+      success: (res)=> {
         if (res.confirm) {
-          that.delComment(index, comm_id)
-        } else {
-          //console.log('用户点击辅助操作')
+          this.delComment(cid, rid)
         }
       }
     });
@@ -560,193 +595,189 @@ Page({
 
   //--点心--
   updateHeart: function (e) {
-    let that = this
     let currData = e.currentTarget.dataset
-    let status = currData.status
-    let openid = App.globalData.openid
-    let user_id = openid
-    let type = ""
-    let index = currData.idx
+    let { idx, status } = currData
+    let userId = App.globalData.openid
     let recordList = this.data.recordList
-    let curr_master = recordList[index]
+    let curMaster = recordList[idx]
+    let url = ''
     if (status == 0) {
-      type = 'push'
-      curr_master["heartShape"] = src_heart_full
-      curr_master["heartStatus"] = 1
-      curr_master["hearts"].push(user_id)
+      url = `${host}/updateHeart`
+      curMaster["heartShape"] = heartOn
+      curMaster["heartStatus"] = 1
+      curMaster["heart"] += 1
     } else {
-      type = "pull"
-      curr_master["heartShape"] = src_heart
-      curr_master["heartStatus"] = 0
-      let idx = curr_master["hearts"].indexOf(user_id)
-      curr_master["hearts"].splice(idx, 1)
+      url = `${host}/cancelHeart`
+      curMaster["heartShape"] = heartOff
+      curMaster["heartStatus"] = 0
+      curMaster["heart"] -= 1
     }
-    let record_id = curr_master["record_id"]
-    wx.cloud.callFunction({
-      name: 'updateHeart',
-      data: { record_id, user_id, type },
-      success: res => {
-        console.log(res)
-        that.setData({ recordList })
+    let recordId = curMaster["record_id"]
+    let masterId = curMaster['master_id']
+    let fileId = this.data.fileId
+    wx.request({
+      url: url,
+      method: 'post',
+      data: { recordId, fileId, userId, masterId },
+      success: ()=>{
+        this.setData({
+          recordList
+        })
       }
     })
   },
 
-  // 上传录音
-  uploadRecord: function () {
+  // 上传录音-- record-1256378396.cos.ap-guangzhou.myqcloud.com/ssr_gq_0_31588943189222.mp3
+  uploadRecord() {
     let that = this
     let recordFile = this.data.recordFile
-    console.log("recordFile:")
-    console.log(recordFile)
-    let master_id = App.globalData.openid
+    console.log("recordFile:", recordFile)
+    let masterId = App.globalData.openid
     let fileId = this.data.fileId
-    const record_id = fileId + new Date().getTime()
-    const path = 'records/' + record_id + '.mp3'
-    wx.cloud.uploadFile({
-      cloudPath: path,
-      filePath: recordFile, // 文件路径
-    }).then(res => {
-      console.log(res)
-      const src_record = res.fileID.replace('cloud://omoz-dev-jono.', 'https://').replace('1256378396', '1256378396.tcb.qcloud.la')
-      wx.cloud.callFunction({
-        name: 'saveRecord',
-        data: { record_id, fileId, src_record, master_id },
-        success: res => {
-          console.log(res)
-          that.onPullDownRefresh()
-        }
-      })
-    }).catch(err => {
-      console.log(err)
+    let recordId = fileId + new Date().getTime()
+    let filename = `${recordId}.mp3`
+    let Cos = App.globalData.Cos
+    Cos.postObject({
+      Bucket: RecordBucket,
+      Region: Region,
+      Key: filename,
+      FilePath: recordFile,
+      onProgress: (info)=> {
+        console.log(JSON.stringify(info));
+      }
+    }, (err, data)=> {
+      console.log(err || data);
+      if (err){
+        wx.showToast({
+          icon: 'none',
+          title: '上传失败了',
+        })
+      }else{ // 上传成功，保存地址
+        let location = data.Location
+        let srcRecord = `https://${location}`
+        wx.request({
+          url: `${host}/saveRecord`,
+          method: 'post',
+          data: { recordId, fileId, masterId, srcRecord },
+          success: (res) => {
+            console.log('saveRecord success:', res)
+            this._tempFile = null
+            this.setData({
+              hasTmp: false,
+              progress_record: 0
+            })
+            this.onPullDownRefresh()
+          }
+        })
+      }
+    })
+  },
+  initCommentList(commentList){
+    let curMaster = this.data.curMaster
+    for (let item of commentList) {
+      item['isOwner'] = App.globalData.openid == item.user_id
+      item['isAuthor'] = item.user_id == curMaster.master_id
+      item['dateStr'] = formatDate(item.c_date)
+    }
+    this.setData({
+      inputValue: '',
+      commentList,
     })
   },
   showComment: function (e) {
-    let openid = App.globalData.openid
-    let user_id = openid
-    let that = this
     let currData = e.currentTarget.dataset
-    let index = currData.idx
+    let { idx } = currData
+    let userId = App.globalData.openid
     let recordList = this.data.recordList
-    this.clearInput()
-    if (recordList[index]["mon"] == "comment-show") {
-      recordList[index]["mon"] = "comment-hide"
-      recordList[index]["comm_word"] = recordList[index]["comm"]
-      that.setData({ recordList })
-    } else {
-      recordList[index]["mon"] = "comment-show"
-      recordList[index]["comm_word"] = "收起"
-      const record_id = recordList[index]["record_id"]
-      wx.showLoading({ title: '加载中...' })
-      wx.cloud.callFunction({
-        name: 'getComment',
-        data: { record_id, user_id },
-        success: res => {
-          wx.hideLoading()
-          console.log('showComment')
-          console.log(res)
-          const comments = res.result['res_comments']
-          for (let v of comments) {
-            let zid = v.zans.includes(user_id)
-            v["zanShape"] = zid ? src_zan_fu : src_zan_em
-            v["self"] = v.user_id === user_id
-          }
-          recordList[index]["comments"] = comments
-          that.setData({ recordList })
-        }
-      })
-    }
-  },
-  addComment: function (e) {
-    let that = this
-    const content = e.detail.value
-    let currData = e.currentTarget.dataset
-    let index = currData.idx
-    let recordList = this.data.recordList
-    for (let v of recordList) {
-      v["focus"] = false
-      v["holder"] = "输入文字"
-    }
-    const master = recordList[index]
-    const record_id = master.record_id
-    const master_id = master.master_id
-    const fileId = master.fileId
-    let openid = App.globalData.openid
-    let user_id = openid
-    const re_id = this.data.re_id
-    const re_name = this.data.re_name
-    const re_content = this.data.re_content
-    const comment = { record_id, master_id, fileId, user_id, content, re_id, re_name, re_content }
-    wx.showLoading({ title: '...' })
-    wx.cloud.callFunction({
-      name: 'saveComment',
-      data: comment,
-      success: res => {
+    let curMaster = recordList[idx]
+    let recordId = curMaster.record_id
+    let nickname = curMaster.nick_name
+    this._inputPh = `评论 ${nickname}：`
+    this.setData({
+      inputPh: `评论 ${nickname}：`,
+      curMaster,
+      commShow: true
+    })
+    wx.request({
+      url: `${host}/queryComment`,
+      method: 'post',
+      data: { recordId, userId },
+      success: (res) => {
         console.log(res)
-        const comments = res.result['res_comments']
-        for (let v of comments) {
-          let zid = v.zans.includes(user_id)
-          v["zanShape"] = zid ? src_zan_fu : src_zan_em
-          v["self"] = v.user_id === user_id
+        if (res){
+          let commentList = res.data
+          this.initCommentList(commentList)
         }
-        recordList[index]["comments"] = comments
-        recordList[index]["comm"] = comments.length
-        recordList[index]["inputValue"] = ""
-        wx.hideLoading()
-        that.setData({ recordList })
       }
     })
-
   },
-  reply: function (e) {
-    let that = this
-    let currData = e.currentTarget.dataset
-    const index = currData["idx"]
-    const re_id = currData["cid"]
-    const re_name = currData["name"]
-    const re_content = currData["content"]
-    let recordList = this.data.recordList
-    this.clearInput()
-    recordList[index]["holder"] = "回复:" + re_name
-    recordList[index]["focus"] = true
-    that.setData({ recordList, re_id, re_name, re_content })
-
-  },
-  clearInput: function () {
-    let recordList = this.data.recordList
-    for (let v of recordList) {
-      v["focus"] = false
-      v["holder"] = "输入文字"
-    }
-    const re_id = ''
-    const re_name = ''
-    const re_content = ''
-    this.setData({ recordList, re_id, re_name, re_content })
-  },
-  delComment: function (index, comm_id) {
-    let openid = App.globalData.openid
-    let user_id = openid
-    let that = this
-    let recordList = this.data.recordList
-    this.clearInput()
-    const record_id = recordList[index]["record_id"]
-    wx.showLoading({ title: '...' })
-    wx.cloud.callFunction({
-      name: 'deleteComment',
-      data: { user_id, record_id, comm_id },
-      success: res => {
-        console.log(res)
-        const comments = res.result['res_comments']
-        for (let v of comments) {
-          let zid = v.zans.includes(user_id)
-          v["zanShape"] = zid ? src_zan_fu : src_zan_em
-          v["self"] = v.user_id === user_id
+  saveComment: function (content) {
+    let { fileId, curMaster } = this.data
+    let recordId = curMaster.record_id
+    let masterId = curMaster.master_id
+    let userId = App.globalData.openid
+    let reId = this.data.reId
+    let reName = this.data.reName
+    let reContent = this.data.reContent
+    wx.request({
+      url: `${host}/saveComment`,
+      method: 'POST',
+      data: { recordId, masterId, fileId, userId, content, reId, reName, reContent },
+      success: (res)=> {
+        console.log(res.data)
+        if (res) {
+          let commentList = res.data
+          this.initCommentList(commentList)
         }
-        recordList[index]["comments"] = comments
-        recordList[index]["comm"] = comments.length
-        wx.hideLoading()
-        that.setData({ recordList })
       }
+    });
+
+  },
+  replyUser(e) {
+    let { cid, nickname, content } = e.currentTarget.dataset
+    let recordList = this.data.recordList
+    let pre = content.substr(0, 5)
+    pre = (content.length > 5) ? pre + '...' : pre
+    this.setData({
+      inputPh: `回复 ${nickname} '${pre}'：`,
+      inputValue: '',
+      recordList,
+      reId: cid,
+      reName: nickname,
+      reContent: content
     })
+  },
+  clearInput() {
+    let inputPh = this._inputPh
+    this.setData({
+      inputPh,
+      inputValue: '',
+      reId: '',
+      reName: '',
+      reContent: ''
+    })
+  },
+  delComment(commId, recordId) {
+    let userId = App.globalData.openid
+    wx.request({
+      url: `${host}/deleteComment`,
+      method: 'POST',
+      data: { recordId, userId, commId },
+      success: (res) => {
+        this.clearInput()
+        console.log(res.data)
+        if (res) {
+          let commentList = res.data
+          this.initCommentList(commentList)
+        }
+      }
+    });
+  },
+
+  confirmInput(e) {
+    let { value } = e.detail
+    console.log('value:',value)
+    this.saveComment(value.trim())
   },
 
   //--留言点赞--
@@ -764,12 +795,12 @@ Page({
     let type = ''
     if (zid) {
       type = 'pull'
-      recordList[idx]["comments"][midx]["zanShape"] = src_zan_em
+      recordList[idx]["comments"][midx]["zanShape"] = zanOff
       let dx = recordList[idx]["comments"][midx]["zans"].indexOf(user_id)
       recordList[idx]["comments"][midx]["zans"].splice(dx, 1)
     } else {
       type = 'push'
-      recordList[idx]["comments"][midx]["zanShape"] = src_zan_fu
+      recordList[idx]["comments"][midx]["zanShape"] = zanOn
       recordList[idx]["comments"][midx]["zans"].push(user_id)
     }
     wx.cloud.callFunction({
@@ -782,10 +813,18 @@ Page({
     })
   },
 
-  showOther: function () {
-    let show_other = !this.data.show_other
+  showOther() {
+    let rt90 = !this.data.rt90
+    let otherShow = !this.data.otherShow
     this.setData({
-      show_other
+      rt90,
+      otherShow,
+    })
+  },
+  closeMask() {
+    this.setData({
+      rt90: false,
+      otherShow: false,
     })
   },
 

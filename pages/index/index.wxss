@@ -69,5 +69,6 @@
   bottom: 0;
   right: 10rpx;
   height: 24rpx;
-  opacity: 0.2;
+  width: 30rpx;
+  opacity: 0.6;
 }

@@ -3,7 +3,7 @@
 
 <view class="box">
   <view class="top-mine">
-    <image class="avatar" src="{{hasLogin ? userInfo.avatarUrl : detaultAvatar}}"></image>
+    <image class="avatar" src="{{hasLogin ? userInfo.avatar_url : detaultAvatar}}"></image>
 
     <view class="relation">
       <view class="mine-menu">
@@ -26,30 +26,24 @@
 
 
     <view class="mine-right">
-      <view wx:if="{{!isMine}}" class="btn-follow" bindtap="uploadAvatar">关注</view>
+      <view wx:if="{{isMine}}" class="btn-follow" bindtap="uploadAvatar">关注</view>
       <image wx:if="{{isMine}}" class="icon-arrow" src="../../images/w-arrow.png"></image>
     </view>
 
   </view>
   
-  <view class="profile">
-    <view class="mine-name">{{userInfo.nickName}}</view>
+  <view class="profile" hidden="{{!hasLogin}}">
+    <view class="mine-name">{{userInfo.nick_name}}</view>
     <view class="mine-coin">硬币：1</view>
-    <view hidden="{{!moto}}" class="mine-coin">{{moto}}</view>
+    <view class="mine-coin">{{motto}}</view>
   </view>
 
   </view>
 
-<button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">获取手机号</button>
   <view class="userinfo">
-    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-    <block wx:else>
+    <button wx:if="{{!hasLogin && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <!-- <block wx:else>
       <image bindtap="toDetail" class="userinfo-avatar" src="{{avatarUrl}}" mode="cover"></image>
       <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-    </block>
-  </view>
-  <view class="usermotto">
-    <button bindtap="uploadAvatar">测试上传</button>
-    <button bindtap="setMoto">moto</button>
-    <text class="user-motto">{{motto}}</text>
+    </block> -->
   </view>

@@ -7,13 +7,11 @@ Page({
    */
   data: {
     isIpx: app.globalData.isIpx,
-    bg: '../../images/bg-0.png',
-    detaultAvatar: '../../images/mine-off',
-    motto: 'Hello Mine',
+    hasLogin: false,
     userInfo: {},
-    moto: '',
-    hasUserInfo: false,
-    hasLogin: true,
+    bg: '../../images/bg-0.png',
+    detaultAvatar: '../../images/de-avatar.png',
+    motto: '',
     isMine: false,
     avatarUrl: 'https://avatar-1256378396.cos.ap-guangzhou.myqcloud.com/n_cm_0.png',
     canIUse: wx.canIUse('button.open-type.getUserInfo')
@@ -38,14 +36,19 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    this.setMotto()
   },
 
   /**
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
+    clearTimeout(this._it0)
+    clearTimeout(this._it1)
     // this.setBgColor()
+    this.setData({
+      motto: ''
+    })
   },
 
   /**
@@ -81,40 +84,35 @@ Page({
    */
 
   init() {
-    if (app.globalData.userInfo) {
+    this.setData({
+      hasLogin: app.globalData.hasLogin,
+      userInfo: app.globalData.userInfo,
+    })
+  },
+  setMotto() {
+    let motto = 'Hello you!'
+    this._it0 = setTimeout(() => {
+      if (!this.data.hasLogin) return
       this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
+        motto: 'Hello'
       })
-    } else if (this.data.canIUse) {
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = res => {
+      this._it1 = setTimeout(() => {
         this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
+          motto
         })
-      }
-    } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
-      wx.getUserInfo({
-        success: res => {
-          app.globalData.userInfo = res.userInfo
-          this.setData({
-            userInfo: res.userInfo,
-            hasUserInfo: true
-          })
-        }
-      })
-    }
+      }, 1000)
+    }, 500)
   },
 
   getUserInfo: function (e) {
-    console.log(e)
-    app.globalData.userInfo = e.detail.userInfo
-    this.setData({
-      userInfo: e.detail.userInfo,
-      hasUserInfo: true
+    let userInfo = e.detail.userInfo
+    app.initAvatar(userInfo).then(data=>{
+      console.log(data)
+      this.setData({
+        userInfo: data,
+        hasLogin: true
+      })
+      this.setMotto()
     })
   },
 
@@ -132,26 +130,16 @@ Page({
       animation: { duration: 300, timingFunc: 'easeOut' }
     })
   },
-  setMoto() {
-    let moto = !this._moto ? '纵然疾风起、人生不言弃' : ''
-    this._moto = !this._moto
-    this.setData({
-      isMine: !this.data.isMine,
-      moto
-    })
-  },
+  // setMotto() {
+  //   let motto = !this._motto ? '纵然疾风起、人生不言弃' : ''
+  //   this._motto = !this._motto
+  //   this.setData({
+  //     isMine: !this.data.isMine,
+  //     motto
+  //   })
+  // },
   uploadAvatar() {
     let avatar = this.data.userInfo.avatarUrl
     console.log(avatar)
-    wx.downloadFile({
-      url: avatar,
-      success(res) {
-        let { tempFilePath } = res
-        app.uploadAvatar("demo.png", tempFilePath).then((data)=>{
-          console.log(data)
-        })
-      }
-      
-    })
   },
 })

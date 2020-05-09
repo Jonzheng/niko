@@ -21,26 +21,6 @@ Component({
       type: Boolean,
       value: false,
     },
-		// 控制空状态的显示
-		emptyShow: {
-			type: Boolean,
-			value: false,
-		},
-		// 当前列表长度
-		listCount: {
-			type: Number,
-			value: 0,
-		},
-		// 空状态的图片
-		emptyUrl: {
-			type: String,
-			value: "/assets/image/empty/empty.png"
-		},
-		// 空状态的文字提示
-		emptyText: {
-			type: String,
-			value: "未找到数据"
-		},
 		// 是否有header
 		hasTop: {
 			type: Boolean,
@@ -49,7 +29,7 @@ Component({
 		// 下拉刷新的高度
 		refreshSize: {
 			type: Number,
-			value: 90,
+			value: 80,
 			observer: 'refreshChange'
 		},
 		// 顶部高度
@@ -151,12 +131,7 @@ Component({
 		 * 加载更多
 		 */
 		more() {
-			if (!this.properties.end) {
-				this.setData({
-					mode: 'more'
-				});
-				this.triggerEvent('more');
-			}
+			this.triggerEvent('more');
 		},
 		/**
 		 * 监听 requesting 字段变化, 来处理下拉刷新对应的状态变化

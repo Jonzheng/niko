@@ -1,0 +1,17 @@
+  <view class="mask {{formShow ? 'mask-show': 'mask-hide'}}" catchtap='clickMask' catch:touchmove='pass'></view>
+
+  <view class="edit-container {{formShow ? 'form-show': 'form-hide'}}">
+    <view class="box-close">
+      <image class="c_close" src="../../images/close.png" catchtap="clickMask"/>
+      <view>{{formTitle}}</view>
+    </view>
+    <scroll-view class="box-edit-menu" scroll-y="{{true}}"
+      style="height: {{boxHeight}}rpx;padding-bottom:{{hasInput? 160 : 0 }}rpx;margin-bottom:{{isIpx&&!hasInput? 60: 0 }}rpx;" catch:touchmove='pass'>
+     <slot></slot>
+    </scroll-view>
+    <view wx:if="{{hasInput}}" class="footer" catch:touchmove='pass'>
+      <input class="comm-input" placeholder="{{inputPh}}" confirm-type="send"
+        bindconfirm="confirmInput" bindblur="blur" value="{{inputValue}}">
+      </input>
+    </view>
+  </view>
