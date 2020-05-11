@@ -79,6 +79,15 @@
   padding: 30rpx;
 }
 
+.non-tips{
+  height: 120rpx;
+  color: #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .box-edit-menu{
   padding-left: 50rpx;
   width: 700rpx;

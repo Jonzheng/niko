@@ -89,6 +89,8 @@
         <block wx:for="{{recordList}}" wx:key="mkey">
           <template is="ele-master" data="{{...item,index,icon_more,icon_comm,icon_zan_em,icon_zan_fu}}"/>
         </block>
+
+        <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
       </view>
 
     </view>
@@ -126,13 +128,14 @@
         catchtap="toSerifu" data-index="{{index}}" data-title="{{item.title}}" data-serifu="{{item.serifu}}">
         <view class="edit-label">
           <view class="title {{fileId == item.file_id ? 'cur':''}}">{{item.title}}</view>
-          <view class="serifu {{fileId == item.file_id ? 'cur':''}}">{{item.serifu}}</view>
+          <view class="serifu {{fileId == item.file_id ? 'cur':''}}">{{item.ser}}</view>
         </view>
       </view>
   </block>
 </action-sheet>
 <action-sheet formShow="{{commShow}}" bind:clickMask="closeMask" bind:confirmInput="confirmInput" bind:blur="clearInput"
-  hasInput="{{true}}" boxHeight="{{isIpx ? 900 : 720}}" inputValue="{{inputValue}}" inputPh="{{inputPh}}" formTitle="评论">
+  hasInput="{{true}}" boxHeight="{{isIpx ? 900 : 720}}" inputValue="{{inputValue}}"
+  inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="index">
     <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url}}"/>
     <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}" data-nickname="{{item.nick_name}}" data-content="{{item.content}}">
@@ -167,7 +170,7 @@
       <view class="tri"></view>
       <view class="re-width">
         <view class="{{boxStyle}} {{anListen}}" data-idx="{{index}}"
-          bindtap="listen" data-nickName="{{show_name ? show_name : nick_name}}" data-record_id="{{record_id}}">
+          bindtap="listen" data-record_id="{{record_id}}">
           <view class='box-paly-btn'>
             <view hidden="{{isListen}}" class="btn-one"></view>
             <view class="btn-two {{listenStatus}}"></view>

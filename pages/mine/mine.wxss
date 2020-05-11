@@ -21,21 +21,22 @@
 }
 
 .box-records{
+  padding: 30rpx 20rpx;
   background: #fff;
   display: flex;
-  align-items: center;
   flex-direction: column;
 }
 
-.item-record{
-  display: flex;
-  width: 100%;
-  border-bottom: 1rpx solid #ccc;
+.record-label{
+  font-size: 28rpx;
+  color: #cccccc;
 }
 
-.sk-avatar{
-  width: 120rpx;
-  height: 120rpx;
+.item-record{
+  color: #666;
+  padding: 20rpx 20rpx;
+  display: flex;
+  border-bottom: 1rpx solid #ccc;
 }
 
 .top-mine{
@@ -64,6 +65,7 @@
 }
 
 .profile{
+  border-bottom: 3rpx solid #bbb;
   width: 750rpx;
   padding: 20rpx 20rpx;
   display: flex;
@@ -72,6 +74,111 @@
   background: #ffffff;
 }
 
+.box-line{
+  padding: 3rpx 0;
+  min-height: 36rpx;
+  display: flex;
+  align-items: center;
+}
+
+.box-col{
+  display: flex;
+  flex-direction: column;
+}
+
+.re-width{
+  width: 620rpx;
+  display: flex;
+  align-items: center;
+}
+
+.btn-play-box{
+  border: 1px #ddd solid; 
+  border-radius: 4px;
+  width:230rpx;
+  height:60rpx;
+  z-index: 1px;
+  transition: width 0.2s ease-in;
+}
+
+.btn-play-box-sm{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px #ddd solid; 
+  border-radius: 4px;
+  width:100rpx;
+  height:60rpx;
+  z-index: 1px;
+  transition: width 0.2s ease-out;
+}
+
+.box-paly-btn{
+  width: 66rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-one {
+  width: 8rpx;
+  height: 8rpx;
+  margin-right: 6rpx;
+  background-color: #ccc;
+  border-radius: 2px;
+  box-shadow: 0px 0px 1px 1px #eee;
+}
+
+.btn-two {
+  height: 28rpx;
+}
+
+.btn-three {
+  width: 10rpx;
+  height: 44rpx;
+  margin-left: 6rpx;
+  background-color: #ccc;
+  border-radius: 2px;
+}
+
+.btn-red-hidden{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a94442;
+  font-size: 0em;
+  border: 1px #f2dede solid;
+  border-radius: 4px;
+  width:1rpx;
+  height:60rpx;
+  z-index: 1px;
+  opacity: 0;
+  transition: all 0.1s;
+}
+
+.an-breath{
+  animation: breath 2s infinite;
+}
+@keyframes breath{
+  50%{opacity: 0.8}
+}
+
+.listen-on{
+  background-color: #ccc;
+  width: 28rpx;
+  border-radius: 2px;
+  transition: width 0.1s ease-in;
+}
+
+.listen-off{
+  background-color: #ccc;
+  width: 10rpx;
+  border-radius: 2px;
+  transition: width 0.1s ease-in;
+}
 
 .mine-name {
   height: 50rpx;

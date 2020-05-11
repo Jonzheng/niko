@@ -322,7 +322,14 @@
   min-height: 360rpx;
   margin-bottom: 100px;
 }
-
+.non-tips{
+  height: 120rpx;
+  color: #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 .inline{
   display:inline-block;
 }

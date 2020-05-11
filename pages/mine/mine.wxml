@@ -52,24 +52,45 @@
   </view>
 
   <view class="box-records">
-
+    <view class="record-label">录音：</view>
     <view class="item-record">
-      <view class="box-avatar">
-        <image class="sk-avatar" src="https://avatar-sk-1256378396.cos.ap-nanjing.myqcloud.com/n_bah.png"></image>
-      </view>
       <view class="box-col">
-        <view class="title">鬼切_技能：</view>
         <view class="serifu">奴のために居続けるのは果たして正しいのか</view>
+    <view class="box-line">
+      <view class="re-width">
+        <view class="{{boxStyle}} {{anListen}}" data-idx="{{index}}"
+          bindtap="listen" data-record_id="{{record_id}}">
+          <view class='box-paly-btn'>
+            <view hidden="{{isListen}}" class="btn-one"></view>
+            <view class="btn-two {{listenStatus}}"></view>
+            <view hidden="{{isListen}}" class="btn-three"></view>
+          </view>
+        </view>
+        <view class="{{btnDelStyle}}" bindtap='delRecordConfirm' data-idx="{{index}}" data-rid="{{record_id}}">撤回</view>
+      </view>
+      <image src="{{icon_more}}" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
+    </view>
       </view>
     </view>
 
     <view class="item-record">
-      <view class="box-avatar">
-        <image class="sk-avatar" src="https://avatar-sk-1256378396.cos.ap-nanjing.myqcloud.com/n_bah.png"></image>
-      </view>
       <view class="box-col">
-        <view class="title">鬼切_技能：</view>
         <view class="serifu">ふん、俺を利用しようなどと思うな</view>
+    <view class="box-line">
+      <view class="re-width">
+        <view class="{{boxStyle}} {{anListen}}" data-idx="{{index}}"
+          bindtap="listen" data-record_id="{{record_id}}">
+          <view class='box-paly-btn'>
+            <view hidden="{{isListen}}" class="btn-one"></view>
+            <view class="btn-two {{listenStatus}}"></view>
+            <view hidden="{{isListen}}" class="btn-three"></view>
+          </view>
+        </view>
+        <view class="{{btnDelStyle}}" bindtap='delRecordConfirm' data-idx="{{index}}" data-rid="{{record_id}}">撤回</view>
+      </view>
+      <image src="{{icon_more}}" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
+    </view>
+
       </view>
     </view>
     

@@ -369,6 +369,8 @@ Page({
           let recordList = record
           this.initSerifu(curList)
           this.initRecords(recordList)
+          list.map((item)=> item['ser'] = trim(item.serifu))
+          console.log(list)
           let shadow = curAudio.shadow.split(",").map((item) => { return item + 'rpx' })
           let srcVideo = curList.src_video.trim()
           console.log(curList.src_video.length, srcVideo.length)

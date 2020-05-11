@@ -5,6 +5,7 @@
       <image class="c_close" src="../../images/close.png" catchtap="clickMask"/>
       <view>{{formTitle}}</view>
     </view>
+    <view wx:if="{{empty}}" class="non-tips"> ※ 没有评论 ※</view>
     <scroll-view class="box-edit-menu" scroll-y="{{true}}"
       style="height: {{boxHeight}}rpx;padding-bottom:{{hasInput? 160 : 0 }}rpx;margin-bottom:{{isIpx&&!hasInput? 60: 0 }}rpx;" catch:touchmove='pass'>
      <slot></slot>

@@ -60,6 +60,15 @@ Component({
         })
       }
     },
+    empty: {
+      type: Boolean,
+      value: false,
+      observer(val) {
+        this.setData({
+          empty: val
+        })
+      }
+    },
   },
 
   /**

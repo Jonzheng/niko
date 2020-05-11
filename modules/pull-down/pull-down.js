@@ -47,6 +47,10 @@ Component({
 			type: String,
 			value: ""
 		},
+		info: {
+			type: String,
+			value: "刷新成功"
+		},
     // iOS点击顶部状态栏、安卓双击标题栏时，滚动条返回顶部，只支持竖向
     enableBackToTop: {
       type: Boolean,
@@ -92,7 +96,6 @@ Component({
 		change(e) {
 			let refreshStatus = this.data.refreshStatus
 			let diff = e.detail.y
-      console.log(diff)
 			if (refreshStatus >= 3) return;
 
 			if (diff > -10) {
