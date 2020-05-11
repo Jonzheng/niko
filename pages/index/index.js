@@ -12,9 +12,6 @@ const tabData = [
 ]
 Page({
 
-  /**
-   * 页面的初始数据
-   */
   data: {
     isIpx: App.globalData.isIpx,
     userInfo: {},
@@ -38,9 +35,6 @@ Page({
     bottomSize: 0,
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function (options) {
     this.init()
     this.getList('refresh', pageStart);
@@ -48,29 +42,21 @@ Page({
     this._indexTab = true
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
   onReady: function () {
 
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow: function () {
 
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
   onHide: function () {
     this._indexTab = false
+    wx.hideNavigationBarLoading()
   },
 
   /**
-   * 生命周期函数--当前是 tab 页时，点击 tab 时触发
+   * 点击当前tab时触发
    */
   onTabItemTap: function (e) {
     if (this._indexTab){

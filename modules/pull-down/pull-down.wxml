@@ -2,7 +2,7 @@
 	<view id="success"
 		  class="success {{successShow ? 'success--show' : ''}} {{successTran ? 'success--tran' : ''}}"
 		  style="top: {{topSize}}rpx;color: {{color}}">
-		<view class="info">刷新成功</view>
+		<view class="info">开发@郑三刀</view>
 	</view>
 	<movable-area class="movable-area">
 		<movable-view
@@ -42,7 +42,7 @@
 							<view class="loading__item"></view>
 							<view class="loading__item"></view>
 						</view>
-						<view class="text" wx:if="{{refreshStatus == 1}}">独立开发@郑三刀</view>
+						<view class="text" wx:if="{{refreshStatus == 1}}">下拉刷新</view>
 						<view class="text" wx:elif="{{refreshStatus == 2}}">松开更新</view>
 						<view class="text" wx:elif="{{refreshStatus == 3}}">加载中...</view>
 					</view>

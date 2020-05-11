@@ -9,7 +9,7 @@
       <view class="mine-menu">
         <view class="menu">
           <view class="menu-num">0</view>
-          <view class="menu-label">动态</view>
+          <view class="menu-label">获赞</view>
         </view>
 
         <view class="menu">
@@ -24,26 +24,56 @@
       </view>
     </view>
 
-
     <view class="mine-right">
       <view wx:if="{{isMine}}" class="btn-follow" bindtap="uploadAvatar">关注</view>
       <image wx:if="{{isMine}}" class="icon-arrow" src="../../images/w-arrow.png"></image>
     </view>
 
   </view>
-  
+</view>
+
+<view class="mine-body">
+  <view class="userinfo">
+    <button wx:if="{{!hasLogin && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+  </view>
+
+  <pull-down wx:if="{{hasLogin}}" id="scroll"
+      requesting="{{requesting}}"
+      end="{{end}}"
+      has-top="{{hasTop}}"
+      color="{{color}}"
+      bind:refresh="refresh"
+      bind:more="more">
+
   <view class="profile" hidden="{{!hasLogin}}">
     <view class="mine-name">{{userInfo.nick_name}}</view>
     <view class="mine-coin">硬币：1</view>
     <view class="mine-coin">{{motto}}</view>
   </view>
 
+  <view class="box-records">
+
+    <view class="item-record">
+      <view class="box-avatar">
+        <image class="sk-avatar" src="https://avatar-sk-1256378396.cos.ap-nanjing.myqcloud.com/n_bah.png"></image>
+      </view>
+      <view class="box-col">
+        <view class="title">鬼切_技能：</view>
+        <view class="serifu">奴のために居続けるのは果たして正しいのか</view>
+      </view>
+    </view>
+
+    <view class="item-record">
+      <view class="box-avatar">
+        <image class="sk-avatar" src="https://avatar-sk-1256378396.cos.ap-nanjing.myqcloud.com/n_bah.png"></image>
+      </view>
+      <view class="box-col">
+        <view class="title">鬼切_技能：</view>
+        <view class="serifu">ふん、俺を利用しようなどと思うな</view>
+      </view>
+    </view>
+    
   </view>
 
-  <view class="userinfo">
-    <button wx:if="{{!hasLogin && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-    <!-- <block wx:else>
-      <image bindtap="toDetail" class="userinfo-avatar" src="{{avatarUrl}}" mode="cover"></image>
-      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-    </block> -->
-  </view>
+  </pull-down>
+</view>

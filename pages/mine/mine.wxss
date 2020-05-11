@@ -4,14 +4,45 @@
   height: 280rpx;
   overflow: hidden;
   background: #ffffff;
+  z-index: 9;
 }
 
 .box{
   position: relative;
   top: -164rpx;
+  z-index: 10;
+}
+
+.mine-body{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 8;
+}
+
+.box-records{
+  background: #fff;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.item-record{
+  display: flex;
+  width: 100%;
+  border-bottom: 1rpx solid #ccc;
+}
+
+.sk-avatar{
+  width: 120rpx;
+  height: 120rpx;
 }
 
 .top-mine{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 140rpx;
   display: flex;
   align-items: center;

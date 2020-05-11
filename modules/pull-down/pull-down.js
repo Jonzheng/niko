@@ -90,9 +90,9 @@ Component({
 		 * movable-view 滚动监听
 		 */
 		change(e) {
-			let refreshStatus = this.data.refreshStatus,
-				diff = e.detail.y;
-
+			let refreshStatus = this.data.refreshStatus
+			let diff = e.detail.y
+      console.log(diff)
 			if (refreshStatus >= 3) return;
 
 			if (diff > -10) {
@@ -158,9 +158,9 @@ Component({
 								successTran: false,
 								move: this.data.scrollHeight1
 							});
-						}, 350)
-					}, 1500)
-				}, 600)
+						}, 250)
+					}, 900)
+				}, 450)
 			} else {
 				if (this.data.refreshStatus !== 3) {
 					this.setData({

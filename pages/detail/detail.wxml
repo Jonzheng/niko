@@ -179,7 +179,7 @@
             </block>
           </view>
         </view>
-        <view class="{{btnDelStyle}}" bindtap='delConfirm' data-idx="{{index}}" data-record_id="{{record_id}}">删除</view>
+        <view class="{{btnDelStyle}}" bindtap='delRecordConfirm' data-idx="{{index}}" data-rid="{{record_id}}">撤回</view>
         <view class="{{btnPoiStyle}}" data-idx="{{index}}" data-record_id="{{record_id}}" hidden="{{true}}"></view>
       </view>
       <image wx:if="{{isMine}}" src="{{icon_more}}" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>

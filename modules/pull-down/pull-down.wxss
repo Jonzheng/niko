@@ -44,7 +44,7 @@
   text-align: center;
   opacity: 0;
   transform: scale(0);
-  color: #3F82FD; }
+  color: #cccccc; }
   .success:after {
     content: " ";
     position: absolute;
@@ -73,7 +73,7 @@
   .success--tran {
     opacity: 0;
     transform: translateY(-100%);
-    transition: opacity 0.35s linear, transform 0.35s linear; }
+    transition: opacity 0.15s ease-in, transform 0.15s ease-in; }
 
 .empty {
   padding: 30rpx;

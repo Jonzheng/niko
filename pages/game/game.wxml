@@ -1,3 +1,5 @@
 <view class="container">
-  <view class="box">游戏移植施工中...</view>
+  <view class="box">
+    <view class="">开发测试中...</view>
+  </view>
 </view>

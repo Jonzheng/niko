@@ -3,5 +3,7 @@
   "disableScroll": true,
   "enablePullDownRefresh": false,
   "navigationStyle": "custom",
-  "usingComponents": {}
+  "usingComponents": {
+    "pull-down": "/modules/pull-down/pull-down"
+  }
 }

@@ -17,64 +17,41 @@ Page({
     canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad: function (options) {
     this.init()
     // this.setBgColor()
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
   onReady: function () {
 
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow: function () {
     this.setMotto()
   },
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
   onHide: function () {
     clearTimeout(this._it0)
     clearTimeout(this._it1)
+    clearTimeout(this._it2)
     // this.setBgColor()
     this.setData({
       motto: ''
     })
   },
 
-  /**
-   * 生命周期函数--监听页面卸载
-   */
   onUnload: function () {
 
   },
 
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
   onPullDownRefresh: function () {
     wx.stopPullDownRefresh();
   },
 
-  /**
-   * 页面上拉触底事件的处理函数
-   */
   onReachBottom: function () {
 
   },
 
-  /**
-   * 用户点击右上角分享
-   */
   onShareAppMessage: function () {
 
   },
@@ -88,6 +65,25 @@ Page({
       hasLogin: app.globalData.hasLogin,
       userInfo: app.globalData.userInfo,
     })
+  },
+  // 刷新数据
+  refresh() {
+    clearTimeout(this._it2)
+    this.setData({
+      requesting: true,
+      empty: false,
+      end: false,
+    })
+    this._it2 = setTimeout(()=>{
+      this.setData({
+        requesting: false
+      })
+    }, 666)
+  },
+  // 加载更多
+  more() {
+    console.log('-the end-')
+    // this.getList();
   },
   setMotto() {
     let motto = 'Hello you!'

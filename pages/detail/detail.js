@@ -81,6 +81,10 @@ Page({
     setTimeout(() => { this.setData({ rt90: false }) }, 300)
   },
 
+  onHide: function () {
+    wx.hideNavigationBarLoading()
+  },
+
   onPullDownRefresh: function () {
     const fileId = this.data.fileId
     const option = { fileId }
@@ -510,35 +514,32 @@ Page({
     }
   },
 
-  delMine: function (record_id) {
-    wx.cloud.callFunction({
-      name: 'updateRecordStatus',
-      data: { record_id },
-      success: res => {
+  delRecord(recordId) {
+    wx.request({
+      url: `${host}/updateRecord`,
+      method: 'post',
+      data: { recordId, status: 0 },
+      success: (res) => {
         console.log(res)
       }
     })
   },
 
-  delConfirm: function (e) {
-    let that = this
+  delRecordConfirm: function (e) {
     let currData = e.currentTarget.dataset
-    let record_id = currData.record_id
+    let recordId = currData.rid
     let index = currData.idx
     wx.showModal({
-      title: '删除录音?',
-      content: '确认删除录音',
+      title: '撤回录音?',
+      content: '撤回后可在「我的」再次发布',
       confirmText: "确认",
       cancelText: "取消",
-      success: function (res) {
-        //console.log(res);
+      success: (res)=> {
         if (res.confirm) {
-          let recordList = that.data.recordList
+          let recordList = this.data.recordList
           recordList.splice(index, 1)
-          that.setData({ recordList })
-          that.delMine(record_id)
-        } else {
-          //console.log('用户点击辅助操作')
+          this.setData({ recordList })
+          this.delRecord(recordId)
         }
       }
     });

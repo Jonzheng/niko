@@ -481,6 +481,7 @@
   font-size: 28rpx;
   color: #999;
   width: 480rpx;
+  height: 36rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -748,6 +749,7 @@
   flex-direction: column;
   margin-top: 10rpx;
   border-bottom: 3rpx solid rgba(0, 0, 255, 0.3);
+  height: 200rpx;
 }
 
 .record-left{
