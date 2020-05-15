@@ -279,7 +279,6 @@ Page({
 
   toDetail(e){
     let fileId = e.currentTarget.dataset.id
-    // fileId = fileId.replace(/\d/g, '0')
     wx.navigateTo({
       url: `../detail/detail?fileId=${fileId}`,
     })

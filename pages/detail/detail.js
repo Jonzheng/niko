@@ -399,17 +399,16 @@ Page({
   },
 
   setMasterStop: function () {
-    let index = this.data.listenIndex
-    //console.log("setMasterStop:", index)
+    let index = this._listenIndex
     let recordList = this.data.recordList
     if (index != null && recordList[index]["isListen"]) {
       recordList[index]["isListen"] = false
       recordList[index]["listenStatus"] = "listen-off"
       recordList[index]["anListen"] = ""
       this._audioContextMaster.stop()
+      this._listenIndex = null
       this.setData({
         recordList,
-        listenIndex: null
       })
     }
   },
@@ -431,39 +430,35 @@ Page({
     }
   },
 
-  stopOri: function () {
+  stopOri() {
     this._audioContextOri.stop()
   },
 
-  showMore: function (e) {
-    let that = this
+  showMore(e) {
     let currData = e.currentTarget.dataset
-    let index = currData.idx
+    let idx = currData.idx
     let recordList = this.data.recordList
-    let master_id = recordList[index]["master_id"]
-    console.log(recordList)
+    let master_id = recordList[idx]["master_id"]
     let isSelf = false
     if (master_id == App.globalData.openid) isSelf = true
-    //console.log(isSelf)
-    //console.log(recordList[index])
-    if (recordList[index]["btnRt"] == "rt-90") {
-      recordList[index]["boxStyle"] = "btn-play-box"
-      recordList[index]["btnRt"] = ""
+    if (recordList[idx]["btnRt"] == "rt-90") {
+      recordList[idx]["boxStyle"] = "btn-play-box"
+      recordList[idx]["btnRt"] = ""
       if (isSelf) {
-        recordList[index]["btnDelStyle"] = "btn-red-hidden"
+        recordList[idx]["btnDelStyle"] = "btn-red-hidden"
       } else {
-        recordList[index]["btnPoiStyle"] = "btn-red-hidden"
+        recordList[idx]["btnPoiStyle"] = "btn-red-hidden"
       }
     } else {
-      recordList[index]["boxStyle"] = "btn-play-box-sm"
-      recordList[index]["btnRt"] = "rt-90"
+      recordList[idx]["boxStyle"] = "btn-play-box-sm"
+      recordList[idx]["btnRt"] = "rt-90"
       if (isSelf) {
-        recordList[index]["btnDelStyle"] = "btn-red"
+        recordList[idx]["btnDelStyle"] = "btn-red"
       } else {
-        recordList[index]["btnPoiStyle"] = "btn-red"
+        recordList[idx]["btnPoiStyle"] = "btn-red"
       }
     }
-    that.setData({
+    this.setData({
       recordList
     })
   },
@@ -565,31 +560,38 @@ Page({
     });
   },
 
+  toPerson(e) {
+    let masterId = e.currentTarget.dataset.uid
+    if (masterId == App.globalData.openid){
+      return wx.switchTab({
+        url: '/pages/mine/mine',
+      })
+    }
+    wx.navigateTo({
+      url: `../person/person?masterId=${masterId}`,
+    })
+  },
 
-  listen: function (e) {
-    let that = this
+  listen(e) {
     let currData = e.currentTarget.dataset
-    let record_id = currData.record_id
-    let index = currData.idx
+    let recordId = currData.rid
+    let idx = currData.idx
     let recordList = this.data.recordList
-    let src_record = recordList[index]["src_record"]
-    if (!src_record) return
-    if (recordList[index]["isListen"]) {
-      recordList[index]["isListen"] = false
-      recordList[index]["listenStatus"] = "listen-off"
-      recordList[index]["anListen"] = ""
+    let srcRecord = recordList[idx]["src_record"]
+    if (!srcRecord) return
+    if (recordList[idx]["isListen"]) {
+      recordList[idx]["isListen"] = false
+      recordList[idx]["listenStatus"] = "listen-off"
+      recordList[idx]["anListen"] = ""
       this._audioContextMaster.stop()
     } else {
-      that.setMasterStop()
-      recordList[index]["isListen"] = true
-      recordList[index]["listenStatus"] = "listen-on"
-      recordList[index]["anListen"] = "an-listen-on"
-      console.log(index, src_record)
-      this._audioContextMaster.src = src_record
-      that.setData({
-        listenIndex: index
-      })
+      this.setMasterStop()
+      recordList[idx]["isListen"] = true
+      recordList[idx]["listenStatus"] = "listen-on"
+      recordList[idx]["anListen"] = "an-listen-on"
+      this._audioContextMaster.src = srcRecord
       this._audioContextMaster.play()
+      this._listenIndex = idx
     }
     this.setData({
       recordList
@@ -597,7 +599,7 @@ Page({
   },
 
   //--点心--
-  updateHeart: function (e) {
+  updateHeart(e) {
     let currData = e.currentTarget.dataset
     let { idx, status } = currData
     let userId = App.globalData.openid
@@ -696,6 +698,7 @@ Page({
     let recordId = curMaster.record_id
     let nickname = curMaster.nick_name
     this._inputPh = `评论 ${nickname}：`
+    this._curRecordIdx = idx
     this.setData({
       inputPh: `评论 ${nickname}：`,
       curMaster,
@@ -825,10 +828,18 @@ Page({
     })
   },
   closeMask() {
+    let idx = this._curRecordIdx
+    console.log('idx;',idx)
+    if (idx != undefined){
+      let recordList = this.data.recordList
+      recordList[idx]['comm'] = this.data.commentList.length
+      this.setData({ recordList })
+    }
     this.setData({
       rt90: false,
       otherShow: false,
     })
+    this._curRecordIdx = undefined
   },
 
   reload: function (e) {

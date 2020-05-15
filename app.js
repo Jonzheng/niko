@@ -132,6 +132,16 @@ App({
       })
     })
   },
+  cosDelete(recordId){
+    let filename = `${recordId}.mp3`
+    Cos.deleteObject({
+      Bucket: RecordBucket,
+      Region: Region,
+      Key: filename
+    }, function (err, data) {
+      console.log(err || data);
+    });
+  },
   globalData: {
     Cos,
     isIpx: false,

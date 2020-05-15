@@ -24,7 +24,10 @@ Page({
   },
 
   onLoad: function (options) {
-    this.init()
+    let { masterId } = options
+    this._masterId = masterId
+    this.getUser(masterId)
+    this.getRecords(masterId)
     // this.setBgColor()
   },
 
@@ -37,7 +40,6 @@ Page({
 
   onShow: function () {
     this.setMotto()
-    this.getRecords()
   },
 
   onHide: function () {
@@ -70,11 +72,24 @@ Page({
    * 自定函数
    */
 
-  init() {
+  getUser(openid) {
+    wx.request({
+      method: 'post',
+      url: `${host}/getUser`,
+      data: { openid },
+      success: res => {
+        if (res && res.data) {
+          let userInfo = res.data
+          this.setData({
+            userInfo
+          })
+        }
+      }
+    })
     this.setData({
+      admini: App.globalData.admini,
       isIpx: App.globalData.isIpx,
-      hasLogin: App.globalData.hasLogin,
-      userInfo: App.globalData.userInfo,
+      hasLogin: App.globalData.hasLogin
     })
   },
   // 刷新数据
@@ -85,8 +100,7 @@ Page({
       empty: false,
       end: false,
     })
-    this.init()
-    this.getRecords()
+    this.getRecords(this._masterId)
   },
   // 加载更多
   more() {
@@ -94,39 +108,19 @@ Page({
     // this.getList();
   },
   setMotto() {
-    let motto = 'Hello you!'
-    this._it0 = setTimeout(() => {
-      if (!this.data.hasLogin) return
-      this.setData({
-        motto: 'Hello'
-      })
-      this._it1 = setTimeout(() => {
-        this.setData({
-          motto
-        })
-      }, 1000)
-    }, 500)
+
   },
-  auth() {
-    if (this.data.userInfo.auth_name != 'admini') return;
-    let admini = !App.globalData.admini
-    App.globalData.admini = admini
-    this.setData({ admini })
-  },
-  showAvatar(){
-    wx.hideTabBar()
+  showAvatar() {
     this.setData({
       avatarShow: true
     })
   },
-  hideAvatar(){
-    wx.showTabBar()
+  hideAvatar() {
     this.setData({
       avatarShow: false
     })
   },
-  getRecords() {
-    let masterId = App.globalData.openid
+  getRecords(masterId) {
     wx.request({
       url: `${host}/queryRecord`,
       method: 'post',
@@ -136,7 +130,8 @@ Page({
           requesting: false
         })
         let { data } = res
-        this.initRecords(data)
+        let recordList = data.filter((item)=>{return item.status == 1 || this.data.admini})
+        this.initRecords(recordList)
       }
     })
   },
@@ -345,17 +340,9 @@ Page({
     })
   },
   showComment: function (e) {
-    wx.hideTabBar({
-      fail: ()=>{
-        wx.showToast({
-          icon: 'none',
-          title: '函数调用失败，请更新微信',
-        })
-      }
-    })
     let currData = e.currentTarget.dataset
     let { idx, fid } = currData
-    let userId = App.globalData.openid
+    let userId = this._masterId
     let recordList = this.data.recordList
     let curMaster = recordList[idx]
     let recordId = curMaster.record_id
@@ -467,7 +454,6 @@ Page({
     this.saveComment(value.trim())
   },
   closeMask() {
-    wx.showTabBar()
     let idx = this._curRecordIdx
     let recordList = this.data.recordList
     console.log(idx, recordList)

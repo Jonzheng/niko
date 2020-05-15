@@ -20,15 +20,16 @@
 }
 .form-show{
   transition: transform .3s ease-in;
-  transform: translateY(-100%) translateZ(0px);
+  transform: translateY(0%) translateZ(0px);
 }
 .form-hide{
   transition: transform .3s ease-in;
-  transform: translateY(10%) translateZ(0px);
+  transform: translateY(100%) translateZ(0px);
 }
 
 .edit-container {
   position: fixed;
+  bottom: 0;
   width: 750rpx;
   background: #ffffff;
   z-index: 11;
@@ -42,7 +43,7 @@
   bottom: -10rpx;
   display: flex;
   justify-content: center;
-  height: 120rpx;
+  height: 110rpx;
   padding: 20rpx 30rpx;
   background: #eeeeee;
   box-shadow: -1rpx -6rpx 6rpx #eeeeee;

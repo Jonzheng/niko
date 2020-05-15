@@ -1,10 +1,9 @@
-<image class="top-bg" src="{{bg}}" style="{{isIpx ? 'height: 280rpx;':''}}"></image>
+<image class="top-bg" src="{{bg}}" style="{{isIpx ? 'height: 160rpx;':''}}"></image>
 <!-- <view class="top-bg"  style="{{isIpx ? 'height: 340rpx;':''}}"></view> -->
 
 <view class="box">
   <view class="top-mine">
-    <image class="avatar {{admini ? 'admini':''}}" src="{{hasLogin ? userInfo.avatar_url : detaultAvatar}}"
-    bindtap="showAvatar"></image>
+    <image class="avatar" src="{{hasLogin ? userInfo.avatar_url : detaultAvatar}}" bindtap="showAvatar"></image>
 
     <view class="relation">
       <view class="mine-menu">
@@ -51,7 +50,7 @@
       bind:more="more">
 
   <view class="profile" hidden="{{!hasLogin}}">
-    <view class="mine-name" bindlongtap="auth">{{userInfo.nick_name}}</view>
+    <view class="mine-name">{{userInfo.nick_name}}</view>
     <view class="mine-coin">硬币：1</view>
     <view class="mine-coin">{{userInfo.motto ? userInfo.motto : motto}}</view>
   </view>
@@ -85,7 +84,7 @@
                 bindtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="1">发布</view>
               <view class="text-del {{item.btnDelStyle}}" bindtap='delRecordConfirm' data-idx="{{index}}" data-rid="{{item.record_id}}">删除</view>
             </view>
-            <image src="{{icon_more}}" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
+            <image hidden="{{!admini}}" src="{{icon_more}}" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
           </view>
 
           <view class="box-line flex-space">
@@ -114,6 +113,7 @@
 
   </pull-down>
 </view>
+
 <view wx:if="{{avatarShow}}" class="avatar-mask" catchtap="hideAvatar">
   <image class="avatar-detail" src="{{userInfo.avatar_url}}" mode="widthFix"></image>
 </view>

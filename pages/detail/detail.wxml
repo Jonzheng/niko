@@ -137,7 +137,7 @@
   hasInput="{{true}}" boxHeight="{{isIpx ? 900 : 720}}" inputValue="{{inputValue}}"
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="index">
-    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url}}"/>
+    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
     <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}" data-nickname="{{item.nick_name}}" data-content="{{item.content}}">
       <view class="comm-top">
         <view class="name">{{item.nick_name}}<view wx:if="{{item.isAuthor}}" class="comm-author">up</view></view>
@@ -166,11 +166,12 @@
       <view class="date">{{dateStr}}</view>
     </view>
     <view class="box-line">
-      <image src="{{avatar_url ? avatar_url : '../../images/de-avatar.png'}}" class="re-avatar"></image>
+      <image src="{{avatar_url ? avatar_url : '../../images/de-avatar.png'}}" class="re-avatar"
+      bindtap="toPerson" data-uid="{{openid}}"></image>
       <view class="tri"></view>
       <view class="re-width">
-        <view class="{{boxStyle}} {{anListen}}" data-idx="{{index}}"
-          bindtap="listen" data-record_id="{{record_id}}">
+        <view class="{{boxStyle}} {{anListen}}"
+          bindtap="listen" data-idx="{{index}}" data-rid="{{record_id}}">
           <view class='box-paly-btn'>
             <view hidden="{{isListen}}" class="btn-one"></view>
             <view class="btn-two {{listenStatus}}"></view>

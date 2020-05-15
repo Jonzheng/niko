@@ -5,7 +5,7 @@ page{
 .top-bg{
   position: relative;
   width: 750rpx;
-  height: 280rpx;
+  height: 160rpx;
   overflow: hidden;
   background: #ffffff;
   z-index: 9;
@@ -51,14 +51,10 @@ page{
   justify-content: center;
   overflow: hidden;
 }
-.admini{
-  box-shadow: 0 0 20rpx black;
-}
 .avatar-detail{
   width: 264rpx;
   height: auto;
 }
-
 .record-label{
   font-size: 28rpx;
   color: #cccccc;
