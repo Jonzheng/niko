@@ -45,7 +45,6 @@ Page({
     loged: false,
     slider: 'bar-ori',
     cname: '* * *',
-    cv: '* * * *',
     skill: '* * *',
     oriPlaying: false,
     recordList: [],
@@ -66,6 +65,7 @@ Page({
     rt90: true,
     color: "#4a5fe2",
     requesting: false,
+    bottomSize: 0,
     commentList: [],
   },
 
@@ -192,6 +192,7 @@ Page({
   // 加载更多
   more() {
     console.log('-the end-')
+    this.setData({end: true})
     // this.getList();
   },
 

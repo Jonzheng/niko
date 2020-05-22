@@ -69,9 +69,29 @@
           <view class="rank-value">最高分</view>
           <view class="rank-value">通关次数</view>
         </view>
-        <block wx:for="{{ranks}}" wx:key="mkey" wx:for-index="idx">
-          <template is="rank-0" data="{{...item,idx,bgc}}"/>
-        </block>
+        <view class="box-list">
+          <scroll id="scroll"
+              requesting="{{requesting}}"
+              empty-show="{{emptyShow}}"
+              end="{{end}}"
+              listCount="{{100}}"
+              scrollTop="{{scrollTop}}"
+              scrollAnimation="{{scrollAnimation}}"
+              has-top="{{hasTop}}"
+              enable-back-to-top="{{enableBackToTop}}"
+              refresh-size="{{refreshSize}}"
+              top-size="{{topSize}}"
+              bottom-size="{{bottomSize}}"
+              color="{{color}}"
+              bind:refresh="refresh"
+              bind:more="more">
+            <view class="cells">
+              <block wx:for="{{ranks}}" wx:key="mkey" wx:for-index="idx">
+                <template is="rank-0" data="{{...item,idx,bgc}}"/>
+              </block>
+            </view>
+          </scroll>
+        </view>
       </view><!-- box-rank end-->
 
 

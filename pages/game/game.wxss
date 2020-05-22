@@ -1,6 +1,7 @@
 .fixed{
   position:fixed;
   width: 750rpx;
+  overflow: hidden;
 }
 
 .top-box{
@@ -133,6 +134,14 @@
   box-shadow:0px 0px 10rpx #ddd;
 }
 
+.box-list{
+  position: relative;
+}
+.cells {
+  background: #ffffff;
+  margin-top: 20rpx;
+}
+
 .row-title{
   display: flex;
   flex: none;
@@ -141,6 +150,7 @@
   box-shadow:0px 0px 10rpx #fff;
   color: #bbb;
   font-size: 30rpx;
+  z-index: 99rpx;
 }
 
 .shop-title{

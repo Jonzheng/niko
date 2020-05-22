@@ -25,6 +25,7 @@ Page({
 
   onLoad: function (options) {
     this.init()
+    this.getUser()
     // this.setBgColor()
   },
 
@@ -33,20 +34,36 @@ Page({
     this._audioContextMaster.onEnded(() => {
       this.setMasterStop();
     });
+    setTimeout(()=>{
+      if (App.globalData.hasLogin && !this.data.userInfo.avatar_url){
+        console.log('reload...')
+        this.getUser()
+      }
+    }, 600)
   },
 
   onShow: function () {
-    this.setMotto()
     this.getRecords()
+    let showName = App.globalData.showName ? App.globalData.showName : ''
+    if (showName){
+      let userInfo = this.data.userInfo
+      userInfo['showName'] = showName
+      this.setData({ userInfo })
+      App.globalData.showName = ''
+    }
+    let motto = App.globalData.motto ? App.globalData.motto : ''
+    if (motto){
+      let userInfo = this.data.userInfo
+      userInfo['motto'] = motto
+      this.setData({ userInfo })
+      App.globalData.motto = ''
+    }
   },
 
   onHide: function () {
-    clearTimeout(this._it0)
-    clearTimeout(this._it1)
-    clearTimeout(this._it2)
     // this.setBgColor()
     this.setData({
-      motto: ''
+      requesting: false
     })
   },
 
@@ -69,43 +86,53 @@ Page({
   /**
    * 自定函数
    */
-
+  getUser() {
+    let openid = App.globalData.openid
+    wx.request({
+      method: 'post',
+      url: `${host}/getUser`,
+      data: { openid },
+      success: res => {
+        if (res && res.data) {
+          let userInfo = res.data
+          this.setData({
+            userInfo
+          })
+        }
+      }
+    })
+    let admini = App.globalData.admini
+    admini = admini ? admini : false
+    this.setData({
+      admini,
+      isIpx: App.globalData.isIpx,
+      hasLogin: App.globalData.hasLogin
+    })
+  },
   init() {
     this.setData({
       isIpx: App.globalData.isIpx,
-      hasLogin: App.globalData.hasLogin,
-      userInfo: App.globalData.userInfo,
+      hasLogin: App.globalData.hasLogin
     })
   },
   // 刷新数据
   refresh() {
-    clearTimeout(this._it2)
     this.setData({
       requesting: true,
       empty: false,
       end: false,
     })
     this.init()
+    this.getUser()
     this.getRecords()
   },
   // 加载更多
   more() {
     console.log('-the end-')
+    this.setData({
+      loadEnd: true
+    })
     // this.getList();
-  },
-  setMotto() {
-    let motto = 'Hello you!'
-    this._it0 = setTimeout(() => {
-      if (!this.data.hasLogin) return
-      this.setData({
-        motto: 'Hello'
-      })
-      this._it1 = setTimeout(() => {
-        this.setData({
-          motto
-        })
-      }, 1000)
-    }, 500)
   },
   auth() {
     if (this.data.userInfo.auth_name != 'admini') return;
@@ -123,6 +150,20 @@ Page({
     wx.showTabBar()
     this.setData({
       avatarShow: false
+    })
+  },
+  toPerson(e) {
+    let masterId = e.currentTarget.dataset.uid
+    if (masterId == App.globalData.openid) return
+    wx.navigateTo({
+      url: `../person/person?masterId=${masterId}`,
+    })
+  },
+  toNews(e) {
+    let level = e.currentTarget.dataset.level
+    let { news, heartCount, followCount, fansCount } = this.data.userInfo
+    wx.navigateTo({
+      url: `../news/news?level=${level}&news=${news}&heartCount=${heartCount}&followCount=${followCount}&fansCount=${fansCount}`,
     })
   },
   getRecords() {
@@ -170,7 +211,6 @@ Page({
         userInfo: data,
         hasLogin: true
       })
-      this.setMotto()
     })
   },
 
@@ -478,7 +518,13 @@ Page({
       otherShow: false,
     })
   },
-
+  toEdit(e) {
+    let showName = e.currentTarget.dataset.name
+    let motto = e.currentTarget.dataset.motto
+    wx.navigateTo({
+      url: `../edit/edit?showName=${showName}&motto=${motto}`,
+    })
+  },
   toDetail(e) {
     let fileId = e.currentTarget.dataset.id
     wx.navigateTo({

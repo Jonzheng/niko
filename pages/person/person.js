@@ -43,13 +43,7 @@ Page({
   },
 
   onHide: function () {
-    clearTimeout(this._it0)
-    clearTimeout(this._it1)
-    clearTimeout(this._it2)
     // this.setBgColor()
-    this.setData({
-      motto: ''
-    })
   },
 
   onUnload: function () {
@@ -73,10 +67,11 @@ Page({
    */
 
   getUser(openid) {
+    let mineId = App.globalData.openid
     wx.request({
       method: 'post',
       url: `${host}/getUser`,
-      data: { openid },
+      data: { openid, mineId },
       success: res => {
         if (res && res.data) {
           let userInfo = res.data
@@ -86,15 +81,16 @@ Page({
         }
       }
     })
+    let admini = App.globalData.admini
+    admini = admini ? admini : false
     this.setData({
-      admini: App.globalData.admini,
+      admini,
       isIpx: App.globalData.isIpx,
       hasLogin: App.globalData.hasLogin
     })
   },
   // 刷新数据
   refresh() {
-    clearTimeout(this._it2)
     this.setData({
       requesting: true,
       empty: false,
@@ -120,6 +116,10 @@ Page({
       avatarShow: false
     })
   },
+  back(){
+    wx.navigateBack()
+  },
+
   getRecords(masterId) {
     wx.request({
       url: `${host}/queryRecord`,
@@ -484,4 +484,32 @@ Page({
     let avatar = this.data.userInfo.avatarUrl
     console.log(avatar)
   },
+  follow(e) {
+    let suffix = (e == 'unFollow') ? e : 'follow'
+    let openid = App.globalData.openid
+    let followId = this._masterId
+    wx.request({
+      url: `${host}/${suffix}`,
+      method: 'post',
+      data: { openid, followId },
+      success: (res) => {
+        console.log(res)
+        let userInfo = this.data.userInfo
+        userInfo['isFollow'] = (suffix == 'follow')
+        this.setData({
+          userInfo
+        })
+      }
+    })
+  },
+  unFollow(){
+    wx.showActionSheet({
+      itemList: ['取消关注'],
+      success:(res)=> {
+        if(res.tapIndex == 0){
+          this.follow('unFollow')
+        }
+      }
+    })
+  }
 })

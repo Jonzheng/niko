@@ -47,7 +47,10 @@ Page({
   },
 
   onShow: function () {
-
+    wx.hideNavigationBarLoading()
+    wx.setNavigationBarTitle({
+      title: '式神录',
+    })
   },
 
   onHide: function () {
@@ -150,7 +153,6 @@ Page({
   },
 
   getList(type, pageNo, level='') {
-    const that = this
     wx.showNavigationBarLoading()
     wx.setNavigationBarTitle({
       title: '加载中...',
@@ -161,7 +163,7 @@ Page({
       url: `${host}/queryList/merge`,
       method: 'post',
       data: { level: level, pageNo: pageNo},
-      complete(res) {
+      complete: (res)=> {
         setTimeout(()=>{
           wx.hideNavigationBarLoading()
           wx.setNavigationBarTitle({
@@ -173,10 +175,10 @@ Page({
           data['type'] = type
           data['pageNo'] = pageNo
           data['level'] = level
-          that.initList(data)
+          this.initList(data)
         }
         // 请求完成都会执行
-        that.setData({
+        this.setData({
           requesting: false,
         })
       }
@@ -292,6 +294,7 @@ Page({
       return;
     }
     let end = this[`_${level}End`]
+    end = end ? end : false
     console.log(index, level, end)
     this.setData({
       empty: false,

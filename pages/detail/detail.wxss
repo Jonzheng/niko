@@ -209,7 +209,7 @@
 .comm-top{
   display: flex;
   height: 36rpx;
-  width: 560rpx;
+  width: 572rpx;
   justify-content: space-between;
 }
 .comm-top .name{
@@ -393,15 +393,18 @@
   bottom: 0;
 }
 
+.box-list{
+  position: relative;
+}
+
 .record-box{
   position: relative;
   width: 750rpx;
-  height: 120rpx;
+  height: 130rpx;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding-top: 8rpx;
-  padding-bottom: 5rpx;
+  padding-bottom: 8rpx;
   opacity: 0.95;
   background-color: #ffffff;
 }

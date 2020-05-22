@@ -70,5 +70,5 @@
   right: 10rpx;
   height: 24rpx;
   width: 30rpx;
-  opacity: 0.6;
+  opacity: 1;
 }

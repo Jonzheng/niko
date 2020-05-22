@@ -1,4 +1,4 @@
-const host = 'https://omoz.club/api'
+const host = 'https://nikoni.fun/api'
 
 const formatTime = date => {
   const year = date.getFullYear()

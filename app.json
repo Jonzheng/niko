@@ -3,7 +3,10 @@
     "pages/index/index",
     "pages/mine/mine",
     "pages/game/game",
-    "pages/detail/detail"
+    "pages/detail/detail",
+    "pages/person/person",
+    "pages/news/news",
+    "pages/edit/edit"
   ],
   "tabBar": {
     "color": "#7A7E83",

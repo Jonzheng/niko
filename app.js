@@ -2,8 +2,8 @@ const COS = require('./lib/cos-sdk.js')
 const { host } = require('./utils/util')
 
 const Cos = new COS({
-  SecretId: 'AKIDtfGm8pIo1Ur57BCE7vJ9tgVFVdaab45x',
-  SecretKey: 'AOSVQEvvpaFl8OU3Yv8B5pPo0SDzfFi2',
+  SecretId: '',
+  SecretKey: '',
 })
 const AvatarBucket = 'avatar-1256378396'
 const RecordBucket = 'record-1256378396'
@@ -145,6 +145,7 @@ App({
   globalData: {
     Cos,
     isIpx: false,
+    admini: false,
     userInfo: null
   }
 })

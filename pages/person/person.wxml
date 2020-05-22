@@ -1,6 +1,7 @@
-<image class="top-bg" src="{{bg}}" style="{{isIpx ? 'height: 160rpx;':''}}"></image>
-<!-- <view class="top-bg"  style="{{isIpx ? 'height: 340rpx;':''}}"></view> -->
-
+<image class="top-bg" src="{{bg}}" style="height:{{isIpx ? 300:''}}rpx;"></image>
+<view class="btn-back" bindtap="back" style="top:{{isIpx ? 110:60}}rpx;">
+  <image class="back" src="../../images/arrow-left.png"></image>
+</view>
 <view class="box">
   <view class="top-mine">
     <image class="avatar" src="{{hasLogin ? userInfo.avatar_url : detaultAvatar}}" bindtap="showAvatar"></image>
@@ -8,17 +9,17 @@
     <view class="relation">
       <view class="mine-menu">
         <view class="menu">
-          <view class="menu-num">0</view>
+          <view class="menu-num">{{userInfo.heartCount || 0}}</view>
           <view class="menu-label">获赞</view>
         </view>
 
         <view class="menu">
-          <view class="menu-num">0</view>
+          <view class="menu-num">{{userInfo.followCount || 0}}</view>
           <view class="menu-label">关注</view>
         </view>
 
         <view class="menu">
-          <view class="menu-num">0</view>
+          <view class="menu-num">{{userInfo.fansCount || 0}}</view>
           <view class="menu-label">粉丝</view>
         </view>
       </view>
@@ -28,8 +29,6 @@
       <button class="out-share" open-type="share" size="mini">
         <image class="btn-share" src="../../images/share.png"></image>
       </button>
-      <view wx:if="{{isMine}}" class="btn-follow" bindtap="uploadAvatar">关注</view>
-      <image wx:if="{{isMine}}" class="icon-arrow" src="../../images/w-arrow.png"></image>
     </view>
 
   </view>
@@ -50,9 +49,13 @@
       bind:more="more">
 
   <view class="profile" hidden="{{!hasLogin}}">
-    <view class="mine-name">{{userInfo.nick_name}}</view>
+    <view class="box-line">
+      <view class="mine-name">{{userInfo.show_name || userInfo.nick_name}}</view>
+      <view wx:if="{{!userInfo.isFollow}}" class="btn-follow" bindtap="follow">+ 关注</view>
+      <view wx:if="{{userInfo.isFollow}}" class="btn-follow-un" bindtap="unFollow">已关注</view>
+    </view>
     <view class="mine-coin">硬币：1</view>
-    <view class="mine-coin">{{userInfo.motto ? userInfo.motto : motto}}</view>
+    <view class="mine-coin">{{userInfo.motto}}</view>
   </view>
 
   <view class="box-records">
@@ -123,9 +126,12 @@
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="index">
     <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url}}"/>
-    <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}" data-nickname="{{item.nick_name}}" data-content="{{item.content}}">
+    <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
+      data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">
       <view class="comm-top">
-        <view class="name">{{item.nick_name}}<view wx:if="{{item.isAuthor}}" class="comm-author">up</view></view>
+        <view class="name">{{item.show_name || item.nick_name}}
+          <view wx:if="{{item.isAuthor}}" class="comm-author">up</view>
+        </view>
         <view class="time">{{item.dateStr}}</view>
       </view>
       <view wx:if="{{item.re_id}}" class="comm-re">

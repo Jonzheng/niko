@@ -46,6 +46,10 @@ Component({
 			type: Boolean,
 			value: false
 		},
+		hideSuccess: {
+			type: Boolean,
+			value: false
+		},
 		// 下拉刷新的高度
 		refreshSize: {
 			type: Number,
@@ -163,20 +167,23 @@ Component({
 		 */
 		requestingEnd(newVal, oldVal) {
 			if (this.data.mode === 'more') return;
-
+      console.log(newVal, oldVal)
 			if (oldVal === true && newVal === false) {
 				setTimeout(() => {
+          console.log('successShow: true')
 					this.setData({
 						successShow: true,
 						refreshStatus: 4,
 						move: this.data.scrollHeight2
 					});
 					setTimeout(() => {
+            console.log('successTran: true')
 						this.setData({
 							successTran: true,
 							move: this.data.scrollHeight1
 						});
 						setTimeout(() => {
+              console.log('refreshStatus: 1')
 							this.setData({
 								refreshStatus: 1,
 								successShow: false,

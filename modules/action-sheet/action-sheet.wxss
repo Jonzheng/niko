@@ -90,8 +90,8 @@
 }
 
 .box-edit-menu{
-  padding-left: 50rpx;
-  width: 700rpx;
+  padding-left: 30rpx;
+  width: 720rpx;
 }
 
 .edit-menu-items{

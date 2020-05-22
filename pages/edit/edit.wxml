@@ -1,0 +1,14 @@
+<view class="label">昵称：</view>
+<view class="box">
+  <input class="in-name" value="{{showName}}" placeholder="输入昵称" maxlength="12"
+  auto-focus="{{true}}" bindinput='setName'></input>
+</view>
+<view class="label">个性签名：</view>
+<view class="box">
+  <input class="in-name" value="{{motto}}" placeholder="" maxlength="30" bindinput='setMotto'></input>
+</view>
+
+<view class="box-btn">
+  <view class="btn btn-save" bindtap="updateProfile">保存</view>
+  <view class="btn btn-cancel" bindtap="back">取消</view>
+</view>

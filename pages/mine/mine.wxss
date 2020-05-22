@@ -25,7 +25,7 @@ page{
 }
 
 .box-records{
-  padding: 30rpx 20rpx;
+  padding: 20rpx 20rpx;
   background: #fff;
   display: flex;
   flex-direction: column;
@@ -37,6 +37,31 @@ page{
 @keyframes an-shad{
   50%{box-shadow: 0 0 10px rgba(0, 0, 255, 0.3) inset;}
 }
+
+.box-news{
+  border-radius: 6rpx;
+  position: relative;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  height: 60rpx;
+  width: 705rpx;
+  background: #FFF5D6;
+  color: #FFA62F;
+}
+.icon-info {
+  margin: 0 10rpx;
+  height: 24rpx;
+  width: 24rpx;
+}
+.icon-next {
+  top: 30%;
+  position: absolute;
+  height: 24rpx;
+  width: 16rpx;
+  right: 18rpx;
+}
+
 .avatar-mask{
   position: fixed;
   top: 0;
@@ -60,6 +85,7 @@ page{
 }
 
 .record-label{
+  margin-top: 10rpx;
   font-size: 28rpx;
   color: #cccccc;
 }
@@ -123,7 +149,6 @@ page{
 
 .profile{
   border-bottom: 3rpx solid #bbb;
-  width: 750rpx;
   padding: 20rpx 20rpx;
   display: flex;
   flex-direction: column;
@@ -239,7 +264,7 @@ page{
 .comm-top{
   display: flex;
   height: 36rpx;
-  width: 560rpx;
+  width: 572rpx;
   justify-content: space-between;
 }
 .comm-top .name{
@@ -403,10 +428,25 @@ page{
 }
 
 .mine-name {
+  width: 590rpx;
   height: 50rpx;
   margin: 8rpx 0;
   font-size: 34rpx;
   color: #666666;
+}
+
+.icon-right{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+  width: 110rpx;
+  opacity: 0.5;
+}
+.icon-right .arrow{
+  width: 36rpx;
+  height: 36rpx;
+  transform: rotate(180deg);
 }
 
 .mine-coin {

@@ -1,0 +1,75 @@
+<image class="top-bg" src="{{bg}}" style="height:{{isIpx ? 260:200}}rpx;"></image>
+<view class="btn-back" bindtap="back" style="top:{{isIpx ? 110:60}}rpx;">
+  <image class="back" src="../../images/arrow-left.png"></image>
+</view>
+
+<view class="box" style="top:{{isIpx ? 162:102}}rpx;">
+  <view class="tab-wrap">
+    <tab tab-cur="{{tabCur}}"
+        tab-data="{{tabData}}"
+        color="{{color}}"
+        size="{{size}}"
+        bindchange="tabChange">
+    </tab>
+  </view>
+</view>
+
+<view class="box-list">
+  <scroll id="scroll"
+      requesting="{{requesting}}"
+      empty-show="{{emptyShow}}"
+      end="{{end || level == 'news'}}"
+      listCount="{{total}}"
+      scrollTop="{{scrollTop}}"
+      scrollAnimation="{{scrollAnimation}}"
+      has-top="{{hasTop}}"
+      enable-back-to-top="{{enableBackToTop}}"
+      refresh-size="{{refreshSize}}"
+      top-size="{{topSize}}"
+      bottom-size="{{bottomSize}}"
+      color="{{color}}"
+      bind:refresh="refresh"
+      bind:more="more">
+    <view class="cells">
+
+      <block wx:for="{{newsList}}" wx:key="index">
+        <view hidden="{{level != 'news'}}" class="cell">
+          <template is="an-list" data="{{item}}"/>
+        </view>
+      </block>
+      <block wx:for="{{heartList}}" wx:key="index">
+        <view hidden="{{level != 'heart'}}" class="cell">
+          <template is="an-list" data="{{item}}"/>
+        </view>
+      </block>
+      <block wx:for="{{followList}}" wx:key="index">
+        <view hidden="{{level != 'follow'}}" class="cell">
+          <template is="an-list" data="{{item}}"/>
+        </view>
+      </block>
+      <block wx:for="{{fansList}}" wx:key="index">
+        <view hidden="{{level != 'fans'}}" class="cell">
+          <template is="an-list" data="{{item}}"/>
+        </view>
+      </block>
+    </view>
+    <view wx:if="{{total == 0}}" class="non-tips"> ※ 没有数据 ※</view>
+  </scroll>
+
+</view>
+<template name="an-list">
+  <image class="avatar" mode="aspectFill" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.openid}}"/>
+  <view class="box-middle">
+    <view class="name">{{item.show_name || item.nick_name}}</view>
+    <view wx:if="{{item.level == 'follow' || item.level == 'fans'}}" class="content">{{item.motto}}</view>
+    <view wx:if="{{item.type == 'fans'}}" class="content-tips">关注了你  @{{item.dateStr}}</view>
+    <view wx:if="{{item.type == 'heart' || item.level == 'heart'}}" class="content-tips">赞了你的录音  @{{item.dateStr}}</view>
+    <view wx:if="{{item.type == 'comment'}}" class="content-tips">评论了你的录音  @{{item.dateStr}}</view>
+  </view>
+  <view class="right">
+    <image wx:if="{{item.skCover}}" class="avatar-sk" src="{{item.skCover}}" bindtap="toDetail" data-id="{{item.file_id}}"></image>
+    <view wx:if="{{item.level == 'fans' && item.status == 0}}" class="btn-follow" bindtap="follow">+ 关注</view>
+    <view wx:if="{{item.status == 2}}" class="btn-follow-un" bindtap="unFollow">互相关注</view>
+    <view wx:if="{{item.status == 1}}" class="btn-follow-un" bindtap="unFollow">已关注</view>
+  </view>
+</template>

@@ -12,7 +12,7 @@
 						bindtap="toggleTab"
             data-value="{{item.value}}"
 						data-index="{{index}}">
-				<view class="tabs__item-child">{{item.name}}</view>
+				<view class="tabs__item-child">{{item.name}} {{item.count}}</view>
 			</view>
 			<view class="tabs__line {{needTransition ? 'transition' : ''}}" style="background: {{color}};width: {{lineWidth}}px;transform: translateX({{translateX}}px)"></view>
 		</view>

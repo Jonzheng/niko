@@ -1,0 +1,126 @@
+page{
+  position: fixed;
+  overflow: hidden;
+}
+.top-bg{
+  position: relative;
+  width: 750rpx;
+  height: 200rpx;
+  overflow: hidden;
+  background: #ffffff;
+  z-index: 10;
+}
+.btn-back{
+  padding: 10rpx 40rpx 10rpx 20rpx;
+  display: inline-flex;
+  position: fixed;
+  left: 0;
+  z-index: 999;
+}
+.back{
+  width: 36rpx;
+  height: 36rpx;
+}
+.box{
+  position: fixed;
+  top: 102rpx;
+  width: 100%;
+  z-index: 99;
+}
+.box-list{
+  position: relative;
+  margin-bottom: 90rpx;
+  padding-bottom: 90rpx;
+}
+.non-tips{
+  height: 120rpx;
+  color: #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.cell{
+  padding-top: 8rpx;
+  background: #ffffff;
+  height: 150rpx;
+  display: flex;
+  border-bottom: 1rpx solid #eee;
+}
+
+.cell .avatar{
+  margin: 0 20rpx;
+  height: 120rpx;
+  width: 120rpx;
+  border-radius: 12rpx;
+}
+
+.box-middle{
+  width: 450rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.box-middle .name{
+  width: 450rpx;
+  height: 40rpx;
+  display: flex;
+  flex-direction: column;
+  color: #666;
+}
+.box-middle .content{
+  margin-top: 8rpx;
+  width: 450rpx;
+  height: 65rpx;
+  font-size: 26rpx;
+  color: #999;
+  display: flex;
+  flex-direction: column;
+}
+.box-middle .content-tips{
+  margin-top: 8rpx;
+  width: 450rpx;
+  height: 65rpx;
+  font-size: 26rpx;
+  color: #999;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.cell .right{
+  display: flex;
+  flex-direction: column;
+}
+.avatar-sk{
+  border-radius: 12rpx;
+  height: 120rpx;
+  width: 120rpx;
+}
+
+.btn-follow{
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid #4a5fe2;
+  font-size: 26rpx;
+  width: 120rpx;
+  height: 48rpx;
+  color: #4a5fe2;
+  background: rgba(bb,bb,bb,0.1);
+  border-radius: 8rpx;
+}
+.btn-follow-un{
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid #bbb;
+  font-size: 26rpx;
+  width: 120rpx;
+  height: 48rpx;
+  color: #bbb;
+  background: rgba(bb,bb,bb,0.1);
+  border-radius: 8rpx;
+}

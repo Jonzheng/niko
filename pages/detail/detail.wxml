@@ -1,109 +1,112 @@
-<pull-down id="scroll"
-		requesting="{{requesting}}"
-		end="{{end}}"
-		has-top="{{hasTop}}"
-		color="{{color}}"
-		bind:refresh="refresh"
-		bind:more="more">
+<view class="box-list">
+  <pull-down id="scroll"
+      requesting="{{requesting}}"
+      end="{{end}}"
+      has-top="{{hasTop}}"
+      color="{{color}}"
+      bottom-size="{{bottomSize}}"
+      bind:refresh="refresh"
+      bind:more="more">
 
-  <view class="container">
-    <view class="box-head">
+    <view class="container">
+      <view class="box-head">
 
-      <view class="box-avatar">
-        <image class="sk-avatar" src="https://avatar-sk-1256378396.cos.ap-nanjing.myqcloud.com/n_bah.png"></image>
-      </view>
-      <view class="box-profile">
-        <view class="box-line">
-          <view class="name">{{cname}}
-            <view class="cv">cv: {{cv}}</view>
-          </view>
-          <button class="out-share" open-type="share" size="mini">
-            <image class="btn-share" src="../../images/share.png"></image>
-          </button>
+        <view class="box-avatar">
+          <image class="sk-avatar" src="{{curAudio.avatar}}"></image>
         </view>
-        <view class="box-line">
-          <view class="curr-title" bindtap="showOther">
-            <view class="text">{{skill}}</view>
-            <view class='text-more {{rt90 ? "rt-other":""}}'>〉</view>
+        <view class="box-profile">
+          <view class="box-line">
+            <view class="name">{{cname}}
+              <view class="cv">cv: {{curAudio.cv || "* * * *"}}</view>
+            </view>
+            <button class="out-share" open-type="share" size="mini">
+              <image class="btn-share" src="../../images/share.png"></image>
+            </button>
+          </view>
+          <view class="box-line">
+            <view class="curr-title" bindtap="showOther">
+              <view class="text">{{skill}}</view>
+              <view class='text-more {{rt90 ? "rt-other":""}}'>〉</view>
+            </view>
           </view>
         </view>
-      </view>
 
-      <!-- <view class='box-other {{show_other ? "other-show":""}}'>
-        <block wx:for="{{other_lst}}" wx:key="mkey">
-          <view class='sk-btn' data-fid='{{item.file_id}}' bindtap="reload" hover-class="space-hover">
-            <view class='sk-title'>{{item.title}}</view>
-            <view class='sk-serifu'>{{item.serifu}}</view>
-          </view>
-        </block>
-      </view> -->
-
-    </view>
-  <view wx:if="{{showVideo}}" class="video-mask" catchtap="hideVideo">
-      <video id="thisVideo" class="video-detail" src="{{srcVideo}}" autoplay="{{true}}" object-fit="fill"
-        bindplay="videoOnPlay" catchtap="pass" show-progress="{{false}}" controls="{{true}}" 
-        bindfullscreenchange="fullScreenChange">
-      </video>
-  </view>
-    <view class="box-body">
-
-      <view class="box-serifu">
-        <view class='serifu'>
-          <block wx:for="{{serifuList}}" wx:key="mkey">
-            <view class="serifu-items">
-              <view wx:if="{{item.desc}}" class="desc">{{item.desc}}</view>
-              <view class="value">{{item.value}}</view>
+        <!-- <view class='box-other {{show_other ? "other-show":""}}'>
+          <block wx:for="{{other_lst}}" wx:key="mkey">
+            <view class='sk-btn' data-fid='{{item.file_id}}' bindtap="reload" hover-class="space-hover">
+              <view class='sk-title'>{{item.title}}</view>
+              <view class='sk-serifu'>{{item.serifu}}</view>
             </view>
           </block>
-        </view>
-        <view class='text-ron'>____</view>
-        <view class='text-ron'>{{koner}}</view>
-        <view class='text-ron'>{{roma}}</view>
+        </view> -->
 
-        <view class="box-ori">
-          <view class="btn-circle" bindtap="playOri" hover-class="black-hover">
-            <view class='{{oriPlaying ? "sound-stop" : "sound-play"}} '></view>
-          </view>
-          <view class="shadow-ori">
-          <view class='{{slider}}'></view>
-            <block wx:for="{{shadow}}" wx:key="mkey">
-              <view class="ele-ori" style="height:{{item}};transition: height 0.6s ease-in;"></view>
+      </view>
+    <view wx:if="{{showVideo}}" class="video-mask" catchtap="hideVideo">
+        <video id="thisVideo" class="video-detail" src="{{srcVideo}}" autoplay="{{true}}" object-fit="fill"
+          bindplay="videoOnPlay" catchtap="pass" show-progress="{{false}}" controls="{{true}}" 
+          bindfullscreenchange="fullScreenChange">
+        </video>
+    </view>
+      <view class="box-body">
+
+        <view class="box-serifu">
+          <view class='serifu'>
+            <block wx:for="{{serifuList}}" wx:key="mkey">
+              <view class="serifu-items">
+                <view wx:if="{{item.desc}}" class="desc">{{item.desc}}</view>
+                <view class="value">{{item.value}}</view>
+              </view>
             </block>
           </view>
+          <view class='text-ron'>____</view>
+          <view class='text-ron'>{{koner}}</view>
+          <view class='text-ron'>{{roma}}</view>
+
+          <view class="box-ori">
+            <view class="btn-circle" bindtap="playOri" hover-class="black-hover">
+              <view class='{{oriPlaying ? "sound-stop" : "sound-play"}} '></view>
+            </view>
+            <view class="shadow-ori">
+            <view class='{{slider}}'></view>
+              <block wx:for="{{shadow}}" wx:key="mkey">
+                <view class="ele-ori" style="height:{{item}};transition: height 0.6s ease-in;"></view>
+              </block>
+            </view>
+          </view>
+
+          <view class="box-line flex-right">
+            <view class="out-btn" bindtap="showVideo">
+              <image class="btn-video" src="../../images/video.png"></image>
+            </view>
+            <view class="out-btn" bindtap="nextSerifu">
+              <image class="btn-next" src="../../images/next.png"></image>
+            </view>
+          </view>
+
         </view>
 
-        <view class="box-line flex-right">
-          <view class="out-btn" bindtap="showVideo">
-            <image class="btn-video" src="../../images/video.png"></image>
-          </view>
-          <view class="out-btn" bindtap="nextSerifu">
-            <image class="btn-next" src="../../images/next.png"></image>
-          </view>
+      <view class="re-title">录音:</view>
+
+        <view class="record-list">
+          <block wx:for="{{recordList}}" wx:key="mkey">
+            <template is="ele-master" data="{{...item,index,icon_more,icon_comm,icon_zan_em,icon_zan_fu}}"/>
+          </block>
+
+          <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
+          <view wx:if="{{end && recordList.length != 0}}" class="non-tips"> ※ 没有更多啦 ※</view>
         </view>
 
       </view>
-
-    <view class="re-title">录音:</view>
-
-      <view class="record-list">
-        <block wx:for="{{recordList}}" wx:key="mkey">
-          <template is="ele-master" data="{{...item,index,icon_more,icon_comm,icon_zan_em,icon_zan_fu}}"/>
-        </block>
-
-        <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
-      </view>
-
     </view>
-  </view>
 
-</pull-down>
-
+  </pull-down>
+</view>
   <view class="fixed-bottom">
     <view class="my-progress-box">
       <view class='{{progress_record == 0 ? "" : "my-progress"}} {{isRecording ? "an-totop": ""}}'
         style='width:{{isRecording ? "" : progress_record}}%;'></view>
     </view>
-    <view class="record-box">
+    <view class="record-box" style="padding-bottom: {{isIpx ? 20:8}}rpx;">
       <button hidden="{{hasLogin}}" open-type="getUserInfo" class="btn-login" bindgetuserinfo="getUserInfo"></button>
       <view class='btn-circle {{!isRecording && hasTmp ? "" : "btn-hidden"}}' bindtap="playMyVoice" hover-class="black-hover">
         <view class='{{isPlaying ? "sound-stop" : "sound-play"}} '></view>
@@ -138,9 +141,10 @@
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="index">
     <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
-    <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}" data-nickname="{{item.nick_name}}" data-content="{{item.content}}">
+    <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
+      data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">
       <view class="comm-top">
-        <view class="name">{{item.nick_name}}<view wx:if="{{item.isAuthor}}" class="comm-author">up</view></view>
+        <view class="name">{{item.show_name || item.nick_name}}<view wx:if="{{item.isAuthor}}" class="comm-author">up</view></view>
         <view class="time">{{item.dateStr}}</view>
       </view>
       <view wx:if="{{item.re_id}}" class="comm-re">
@@ -162,7 +166,7 @@
 <template name="ele-master">
   <view class="box-record">
     <view class="box-line">
-      <view class="nickname">{{show_name ? show_name : nick_name}}</view>
+      <view class="nickname">{{show_name || nick_name}}</view>
       <view class="date">{{dateStr}}</view>
     </view>
     <view class="box-line">

@@ -1,0 +1,40 @@
+.box{
+  margin: 6rpx 0;
+  padding: 20rpx;
+  background: #fff;
+}
+.box .in-name{
+  background: #fff;
+}
+.label{
+  margin-left: 8rpx;
+  font-size: 26rpx;
+  color: #bbb;
+}
+
+.box-btn{
+  margin-top: 30rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.box-btn .btn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8rpx;
+  height: 80rpx;
+  width: 670rpx;
+  margin-top: 12rpx;
+  letter-spacing: 12rpx;
+}
+
+.btn-save{
+  color: #337ab7;
+  background: #fff;
+  border: 1px solid #337ab7;
+}
+.btn-cancel{
+  color: #888;
+  background: transparent;
+}

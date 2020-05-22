@@ -1,25 +1,25 @@
-<image class="top-bg" src="{{bg}}" style="{{isIpx ? 'height: 280rpx;':''}}"></image>
+<image class="top-bg" src="{{bg}}" style="height:{{isIpx ? 300:''}}rpx;"></image>
 <!-- <view class="top-bg"  style="{{isIpx ? 'height: 340rpx;':''}}"></view> -->
 
 <view class="box">
   <view class="top-mine">
-    <image class="avatar {{admini ? 'admini':''}}" src="{{hasLogin ? userInfo.avatar_url : detaultAvatar}}"
+    <image class="avatar {{admini ? 'admini':''}}" src="{{userInfo.avatar_url || detaultAvatar}}"
     bindtap="showAvatar"></image>
 
     <view class="relation">
       <view class="mine-menu">
-        <view class="menu">
-          <view class="menu-num">0</view>
+        <view class="menu" bindtap="toNews" data-level="heart">
+          <view class="menu-num">{{userInfo.heartCount || 0}}</view>
           <view class="menu-label">获赞</view>
         </view>
 
-        <view class="menu">
-          <view class="menu-num">0</view>
+        <view class="menu" bindtap="toNews" data-level="follow">
+          <view class="menu-num">{{userInfo.followCount || 0}}</view>
           <view class="menu-label">关注</view>
         </view>
 
-        <view class="menu">
-          <view class="menu-num">0</view>
+        <view class="menu" bindtap="toNews" data-level="fans">
+          <view class="menu-num">{{userInfo.fansCount || 0}}</view>
           <view class="menu-label">粉丝</view>
         </view>
       </view>
@@ -29,8 +29,6 @@
       <button class="out-share" open-type="share" size="mini">
         <image class="btn-share" src="../../images/share.png"></image>
       </button>
-      <view wx:if="{{isMine}}" class="btn-follow" bindtap="uploadAvatar">关注</view>
-      <image wx:if="{{isMine}}" class="icon-arrow" src="../../images/w-arrow.png"></image>
     </view>
 
   </view>
@@ -51,12 +49,22 @@
       bind:more="more">
 
   <view class="profile" hidden="{{!hasLogin}}">
-    <view class="mine-name" bindlongtap="auth">{{userInfo.nick_name}}</view>
+    <view class="box-line">
+      <view class="mine-name" bindlongtap="auth">{{userInfo.show_name}}</view>
+      <view class="icon-right" bindtap="toEdit" data-name="{{userInfo.show_name}}" data-motto="{{userInfo.motto}}">
+        <image class="arrow" src="../../images/arrow-left.png"></image>
+      </view>
+    </view>
     <view class="mine-coin">硬币：1</view>
     <view class="mine-coin">{{userInfo.motto ? userInfo.motto : motto}}</view>
   </view>
 
   <view class="box-records">
+    <view wx:if="{{userInfo.news > 0}}" class="box-news" bindtap="toNews" data-level="news">
+      <image class="icon-info" src="../../images/news-info.png"></image>
+      {{userInfo.news}}条未读信息
+      <image class="icon-next" src="../../images/news-next.png"></image>
+    </view>
     <view class="record-label">录音：</view>
     <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
     <block wx:for="{{recordList}}" wx:key="mkey">
@@ -109,7 +117,7 @@
         </view>
       </view>
     </block>
-    
+    <view wx:if="{{loadEnd}}" class="non-tips"> ※ 没有更多了 ※</view>
   </view>
 
   </pull-down>
@@ -122,10 +130,13 @@
   hasInput="{{true}}" boxHeight="{{isIpx ? 900 : 720}}" inputValue="{{inputValue}}"
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="index">
-    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url}}"/>
-    <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}" data-nickname="{{item.nick_name}}" data-content="{{item.content}}">
+    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
+    <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
+      data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">
       <view class="comm-top">
-        <view class="name">{{item.nick_name}}<view wx:if="{{item.isAuthor}}" class="comm-author">up</view></view>
+        <view class="name">{{item.show_name || item.nick_name}}
+          <view wx:if="{{item.isAuthor}}" class="comm-author">up</view>
+        </view>
         <view class="time">{{item.dateStr}}</view>
       </view>
       <view wx:if="{{item.re_id}}" class="comm-re">

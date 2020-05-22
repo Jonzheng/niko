@@ -5,12 +5,22 @@ page{
 .top-bg{
   position: relative;
   width: 750rpx;
-  height: 160rpx;
+  height: 280rpx;
   overflow: hidden;
   background: #ffffff;
   z-index: 9;
 }
-
+.btn-back{
+  padding: 10rpx 40rpx 10rpx 20rpx;
+  display: inline-flex;
+  position: fixed;
+  left: 0;
+  z-index: 999;
+}
+.back{
+  width: 36rpx;
+  height: 36rpx;
+}
 .box{
   position: relative;
   top: -164rpx;
@@ -119,7 +129,6 @@ page{
 
 .profile{
   border-bottom: 3rpx solid #bbb;
-  width: 750rpx;
   padding: 20rpx 20rpx;
   display: flex;
   flex-direction: column;
@@ -235,7 +244,7 @@ page{
 .comm-top{
   display: flex;
   height: 36rpx;
-  width: 560rpx;
+  width: 572rpx;
   justify-content: space-between;
 }
 .comm-top .name{
@@ -399,6 +408,7 @@ page{
 }
 
 .mine-name {
+  width: 590rpx;
   height: 50rpx;
   margin: 8rpx 0;
   font-size: 34rpx;
@@ -431,9 +441,22 @@ page{
   align-items: center;
   justify-content: center;
   border: 1rpx solid #4a5fe2;
-  width: 100rpx;
+  font-size: 26rpx;
+  width: 120rpx;
   height: 48rpx;
   color: #4a5fe2;
+  background: rgba(bb,bb,bb,0.1);
+  border-radius: 8rpx;
+}
+.btn-follow-un{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid #bbb;
+  font-size: 26rpx;
+  width: 120rpx;
+  height: 48rpx;
+  color: #bbb;
   background: rgba(bb,bb,bb,0.1);
   border-radius: 8rpx;
 }

@@ -1,5 +1,6 @@
 const App = new getApp()
 const { host } = require('../../utils/util')
+const pageStart = 1
 
 const kana_a = [["kana_a", "a", "あ", "ア"], ["kana_a", "i", "い", "イ"], ["kana_a", "u", "う", "ウ"], ["kana_a", "e", "え", "エ"], ["kana_a", "o", "お", "オ"]]
 const kana_ka = [["kana_ka", "ka", "か", "カ"], ["kana_ka", "ki", "き", "キ"], ["kana_ka", "ku", "く", "ク"], ["kana_ka", "ke", "け", "ケ"], ["kana_ka", "ko", "こ", "コ"]]
@@ -45,7 +46,7 @@ Page({
     tip: '',
     spend: 0,
     remind: 0,
-    tips: ['方块的颜色和假名都可以自由设定', '某个地方的方块也可以长按', '据说黑色的方块很好看', '说不定以后会有假名发音呢'],
+    tips: ['方块的颜色和假名都可以自由设定', '据说黑色的方块很好看', '说不定以后会有假名发音呢'],
     option: 1,
     top_hide: true,
     rank_hide: true,
@@ -60,20 +61,29 @@ Page({
     old_coin: 0,
     sub_coin: 0,
     try_idx: 0,
+    color: "#4a5fe2",
+    requesting: false,
+    end: false,
+    emptyShow: false,
+    scrollTop: null,
+    enableBackToTop: true,
+    refreshSize: 0,
+    topSize: 0,
+    bottomSize: 220,
   },
 
-  onLoad: function (options) {
-    var that = this
-    var tips = that.data.tips
-    var count_it = setInterval(function () {
-      that.data.spend += 3
-      if (that.data.spend % 18 == 0) {
+  onLoad(options) {
+    this._pageNo = pageStart
+    var tips = this.data.tips
+    var count_it = setInterval(()=> {
+      this.data.spend += 3
+      if (this.data.spend % 18 == 0) {
         var ridx = parseInt(Math.random() * tips.length)
         ridx = Math.min(ridx, tips.length - 1)
         var tip = tips[ridx]
-        that.setData({ tipsClass: 'tips-show', tip })
+        this.setData({ tipsClass: 'tips-show', tip })
       }
-      that.setData({
+      this.setData({
         count_it,
       })
     }, 3000)
@@ -94,9 +104,8 @@ Page({
       method: 'POST',
       data: { openid },
       success: (res)=> {
-        var ranks = res.data
-        if (ranks.length == 1) {
-          var rank = ranks[0]
+        var rank = res.data
+        if (rank) {
           var cosmap = this.data.cosmap
           var hira = rank.hira
           var kata = rank.kata
@@ -342,23 +351,33 @@ Page({
     });
   },
 
-  loadRank: function () {
+  loadRank(type, pageNo) {
+    this.setData({
+      requesting: true
+    })
     wx.request({
       url: `${host}/queryRank`,
       method: 'POST',
+      data: { pageNo },
       success: (res)=> {
-        var ranks = res.data
-        for (let rank of ranks) {
-          var myco = rank.myco
-          var colst = myco.split(",")
+        setTimeout(()=>{
+          this.setData({
+            requesting: false
+          })
+        }, 600)
+        let list = res.data
+        for (let rank of list) {
+          let myco = rank.myco
+          let colst = myco.split(",")
           rank["colst"] = colst
         }
+        let ranks = type === 'more' ? this.data.ranks.concat(list) : list
         this.setData({ ranks })
       }
     });
   },
 
-  setting: function (e) {
+  setting(e) {
     if (!this.data.loged) return
     var currData = e.currentTarget.dataset
     var option = currData.option
@@ -388,7 +407,21 @@ Page({
       this.setData({ option: 3 })
     }
     this.setData({ old_coin: 0, sub_coin: 0, buy_log: "" })
-
+  },
+  // 刷新数据
+  refresh() {
+    this._pageNo = pageStart
+    this.setData({
+      requesting: true,
+      empty: false,
+      end: false,
+    })
+    this.loadRank('refresh', pageStart);
+  },
+  // 加载更多
+  more() {
+    this._pageNo += 1
+    this.loadRank('more', this._pageNo);
   },
   select: function (e) {
     var currData = e.currentTarget.dataset
@@ -443,9 +476,8 @@ Page({
         method: 'POST',
         data: { openid },
         success: (res)=> {
-          var ranks = res.data
-          if (ranks.length != 1) return
-          var rank = ranks[0]
+          var rank = res.data
+          if (!rank) return
           var re_puz = rank.puz
           this.setPuzMap(re_puz)
           this.setData({ puzon })
@@ -621,9 +653,8 @@ Page({
         method: 'POST',
         data: { openid },
         success: function (res) {
-          var ranks = res.data.data
-          if (ranks.length != 1) return
-          var rank = ranks[0]
+          var rank = res.data
+          if (!rank) return
           var re_puz = rank.puz
           var puz_map = that.setPuzMap(re_puz)
           var canbuy = true
