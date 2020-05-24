@@ -66,3 +66,8 @@ page{
   transform: rotate(270deg);
   transition: transform 0.3s ease-in;
 }
+
+.blue-hover{
+  transform:scale(1.01, 1.01);
+  box-shadow: 0 0 20rpx rgba(0, 0, 255, 0.3);
+}

@@ -1,5 +1,6 @@
 <view class='page {{top_hide ? "fixed":""}}'>
-    <button hidden="{{loged}}" open-type="getUserInfo" class="get-user" bindgetuserinfo="toLogin">点击授权</button>
+    <button wx:if="{{!hasLogin}}" open-type="getUserInfo" class="get-user"
+      size="mini" bindgetuserinfo="getUserInfo">点击授权</button>
 
     <view class='top-box'>
       <view class='box-point'>
@@ -23,7 +24,7 @@
 
     </view><!-- top-box end-->
 
-  <view class='box-body' hidden="{{!loged}}">
+  <view class='box-body'>
 
     <view class='box-link' hidden='{{!top_hide}}'>
 
@@ -58,7 +59,7 @@
         <!-- omoz-img -->
         <view class='box-omoz-img' hidden='{{!puzon}}'>
           <image class='omoz-sm omoz-spin' src='{{icon_omoz}}'></image>
-          <image class='omoz-avatar' src='{{avatar_url}}'></image>
+          <image class='omoz-avatar' src='{{userInfo.avatar_url}}'></image>
         </view>
       </view><!-- box-kana end-->
 
@@ -74,7 +75,7 @@
               requesting="{{requesting}}"
               empty-show="{{emptyShow}}"
               end="{{end}}"
-              listCount="{{100}}"
+              listCount="{{total}}"
               scrollTop="{{scrollTop}}"
               scrollAnimation="{{scrollAnimation}}"
               has-top="{{hasTop}}"
@@ -104,8 +105,8 @@
             <view class="label-item">我的颜色:</view>
             <view class="label-item label-gold">金币:
               <view class="value-gold">{{my_coin}}</view>
-              <view class='add-gold' hidden="{{old_coin==0}}">+{{old_coin}}</view>
-              <view class='{{sub_coin > 0 ? "sub-gold":""}}' hidden='{{sub_coin==0}}'>-{{sub_coin}}</view>
+              <view class='add-gold' hidden="{{oldCoin==0}}">+{{oldCoin}}</view>
+              <view class='{{subCoin > 0 ? "sub-gold":""}}' hidden='{{subCoin==0}}'>-{{subCoin}}</view>
             </view>
           </view>
 
@@ -190,7 +191,7 @@
     </view><!-- box-setting end-->
 
   </view><!-- box-body end-->
-  <view hidden='{{!top_hide}}' class='tips-label {{tipsClass}}'>※{{tip}}</view>
+  <view hidden='{{!top_hide || !hasLogin}}' class='tips-label {{tipsClass}}'>※{{tip}}</view>
 
 </view><!-- box-page end-->
 

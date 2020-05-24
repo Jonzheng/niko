@@ -24,6 +24,11 @@ page{
   z-index: 8;
 }
 
+.btn-user{
+  border-radius: 12rpx;
+  margin-top: 320rpx;
+}
+
 .box-records{
   padding: 20rpx 20rpx;
   background: #fff;
@@ -140,8 +145,8 @@ page{
 }
 
 .top-mine .relation{
-  width: 432rpx;
-  padding: 0 20rpx;
+  width: 390rpx;
+  padding: 0 10rpx;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -338,11 +343,17 @@ page{
 }
 
 .out-share{
+  padding: 0 8rpx;
   display: flex;
   align-items: center;
   background: transparent;
   width: 50rpx;
   height: 50rpx;
+  z-index: 11;
+}
+.btn-contact{
+  width: 46rpx;
+  height: 46rpx;
 }
 .btn-share{
   width: 46rpx;
@@ -450,18 +461,17 @@ page{
 }
 
 .mine-coin {
+  margin: 3rpx 0;
   height: 32rpx;
   font-size: 24rpx;
   color: #888888;
 }
 
 .mine-right{
-  text-align: right;
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 100%;
-  width: 120rpx;
+  align-items: flex-end;
+  height: 92rpx;
+  width: 180rpx;
 }
 
 .icon-arrow{
@@ -484,7 +494,7 @@ page{
 
 .mine-menu{
   margin: 0;
-  padding: 10rpx 20rpx;
+  padding: 10rpx 0;
   display: flex;
   align-items: center;
   justify-content: space-around;

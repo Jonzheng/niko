@@ -107,7 +107,7 @@
         style='width:{{isRecording ? "" : progress_record}}%;'></view>
     </view>
     <view class="record-box" style="padding-bottom: {{isIpx ? 20:8}}rpx;">
-      <button hidden="{{hasLogin}}" open-type="getUserInfo" class="btn-login" bindgetuserinfo="getUserInfo"></button>
+      <button wx:if="{{!hasLogin}}" open-type="getUserInfo" class="btn-login" size="mini" bindgetuserinfo="getUserInfo"></button>
       <view class='btn-circle {{!isRecording && hasTmp ? "" : "btn-hidden"}}' bindtap="playMyVoice" hover-class="black-hover">
         <view class='{{isPlaying ? "sound-stop" : "sound-play"}} '></view>
       </view>

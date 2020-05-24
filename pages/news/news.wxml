@@ -34,22 +34,22 @@
 
       <block wx:for="{{newsList}}" wx:key="index">
         <view hidden="{{level != 'news'}}" class="cell">
-          <template is="an-list" data="{{item}}"/>
+          <template is="an-list" data="{{item, index}}"/>
         </view>
       </block>
       <block wx:for="{{heartList}}" wx:key="index">
         <view hidden="{{level != 'heart'}}" class="cell">
-          <template is="an-list" data="{{item}}"/>
+          <template is="an-list" data="{{item, index}}"/>
         </view>
       </block>
       <block wx:for="{{followList}}" wx:key="index">
         <view hidden="{{level != 'follow'}}" class="cell">
-          <template is="an-list" data="{{item}}"/>
+          <template is="an-list" data="{{item, index}}"/>
         </view>
       </block>
       <block wx:for="{{fansList}}" wx:key="index">
         <view hidden="{{level != 'fans'}}" class="cell">
-          <template is="an-list" data="{{item}}"/>
+          <template is="an-list" data="{{item, index}}"/>
         </view>
       </block>
     </view>
@@ -59,17 +59,35 @@
 </view>
 <template name="an-list">
   <image class="avatar" mode="aspectFill" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.openid}}"/>
-  <view class="box-middle">
-    <view class="name">{{item.show_name || item.nick_name}}</view>
+  <view class="box-middle" catchtap="{{item.type == 'fans' || item.level == 'fans' || item.level=='follow' ? 'toPerson':'toDetail'}}"
+    data-id="{{item.file_id}}" data-uid="{{item.openid}}">
+    <view class="name" catchtap="toPerson" data-uid="{{item.openid}}">{{item.show_name || item.nick_name}}</view>
     <view wx:if="{{item.level == 'follow' || item.level == 'fans'}}" class="content">{{item.motto}}</view>
-    <view wx:if="{{item.type == 'fans'}}" class="content-tips">关注了你  @{{item.dateStr}}</view>
-    <view wx:if="{{item.type == 'heart' || item.level == 'heart'}}" class="content-tips">赞了你的录音  @{{item.dateStr}}</view>
-    <view wx:if="{{item.type == 'comment'}}" class="content-tips">评论了你的录音  @{{item.dateStr}}</view>
+    <view wx:if="{{item.type == 'fans'}}" class="content-line">
+      <view class="content-label">关注了你</view>
+      <text class="content-label">@{{item.dateStr}}</text>
+    </view>
+    <view wx:if="{{item.type == 'heart' || item.level == 'heart'}}" class="content-line">
+      <view class="content-label">赞了你</view>
+      <text class="content-label">@{{item.dateStr}}</text>
+    </view>
+    <view wx:if="{{item.type == 'comment'}}" class="content">
+      <view class="content-label">评论了你</view>
+      <view class="content-line">
+        <text>{{item.pre}}</text>
+        <text class="content-label">@{{item.dateStr}}</text></view>
+    </view>
   </view>
-  <view class="right">
-    <image wx:if="{{item.skCover}}" class="avatar-sk" src="{{item.skCover}}" bindtap="toDetail" data-id="{{item.file_id}}"></image>
-    <view wx:if="{{item.level == 'fans' && item.status == 0}}" class="btn-follow" bindtap="follow">+ 关注</view>
-    <view wx:if="{{item.status == 2}}" class="btn-follow-un" bindtap="unFollow">互相关注</view>
-    <view wx:if="{{item.status == 1}}" class="btn-follow-un" bindtap="unFollow">已关注</view>
+  <view class="right" catchtap="{{item.skCover ? 'toDetail': (item.level=='news' || item.level=='heart') ? 'toPerson':''}}"
+    data-id="{{item.file_id}}" data-uid="{{item.openid}}">
+    <image wx:if="{{item.skCover}}" class="avatar-sk" src="{{item.skCover}}"></image>
+    <view wx:if="{{item.level == 'follow' && item.both == 0}}" class="btn-follow-un"
+      catchtap="unFollow" data-uid="{{item.openid}}" data-idx="{{index}}">已关注</view>
+    <view wx:if="{{item.level == 'follow' && item.both == 1}}" class="btn-follow-un"
+      catchtap="unFollow" data-uid="{{item.openid}}" data-idx="{{index}}">互相关注</view>
+    <view wx:if="{{item.level == 'fans' && item.both == 0}}" class="btn-follow"
+      catchtap="follow" data-uid="{{item.openid}}" data-idx="{{index}}">+ 关注</view>
+    <view wx:if="{{item.level == 'fans' && item.both == 1}}" class="btn-follow-un"
+      catchtap="unFollow" data-uid="{{item.openid}}" data-idx="{{index}}">互相关注</view>
   </view>
 </template>

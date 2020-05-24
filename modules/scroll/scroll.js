@@ -46,10 +46,6 @@ Component({
 			type: Boolean,
 			value: false
 		},
-		hideSuccess: {
-			type: Boolean,
-			value: false
-		},
 		// 下拉刷新的高度
 		refreshSize: {
 			type: Number,
@@ -116,7 +112,6 @@ Component({
 		change(e) {
 			let refreshStatus = this.data.refreshStatus,
 				diff = e.detail.y;
-				
 			if (refreshStatus >= 3) return;
 
 			if (diff > -10) {
@@ -134,7 +129,6 @@ Component({
 		 */
 		touchend() {
 			let refreshStatus = this.data.refreshStatus;
-
 			if (refreshStatus >= 3) return;
 
 			if (refreshStatus === 2) {
@@ -147,7 +141,7 @@ Component({
 				this.triggerEvent('refresh');
 			} else if (refreshStatus === 1) {
 				this.setData({
-					move: this.data.scrollHeight1
+          move: this.data.scrollHeight1
 				});
 			}
 		},
@@ -167,7 +161,6 @@ Component({
 		 */
 		requestingEnd(newVal, oldVal) {
 			if (this.data.mode === 'more') return;
-      console.log(newVal, oldVal)
 			if (oldVal === true && newVal === false) {
 				setTimeout(() => {
           console.log('successShow: true')
@@ -222,11 +215,13 @@ Component({
 			let successHeight = (windowWidth || 375) / 750 * 70;
 
 			this.createSelectorQuery().select("#refresh").boundingClientRect((res) => {
-				this.setData({
-          move: -res.height,
-					scrollHeight1: -res.height,
-					scrollHeight2: successHeight - res.height
-				});
+        console.log('h:', res.height, successHeight)
+        let move = res.height ? -res.height : -66
+        this.setData({
+          move,
+          scrollHeight1: move,
+          scrollHeight2: successHeight - move
+        });
 			}).exec();
 		},
 	},

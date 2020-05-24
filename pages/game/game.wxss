@@ -16,15 +16,15 @@
 }
 
 .get-user{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
+  position: fixed;
   top: 0;
-  width: 750rpx;
-  height:1180rpx;
-  opacity: 0.8;
-  color: #bbb;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 0.1;
+  color: #fff;
+  z-index: 999;
 }
 
 .box-omoz-img{
@@ -42,13 +42,13 @@
   top: 62rpx;
   width: 100rpx;
   height: 100rpx;
-  z-index: 99px;
+  z-index: 99;
 }
 
 .omoz-sm{
   width: 222rpx;
   height: 222rpx;
-  z-index: 9px;
+  z-index: 9;
 }
 
 .box-point{
@@ -126,6 +126,7 @@
   flex: none;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
 }
 
 .box-rank{
@@ -136,10 +137,11 @@
 
 .box-list{
   position: relative;
+  z-index: 9;
 }
 .cells {
-  background: #ffffff;
-  margin-top: 20rpx;
+  margin: 0;
+  z-index: 9;
 }
 
 .row-title{
@@ -150,7 +152,8 @@
   box-shadow:0px 0px 10rpx #fff;
   color: #bbb;
   font-size: 30rpx;
-  z-index: 99rpx;
+  z-index: 10;
+  background: #eee;
 }
 
 .shop-title{
@@ -418,10 +421,13 @@
 }
 
 .user-name{
-  margin: 6rpx 6rpx;
-  display: flex;
   color: #999;
-  font-size: 14px;
+  font-size: 28rpx;
+  height: 36rpx;
+  width: 275rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rank-no{
@@ -443,7 +449,7 @@
   display: flex;
   flex-direction:column;
   padding: 5rpx 5rpx;
-  z-index: 9px;
+  z-index: 9;
 }
 
 .box-link{

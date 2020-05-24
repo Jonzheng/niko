@@ -77,15 +77,21 @@ page{
   display: flex;
   flex-direction: column;
 }
-.box-middle .content-tips{
-  margin-top: 8rpx;
-  width: 450rpx;
+.box-middle .content-line{
+  padding-top: 8rpx;
+  width: 420rpx;
   height: 65rpx;
   font-size: 26rpx;
   color: #999;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  justify-content: space-between;
+}
+.comm-sumery{
+  width: 320rpx;
+}
+
+.content-label{
+  color: #bbb;
 }
 
 .cell .right{
@@ -99,27 +105,25 @@ page{
 }
 
 .btn-follow{
-  margin-top: 12rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1rpx solid #4a5fe2;
   font-size: 26rpx;
   width: 120rpx;
-  height: 48rpx;
+  padding: 8rpx 0;
   color: #4a5fe2;
   background: rgba(bb,bb,bb,0.1);
   border-radius: 8rpx;
 }
 .btn-follow-un{
-  margin-top: 12rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1rpx solid #bbb;
   font-size: 26rpx;
   width: 120rpx;
-  height: 48rpx;
+  padding: 8rpx 0;
   color: #bbb;
   background: rgba(bb,bb,bb,0.1);
   border-radius: 8rpx;

@@ -42,12 +42,12 @@ Page({
     }, 600)
   },
 
-  onShow: function () {
+  onShow() {
     this.getRecords()
     let showName = App.globalData.showName ? App.globalData.showName : ''
     if (showName){
       let userInfo = this.data.userInfo
-      userInfo['showName'] = showName
+      userInfo['show_name'] = showName
       this.setData({ userInfo })
       App.globalData.showName = ''
     }
@@ -80,7 +80,11 @@ Page({
   },
 
   onShareAppMessage: function () {
-
+    let masterId = App.globalData.openid
+    return {
+      title: '阴阳师·式神台词语音',
+      path: `/pages/person/person?masterId=${masterId}`,
+    }
   },
 
   /**
@@ -128,7 +132,6 @@ Page({
   },
   // 加载更多
   more() {
-    console.log('-the end-')
     this.setData({
       loadEnd: true
     })
@@ -160,10 +163,22 @@ Page({
     })
   },
   toNews(e) {
+    if (!App.globalData.hasLogin) return
     let level = e.currentTarget.dataset.level
     let { news, heartCount, followCount, fansCount } = this.data.userInfo
     wx.navigateTo({
       url: `../news/news?level=${level}&news=${news}&heartCount=${heartCount}&followCount=${followCount}&fansCount=${fansCount}`,
+    })
+    let openid = App.globalData.openid
+    wx.request({
+      url: `${host}/clearNews`,
+      method: 'post',
+      data: { openid },
+      success: (res) => {
+        let userInfo = this.data.userInfo
+        userInfo['news'] = 0
+        this.setData({ userInfo })
+      }
     })
   },
   getRecords() {
@@ -203,8 +218,9 @@ Page({
     })
   },
 
-  getUserInfo: function (e) {
+  getUserInfo(e) {
     let userInfo = e.detail.userInfo
+    if(!userInfo) return
     App.initAvatar(userInfo).then(data=>{
       console.log(data)
       this.setData({

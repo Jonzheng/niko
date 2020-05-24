@@ -76,6 +76,7 @@ App({
           let { tempFilePath } = res
           let filename = `${openid}.png`
           this.uploadAvatar(filename, tempFilePath).then(data => {
+            this.globalData.hasLogin = true
             let location = data.Location
             avatarUrl = `https://${location}`
             console.log(data)

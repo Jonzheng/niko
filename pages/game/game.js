@@ -1,4 +1,6 @@
 const App = new getApp()
+const audioContextOri = wx.createInnerAudioContext()
+
 const { host } = require('../../utils/util')
 const pageStart = 1
 
@@ -20,6 +22,9 @@ const max_sed = 15
 const least_sed = 10
 const half_sed = 40
 const total_step = 80
+
+const SrcYuku = 'https://link-1256378396.cos.ap-guangzhou.myqcloud.com/yuku_'
+const SrcHshs = 'https://link-1256378396.cos.ap-guangzhou.myqcloud.com/hshs.wav'
 
 Page({
   data: {
@@ -46,7 +51,7 @@ Page({
     tip: '',
     spend: 0,
     remind: 0,
-    tips: ['方块的颜色和假名都可以自由设定', '据说黑色的方块很好看', '说不定以后会有假名发音呢'],
+    tips: ['方块的颜色和假名都可以自由设定', '加油，手指！'],
     option: 1,
     top_hide: true,
     rank_hide: true,
@@ -58,8 +63,8 @@ Page({
     sakki_kata: "",
     sakki_roma: "",
     show_price: 0,
-    old_coin: 0,
-    sub_coin: 0,
+    oldCoin: 0,
+    subCoin: 0,
     try_idx: 0,
     color: "#4a5fe2",
     requesting: false,
@@ -74,45 +79,42 @@ Page({
 
   onLoad(options) {
     this._pageNo = pageStart
-    var tips = this.data.tips
-    var count_it = setInterval(()=> {
+    let tips = this.data.tips
+    let count_it = setInterval(()=> {
       this.data.spend += 3
       if (this.data.spend % 18 == 0) {
-        var ridx = parseInt(Math.random() * tips.length)
+        let ridx = parseInt(Math.random() * tips.length)
         ridx = Math.min(ridx, tips.length - 1)
-        var tip = tips[ridx]
+        let tip = tips[ridx]
         this.setData({ tipsClass: 'tips-show', tip })
       }
       this.setData({
         count_it,
       })
     }, 3000)
-    var avatar_url = App.globalData.avatarUrl
-    avatar_url = avatar_url ? avatar_url : ""
-    var loged = App.globalData.hasLogin
     this.setData({
-      loged,
-      avatar_url
+      hasLogin: App.globalData.hasLogin,
+      userInfo: App.globalData.userInfo
     })
   },
 
   onReady: function () {
     this.initKanaRows()
-    var openid = App.globalData.openid
+    let openid = App.globalData.openid
     wx.request({
       url: `${host}/queryRank`,
       method: 'POST',
       data: { openid },
       success: (res)=> {
-        var rank = res.data
+        let rank = res.data
         if (rank) {
-          var cosmap = this.data.cosmap
-          var hira = rank.hira
-          var kata = rank.kata
-          var space = rank.space
-          cosmap["hira"] = hira
-          cosmap["kata"] = kata
-          cosmap["space"] = space
+          let cosmap = this.data.cosmap
+          let hira = rank.hira
+          let kata = rank.kata
+          let space = rank.space
+          cosmap["hira"] = hira ? hira : 'ka'
+          cosmap["kata"] = kata ? kata : 'ka'
+          cosmap["space"] = space ? space : 'ke'
           this.setData({ cosmap })
         }
         this.initGame()
@@ -143,6 +145,18 @@ Page({
 
   onShareAppMessage: function () {
 
+  },
+
+  getUserInfo(e) {
+    let userInfo = e.detail.userInfo
+    if (!userInfo) return
+    App.initAvatar(userInfo).then(data => {
+      console.log(data)
+      this.setData({
+        userInfo: data,
+        hasLogin: true
+      })
+    })
   },
 
   getKanaRows: function (kana_row) {
@@ -313,8 +327,8 @@ Page({
   },
 
   initColor: function (rank) {
-    var old_coin = rank.old_coin
-    if (!old_coin) old_coin = 0
+    var oldCoin = rank.oldCoin
+    if (!oldCoin) oldCoin = 0
     var my_coin = rank.coin
     var myco = rank.myco
     var mycos = myco.split(",")
@@ -325,7 +339,7 @@ Page({
     }
     this.setData({
       my_coin,
-      old_coin,
+      oldCoin,
       myco,
       myclst
     })
@@ -358,27 +372,28 @@ Page({
     wx.request({
       url: `${host}/queryRank`,
       method: 'POST',
-      data: { pageNo },
+      data: { pageNo, pageSize:20 },
       success: (res)=> {
-        setTimeout(()=>{
-          this.setData({
-            requesting: false
-          })
-        }, 600)
-        let list = res.data
+        let total = res.data.total
+        let list = res.data.ranks
         for (let rank of list) {
           let myco = rank.myco
           let colst = myco.split(",")
           rank["colst"] = colst
         }
         let ranks = type === 'more' ? this.data.ranks.concat(list) : list
-        this.setData({ ranks })
+        this.setData({
+          total,
+          requesting: false,
+          end: ranks.length >= total,
+          ranks
+        })
       }
     });
   },
 
   setting(e) {
-    if (!this.data.loged) return
+    if (!this.data.hasLogin) return
     var currData = e.currentTarget.dataset
     var option = currData.option
     if (option == 0) { //icon-setting
@@ -393,6 +408,7 @@ Page({
         rank_hide: se == 1,
         kana_hide: se == 2,
         color_hide: se == 3,
+        requesting: false,
       })
       var ch_color = this.data.ch_color
       if (ch_color) this.updateColor()
@@ -400,13 +416,15 @@ Page({
     } else if (option == 1) { //假名设定
       this.setData({ option: 1 })
     } else if (option == 2) { //排行榜
-      this.loadRank()
+      if (!this.data.total){
+        this.loadRank('refresh', pageStart)
+      }
       this.setData({ option: 2 })
     } else if (option == 3) { //颜色设定
       this.checkRank(0, 0)
       this.setData({ option: 3 })
     }
-    this.setData({ old_coin: 0, sub_coin: 0, buy_log: "" })
+    this.setData({ oldCoin: 0, subCoin: 0, buy_log: "" })
   },
   // 刷新数据
   refresh() {
@@ -437,6 +455,11 @@ Page({
     } else {
       ks_sed.push([row, col])
       ks_all[row][col]["selected"] = true
+      let cur = ks_all[row][col]['roma']
+      let curSrc = SrcYuku + cur + '.wav'
+      console.log(curSrc)
+      audioContextOri.src = curSrc
+      audioContextOri.play()
     }
     if (ks_sed.length > max_sed) { //如果点击已选或者大于可选--取消最先选择的
       var ned = ks_sed.shift()
@@ -493,6 +516,10 @@ Page({
   switchKata: function () {
     var kon = !this.data.kon
     this.setData({ kon })
+    if (kon) {
+      audioContextOri.src = SrcHshs
+      audioContextOri.play()
+    }
   },
 
   initGame: function () {
@@ -595,7 +622,7 @@ Page({
     } else if ("签" == word) { //日签
       var bgk_ori = this.data.bgk_ori
       var bgk = bgk_ori
-      this.setData({ bgk, old_coin: 0, sub_coin: 0, buy_log: "" })
+      this.setData({ bgk, oldCoin: 0, subCoin: 0, buy_log: "" })
       var ran = Math.random()
       var checkCoin = parseInt(ran * 666)
       checkCoin = Math.max(100, checkCoin)
@@ -611,9 +638,9 @@ Page({
       if (myco.includes(key)) show_price = "已兑换"
       var try_idx = 0
       var buy_log = ""
-      var sub_coin = 0
+      var subCoin = 0
       var co_key = key
-      this.setData({ show_price, bgk, try_idx, buy_log, co_key, sub_coin })
+      this.setData({ show_price, bgk, try_idx, buy_log, co_key, subCoin })
     }
     this.setData({
       cosmap,
@@ -686,7 +713,7 @@ Page({
   buyColor: function (color, coin, price) {
     var openid = App.globalData.openid
     var balance = coin - price
-    var sub_coin = price
+    var subCoin = price
     wx.request({
       url: `${host}/buyColor`,
       method: 'POST',
@@ -697,7 +724,7 @@ Page({
         var rank = ranks[0]
         var show_price = "已兑换"
         var buy_log = "兑换成功!"
-        this.setData({ sub_coin, buy_log, show_price })
+        this.setData({ subCoin, buy_log, show_price })
         this.initColor(rank)
       }
     });
@@ -967,6 +994,12 @@ Page({
     var both = [sold, sthis]
     steps = steps.concat(both)
     this.passStep(steps)
+
+    let cur = this_step["roma"]
+    let curSrc = SrcYuku + cur + '.wav'
+    console.log(curSrc)
+    audioContextOri.src = curSrc
+    audioContextOri.play()
 
     var sakki_roma = this_step["roma"]
     var sakki_hira = this_step["hira"]
@@ -1242,7 +1275,10 @@ Page({
     var col = currData.col
     var this_step = fields[row][col]
     this_step["hint"] = true
-
+    let cur = this_step['roma']
+    let curSrc = SrcYuku + cur + '.wav'
+    audioContextOri.src = curSrc
+    audioContextOri.play()
     var st_hint = setTimeout(() => {
       this_step["hint"] = false
       this.setData({ fields, st_hint: 0 })
@@ -1251,9 +1287,12 @@ Page({
     this.setData({ fields, st_hint })
   },
 
-  sakki: function () {
+  sakki() {
     var skon = !this.data.skon
     this.setData({ skon })
+    let curSrc = SrcYuku + this.data.sakki_roma + '.wav'
+    audioContextOri.src = curSrc
+    audioContextOri.play()
   },
 
 })

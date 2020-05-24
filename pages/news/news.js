@@ -43,13 +43,14 @@ Page({
     ]
     tops['follow'].total = followCount
     tops['fans'].total = fansCount
+    this._level = level
     this.setData({
       isIpx: App.globalData.isIpx,
       level,
       total: tops[level].total,
       tabCur: tops[level].idx,
       heartCount,
-      followCount,
+      followCount: parseInt(followCount),
       fansCount,
       tabData
     })
@@ -113,14 +114,71 @@ Page({
     this.setData({
       requesting: true
     })
-    let { level } = this.data
+    let level = this._level
     let pageNo = this.data[`${level}Page`]
     this.getList('more', pageNo, level);
+  },
+  follow(e, followId='', idx=-1) {
+    let suffix = (e == 'unFollow') ? e : 'follow'
+    let openid = App.globalData.openid
+    followId = followId ? followId : e.currentTarget.dataset.uid
+    idx = idx > -1 ? idx : e.currentTarget.dataset.idx
+    let followCount = this.data.followCount
+    followCount = (suffix == 'follow') ? followCount + 1 : followCount - 1
+    let tabData = this.data.tabData
+    tabData[2]['count'] = followCount
+    let level = this._level
+    if (level == 'follow'){
+      let followList = this.data.followList
+      followList[idx]['both'] = (suffix == 'follow') ? 1 : 0
+      this.setData({
+        tabData,
+        followCount,
+      })
+    } else if (level == 'fans'){
+      let fansList = this.data.fansList
+      fansList[idx]['both'] = (suffix == 'follow') ? 1 : 0
+      this.setData({
+        tabData,
+        followCount,
+        fansList
+      })
+    }
+    this._reload = true
+    wx.request({
+      url: `${host}/${suffix}`,
+      method: 'post',
+      data: { openid, followId },
+      success: (res) => {
+        console.log(res)
+        if (level == 'follow'){
+          this.getList('refresh', pageStart, level);
+        }
+      }
+    })
+  },
+  unFollow(e) {
+    console.log(e.currentTarget.dataset)
+    let followId = e.currentTarget.dataset.uid
+    let idx = e.currentTarget.dataset.idx
+    wx.showActionSheet({
+      itemList: ['取消关注'],
+      success: (res) => {
+        if (res.tapIndex == 0) {
+          this.follow('unFollow', followId, idx)
+        }
+      }
+    })
   },
   initList(list, type, pageNo, level) {
     list.map((item) => {
       item["level"] = level
       item["dateStr"] = formatDate(item.c_date)
+      if (item.content){
+        let pre = item.content.substr(0, 7)
+        pre = (item.content.length > 5) ? pre + '...' : pre
+        item['pre'] = pre
+      }
       if (item.file_id) {
         let sps = item.file_id.split('_')
         let fname = sps[0] + '_' + sps[1] + '_0.png'
@@ -217,7 +275,8 @@ Page({
       level
     })
     this._level = level
-    if (!this.data[`${level}List`]) {
+    if (!this.data[`${level}List`] || this._reload) {
+      this._reload = false
       this.getList('refresh', pageStart, level);
     }
   },

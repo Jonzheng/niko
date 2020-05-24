@@ -42,7 +42,6 @@ function _next() {
 Page({
   data: {
     isIpx: App.globalData.isIpx,
-    loged: false,
     slider: 'bar-ori',
     cname: '* * *',
     skill: '* * *',
@@ -75,6 +74,7 @@ Page({
     this.initPageData(fileId)
     this.setData({
       fileId,
+      isIpx: App.globalData.isIpx,
       userId: App.globalData.openid,
       hasLogin: App.globalData.hasLogin,
     })
@@ -169,8 +169,9 @@ Page({
    * 自定义函数
    */
 
-  getUserInfo: function (e) {
+  getUserInfo(e) {
     let userInfo = e.detail.userInfo
+    if(!userInfo) return
     App.initAvatar(userInfo).then(data=>{
       console.log(data)
       this.setData({

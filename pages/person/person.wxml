@@ -4,7 +4,7 @@
 </view>
 <view class="box">
   <view class="top-mine">
-    <image class="avatar" src="{{hasLogin ? userInfo.avatar_url : detaultAvatar}}" bindtap="showAvatar"></image>
+    <image class="avatar" src="{{ userInfo.avatar_url || detaultAvatar}}" bindtap="showAvatar"></image>
 
     <view class="relation">
       <view class="mine-menu">
@@ -35,11 +35,11 @@
 </view>
 
 <view class="mine-body">
-  <view class="userinfo">
-    <button wx:if="{{!hasLogin && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-  </view>
+  <button wx:if="{{!hasLogin && canIUse}}" class="get-user"
+    size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
+  </button>
 
-  <pull-down wx:if="{{hasLogin}}" id="scroll"
+  <pull-down id="scroll"
       requesting="{{requesting}}"
       bottomSize="280"
       end="{{end}}"
@@ -48,8 +48,8 @@
       bind:refresh="refresh"
       bind:more="more">
 
-  <view class="profile" hidden="{{!hasLogin}}">
-    <view class="box-line">
+  <view class="profile">
+    <view class="box-line" wx:if="{{isReady}}">
       <view class="mine-name">{{userInfo.show_name || userInfo.nick_name}}</view>
       <view wx:if="{{!userInfo.isFollow}}" class="btn-follow" bindtap="follow">+ 关注</view>
       <view wx:if="{{userInfo.isFollow}}" class="btn-follow-un" bindtap="unFollow">已关注</view>
@@ -101,7 +101,7 @@
                 <view class="text-heart">{{item.heart}}</view>
                 <image src="../../images/heart-{{item.heartStatus == 1 ? 'on' : 'off'}}.png" class="sm-icon"></image>
               </view>
-              <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-fid="item.file_id">
+              <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-fid="{{item.file_id}}">
                 <view class="text-heart">{{item.comm}}</view>
                 <image src="../../images/comm.png" class="icon-comm"></image>
               </view>
@@ -111,7 +111,7 @@
         </view>
       </view>
     </block>
-    
+    <view wx:if="{{loadEnd}}" class="non-tips"> ※ 没有更多了 ※</view>
   </view>
 
   </pull-down>

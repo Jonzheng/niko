@@ -66,12 +66,13 @@
 }
 
 .btn-login{
-  position: absolute;
-  left: 28%;
-  width: 320rpx;
-  height: 110rpx;
-  background: transparent;
-  z-index: 99;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 0.1;
 }
 
 .sk-avatar{

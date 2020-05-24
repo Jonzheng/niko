@@ -26,6 +26,9 @@
     </view>
 
     <view class="mine-right">
+      <button class="out-share" open-type="contact" size="mini">
+        <image class="btn-contact" src="../../images/comm.png"></image>
+      </button>
       <button class="out-share" open-type="share" size="mini">
         <image class="btn-share" src="../../images/share.png"></image>
       </button>
@@ -36,10 +39,10 @@
 
 <view class="mine-body">
   <view class="userinfo">
-    <button wx:if="{{!hasLogin && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <button wx:if="{{!hasLogin && canIUse}}" class="btn-user" open-type="getUserInfo" bindgetuserinfo="getUserInfo">二次元入口</button>
   </view>
 
-  <pull-down wx:if="{{hasLogin}}" id="scroll"
+  <pull-down id="scroll" wx:if="{{hasLogin}}"
       requesting="{{requesting}}"
       bottomSize="280"
       end="{{end}}"
@@ -48,10 +51,10 @@
       bind:refresh="refresh"
       bind:more="more">
 
-  <view class="profile" hidden="{{!hasLogin}}">
+  <view class="profile">
     <view class="box-line">
-      <view class="mine-name" bindlongtap="auth">{{userInfo.show_name}}</view>
-      <view class="icon-right" bindtap="toEdit" data-name="{{userInfo.show_name}}" data-motto="{{userInfo.motto}}">
+      <view class="mine-name" bindlongtap="auth">{{userInfo.show_name || userInfo.nick_name}}</view>
+      <view class="icon-right" bindtap="toEdit" data-name="{{userInfo.show_name || userInfo.nick_name}}" data-motto="{{userInfo.motto}}">
         <image class="arrow" src="../../images/arrow-left.png"></image>
       </view>
     </view>
@@ -107,7 +110,7 @@
                 <view class="text-heart">{{item.heart}}</view>
                 <image src="../../images/heart-{{item.heartStatus == 1 ? 'on' : 'off'}}.png" class="sm-icon"></image>
               </view>
-              <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-fid="item.file_id">
+              <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-fid="{{item.file_id}}">
                 <view class="text-heart">{{item.comm}}</view>
                 <image src="../../images/comm.png" class="icon-comm"></image>
               </view>

@@ -24,8 +24,14 @@ Page({
   },
 
   onLoad: function (options) {
+    console.log('onload:', options)
     let { masterId } = options
     this._masterId = masterId
+    if (App.globalData.openid == this._masterId) {
+      return wx.switchTab({
+        url: '/pages/mine/mine',
+      })
+    }
     this.getUser(masterId)
     this.getRecords(masterId)
     // this.setBgColor()
@@ -36,6 +42,7 @@ Page({
     this._audioContextMaster.onEnded(() => {
       this.setMasterStop();
     });
+    this.setData({ isReady: true })
   },
 
   onShow: function () {
@@ -47,7 +54,9 @@ Page({
   },
 
   onUnload: function () {
-    this._audioContextMaster.stop()
+    if (this._audioContextMaster){
+      this._audioContextMaster.stop()
+    }
   },
 
   onPullDownRefresh: function () {
@@ -59,7 +68,11 @@ Page({
   },
 
   onShareAppMessage: function () {
-
+    let masterId = this._masterId
+    return {
+      title: '阴阳师·式神台词语音',
+      path: `/pages/person/person?masterId=${masterId}`,
+    }
   },
 
   /**
@@ -68,6 +81,8 @@ Page({
 
   getUser(openid) {
     let mineId = App.globalData.openid
+    console.log('openid:', mineId)
+    if (!mineId) return
     wx.request({
       method: 'post',
       url: `${host}/getUser`,
@@ -100,7 +115,9 @@ Page({
   },
   // 加载更多
   more() {
-    console.log('-the end-')
+    this.setData({
+      loadEnd: true
+    })
     // this.getList();
   },
   setMotto() {
@@ -117,7 +134,13 @@ Page({
     })
   },
   back(){
-    wx.navigateBack()
+    wx.navigateBack({
+      fail: ()=>{
+        wx.switchTab({
+          url: '/pages/index/index',
+        })
+      }
+    })
   },
 
   getRecords(masterId) {
@@ -157,15 +180,14 @@ Page({
     })
   },
 
-  getUserInfo: function (e) {
+  getUserInfo(e) {
     let userInfo = e.detail.userInfo
-    App.initAvatar(userInfo).then(data=>{
-      console.log(data)
+    if (!userInfo) return
+    App.initAvatar(userInfo).then(data => {
       this.setData({
         userInfo: data,
         hasLogin: true
       })
-      this.setMotto()
     })
   },
 

@@ -416,6 +416,7 @@ page{
 }
 
 .mine-coin {
+  margin: 3rpx 0;
   height: 32rpx;
   font-size: 24rpx;
   color: #888888;
@@ -443,7 +444,7 @@ page{
   border: 1rpx solid #4a5fe2;
   font-size: 26rpx;
   width: 120rpx;
-  height: 48rpx;
+  padding: 8rpx 0;
   color: #4a5fe2;
   background: rgba(bb,bb,bb,0.1);
   border-radius: 8rpx;
@@ -455,10 +456,22 @@ page{
   border: 1rpx solid #bbb;
   font-size: 26rpx;
   width: 120rpx;
-  height: 48rpx;
+  padding: 8rpx 0;
   color: #bbb;
   background: rgba(bb,bb,bb,0.1);
   border-radius: 8rpx;
+}
+
+.get-user{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 0.1;
+  color: #fff;
+  z-index: 999;
 }
 
 .mine-menu{
