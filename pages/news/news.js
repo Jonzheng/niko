@@ -6,7 +6,6 @@ const tops = {
   "follow": { api: "queryFollow", idx: 2, total: 0 },
   "fans": { api: "queryFans", idx: 3, total: 0 },
   }
-const levels = [ "news", "heart", "follow", "fans" ]
 const pageStart = 1
 
 Page({
@@ -33,22 +32,29 @@ Page({
 
   onLoad: function (options) {
     console.log('onLoad:', options)
-    let { level, news, heartCount, followCount, fansCount } = options
-    news = news ? '+'+news : '+0'
-    const tabData = [
-      { value: "news", name: "通知", count: news},
+    let { level, news, heartCount, followCount, fansCount, masterId} = options
+    news = parseInt(news)
+    let tabData = [
+      { value: "news", name: "通知", count: '+'+news},
       { value: "heart", name: "获赞", count: heartCount},
       { value: "follow", name: "关注", count: followCount},
       { value: "fans", name: "粉丝", count: fansCount},
     ]
+    let tabCur = tops[level].idx
+    if(news == -1){
+      tabData.shift()
+      tabCur -= 1
+    }
     tops['follow'].total = followCount
     tops['fans'].total = fansCount
     this._level = level
+    this._masterId = masterId
     this.setData({
       isIpx: App.globalData.isIpx,
+      news,
       level,
       total: tops[level].total,
-      tabCur: tops[level].idx,
+      tabCur,
       heartCount,
       followCount: parseInt(followCount),
       fansCount,
@@ -89,16 +95,14 @@ Page({
   },
   toDetail(e) {
     let fileId = e.currentTarget.dataset.id
-    wx.navigateTo({
-      url: `../detail/detail?fileId=${fileId}`,
-    })
+    let url = `../detail/detail?fileId=${fileId}`
+    App.toPage(url)
   },
   toPerson(e) {
     let masterId = e.currentTarget.dataset.uid
     if (masterId == App.globalData.openid) return
-    wx.navigateTo({
-      url: `../person/person?masterId=${masterId}`,
-    })
+    let url = `../person/person?masterId=${masterId}`
+    App.toPage(url)
   },
   // 刷新数据
   refresh() {
@@ -228,7 +232,7 @@ Page({
     wx.showNavigationBarLoading()
     level = level ? level : this.data.level
     let suffix = tops[level].api
-    let openid = App.globalData.openid
+    let openid = this._masterId ? this._masterId : App.globalData.openid
     console.log({ level: level, pageNo: pageNo })
     wx.request({
       url: `${host}/${suffix}`,

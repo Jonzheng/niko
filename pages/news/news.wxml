@@ -34,22 +34,22 @@
 
       <block wx:for="{{newsList}}" wx:key="index">
         <view hidden="{{level != 'news'}}" class="cell">
-          <template is="an-list" data="{{item, index}}"/>
+          <template is="an-list" data="{{item, news, index}}"/>
         </view>
       </block>
       <block wx:for="{{heartList}}" wx:key="index">
         <view hidden="{{level != 'heart'}}" class="cell">
-          <template is="an-list" data="{{item, index}}"/>
+          <template is="an-list" data="{{item, news, index}}"/>
         </view>
       </block>
       <block wx:for="{{followList}}" wx:key="index">
         <view hidden="{{level != 'follow'}}" class="cell">
-          <template is="an-list" data="{{item, index}}"/>
+          <template is="an-list" data="{{item, news, index}}"/>
         </view>
       </block>
       <block wx:for="{{fansList}}" wx:key="index">
         <view hidden="{{level != 'fans'}}" class="cell">
-          <template is="an-list" data="{{item, index}}"/>
+          <template is="an-list" data="{{item, news, index}}"/>
         </view>
       </block>
     </view>
@@ -64,21 +64,22 @@
     <view class="name" catchtap="toPerson" data-uid="{{item.openid}}">{{item.show_name || item.nick_name}}</view>
     <view wx:if="{{item.level == 'follow' || item.level == 'fans'}}" class="content">{{item.motto}}</view>
     <view wx:if="{{item.type == 'fans'}}" class="content-line">
-      <view class="content-label">关注了你</view>
+      <view class="content-label">关注了{{news == -1 ? 'ta':'你'}}</view>
       <text class="content-label">@{{item.dateStr}}</text>
     </view>
     <view wx:if="{{item.type == 'heart' || item.level == 'heart'}}" class="content-line">
-      <view class="content-label">赞了你</view>
+      <view class="content-label">赞了{{news == -1 ? 'ta':'你'}}</view>
       <text class="content-label">@{{item.dateStr}}</text>
     </view>
     <view wx:if="{{item.type == 'comment'}}" class="content">
-      <view class="content-label">评论了你</view>
+      <view class="content-label">评论了{{news == -1 ? 'ta':'你'}}</view>
       <view class="content-line">
         <text>{{item.pre}}</text>
         <text class="content-label">@{{item.dateStr}}</text></view>
     </view>
   </view>
-  <view class="right" catchtap="{{item.skCover ? 'toDetail': (item.level=='news' || item.level=='heart') ? 'toPerson':''}}"
+  <view wx:if="{{news != -1}}" class="right"
+    catchtap="{{item.skCover ? 'toDetail': (item.level=='news' || item.level=='heart') ? 'toPerson':''}}"
     data-id="{{item.file_id}}" data-uid="{{item.openid}}">
     <image wx:if="{{item.skCover}}" class="avatar-sk" src="{{item.skCover}}"></image>
     <view wx:if="{{item.level == 'follow' && item.both == 0}}" class="btn-follow-un"

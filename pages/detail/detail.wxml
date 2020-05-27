@@ -12,7 +12,7 @@
       <view class="box-head">
 
         <view class="box-avatar">
-          <image class="sk-avatar" src="{{curAudio.avatar}}"></image>
+          <image class="sk-avatar" src="{{curAudio.avatar}}" catchtap="toggleCode"></image>
         </view>
         <view class="box-profile">
           <view class="box-line">
@@ -31,6 +31,10 @@
           </view>
         </view>
 
+        <view wx:if="{{showCode}}" class='box-omoz-img'>
+          <image class='omoz-sm omoz-spin' src='{{icon_omoz}}'></image>
+          <image class='omoz-avatar' src='{{curAudio.avatar}}'></image>
+        </view>
         <!-- <view class='box-other {{show_other ? "other-show":""}}'>
           <block wx:for="{{other_lst}}" wx:key="mkey">
             <view class='sk-btn' data-fid='{{item.file_id}}' bindtap="reload" hover-class="space-hover">
@@ -160,7 +164,7 @@
 
     </view>
   </view>
-  <view class="weui-footer__text" wx:if="{{comEnd && commentList.length > 0}}"> - 没有更多评论了 -</view>
+  <view class="non-tips" wx:if="{{commentList.length > 0}}">-- end --</view>
 </action-sheet>
 
 <template name="ele-master">

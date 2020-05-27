@@ -32,6 +32,10 @@ Page({
         url: '/pages/mine/mine',
       })
     }
+    let pages = getCurrentPages()
+    this.setData({
+      home: pages.length == 1
+    })
     this.getUser(masterId)
     this.getRecords(masterId)
     // this.setBgColor()
@@ -46,7 +50,6 @@ Page({
   },
 
   onShow: function () {
-    this.setMotto()
   },
 
   onHide: function () {
@@ -69,9 +72,16 @@ Page({
 
   onShareAppMessage: function () {
     let masterId = this._masterId
+    let title = '阴阳师·式神台词语音'
+    let path = `/pages/index/index`
+    if (this.data.recordList) {
+      let name = this.data.userInfo.show_name || this.data.userInfo.nick_name
+      title = `${name}の式神台词模仿录音`
+      path = `/pages/person/person?masterId=${masterId}`
+    }
     return {
-      title: '阴阳师·式神台词语音',
-      path: `/pages/person/person?masterId=${masterId}`,
+      title,
+      path,
     }
   },
 
@@ -120,8 +130,15 @@ Page({
     })
     // this.getList();
   },
-  setMotto() {
-
+  toNews(e) {
+    if (!App.globalData.hasLogin) return
+    wx.vibrateShort()
+    let level = e.currentTarget.dataset.level
+    let { news, heartCount, followCount, fansCount } = this.data.userInfo
+    let masterId = this._masterId
+    news = -1
+    let url = `../news/news?level=${level}&news=${news}&heartCount=${heartCount}&followCount=${followCount}&fansCount=${fansCount}&masterId=${masterId}`
+    App.toPage(url)
   },
   showAvatar() {
     this.setData({
@@ -220,6 +237,7 @@ Page({
       recordList[idx]["anListen"] = ""
       this._audioContextMaster.stop()
     } else {
+      wx.vibrateShort()
       this.setMasterStop()
       recordList[idx]["isListen"] = true
       recordList[idx]["listenStatus"] = "listen-on"
@@ -243,6 +261,7 @@ Page({
       recordList[idx]["btnRt"] = ""
       recordList[idx]["btnDelStyle"] = "btn-red-hidden"
     } else {
+      wx.vibrateShort()
       recordList[idx]["boxStyle"] = "btn-play-box-sm"
       recordList[idx]["btnRt"] = "rt-90"
       recordList[idx]["btnDelStyle"] = "btn-red"
@@ -262,6 +281,7 @@ Page({
     let curMaster = recordList[idx]
     let url = ''
     if (status == 0) {
+      wx.vibrateShort()
       url = `${host}/updateHeart`
       curMaster["heartStatus"] = 1
       curMaster["heart"] += 1
@@ -315,6 +335,7 @@ Page({
   },
   delRecord(recordId) {
     let masterId = App.globalData.openid
+    masterId = this.data.admini ? this._masterId : masterId
     wx.request({
       url: `${host}/deleteRecord`,
       method: 'post',
@@ -489,9 +510,8 @@ Page({
 
   toDetail(e) {
     let fileId = e.currentTarget.dataset.id
-    wx.navigateTo({
-      url: `../detail/detail?fileId=${fileId}`,
-    })
+    let url = `../detail/detail?fileId=${fileId}`
+    App.toPage(url)
   },
   setBgColor() {
     let frontColor = !this._black ? '#ffffff' : '#000000'

@@ -267,7 +267,6 @@ Page({
       })
       this._mEnd = mList.length >= total
     }
-    console.log('====', this.data.spList)
   },
 
   getUserInfo(e) {
@@ -281,15 +280,14 @@ Page({
 
   toDetail(e){
     let fileId = e.currentTarget.dataset.id
-    wx.navigateTo({
-      url: `../detail/detail?fileId=${fileId}`,
-    })
+    let url = `../detail/detail?fileId=${fileId}`
+    App.toPage(url)
   },
-  tabChange: function (e) {
+  tabChange(e) {
+    wx.vibrateShort()
     let { index, value } = e.detail
     let level = value
     if (level == this._level) {
-      wx.vibrateShort()
       this.toTop()
       return;
     }

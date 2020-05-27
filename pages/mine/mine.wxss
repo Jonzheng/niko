@@ -145,7 +145,7 @@ page{
 }
 
 .top-mine .relation{
-  width: 390rpx;
+  width: 466rpx;
   padding: 0 10rpx;
   display: flex;
   flex-direction: column;
@@ -342,22 +342,60 @@ page{
   justify-content: center;
 }
 
-.out-share{
-  padding: 0 8rpx;
+.end-pd{
+  position: relative;
+  left: -15rpx;
+}
+
+.out-about{
   display: flex;
   align-items: center;
   background: transparent;
   width: 50rpx;
   height: 50rpx;
   z-index: 11;
+  position: relative;
+}
+.out-share{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  width: 50rpx;
+  height: 50rpx;
+  z-index: 11;
+  position: relative;
 }
 .btn-contact{
+  display: flex;
   width: 46rpx;
   height: 46rpx;
+  margin: 0 20rpx;
 }
 .btn-share{
-  width: 46rpx;
-  height: 46rpx;
+  display: flex;
+  width: 50rpx;
+  height: 50rpx;
+  margin: 0 20rpx;
+}
+.btn-about{
+  display: flex;
+  width: 50rpx;
+  height: 50rpx;
+}
+
+.about-label{
+  color: #bbb;
+  margin: 10rpx 10rpx;
+}
+
+.about-desc{
+  text-indent: 26px;
+  margin-left: 30rpx;
+  color: #888;
+  font-size: 28rpx;
+  padding: 10rpx 50rpx 0 20rpx;
+  border-left: 6rpx solid #ddd;
 }
 
 .text-del{
@@ -470,8 +508,9 @@ page{
 .mine-right{
   display: flex;
   align-items: flex-end;
-  height: 92rpx;
-  width: 180rpx;
+  justify-content: center;
+  height: 80rpx;
+  width: 100rpx;
 }
 
 .icon-arrow{

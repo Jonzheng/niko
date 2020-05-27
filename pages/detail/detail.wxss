@@ -31,6 +31,45 @@
   color: #999999;
 }
 
+.box-omoz-img{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: absolute;
+  top: 390rpx;
+  right: 10rpx;
+  z-index: 1;
+}
+
+.omoz-avatar{
+  border-radius: 50%;
+  position: absolute;
+  top: 62rpx;
+  width: 100rpx;
+  height: 100rpx;
+  opacity: 1;
+  z-index: 9;
+}
+
+.omoz-sm{
+  width: 222rpx;
+  height: 222rpx;
+  z-index: 1;
+}
+
+.omoz-spin{
+  animation: ke-spin 60s linear infinite;
+}
+
+@keyframes ke-spin{
+  0%{
+    transform: rotate(0deg);
+  }
+  100%{
+    transform: rotate(360deg);
+  }
+}
+
 .box-line{
   padding: 3rpx 0;
   min-height: 36rpx;
@@ -46,8 +85,8 @@
   height: 50rpx;
 }
 .btn-share{
-  width: 46rpx;
-  height: 46rpx;
+  width: 50rpx;
+  height: 50rpx;
 }
 
 .out-btn{
@@ -331,6 +370,12 @@
   align-items: center;
   justify-content: center;
 }
+
+.end-pd{
+  position: relative;
+  left: -15rpx;
+}
+
 .inline{
   display:inline-block;
 }

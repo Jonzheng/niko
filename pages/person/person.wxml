@@ -1,6 +1,7 @@
 <image class="top-bg" src="{{bg}}" style="height:{{isIpx ? 300:''}}rpx;"></image>
 <view class="btn-back" bindtap="back" style="top:{{isIpx ? 110:60}}rpx;">
-  <image class="back" src="../../images/arrow-left.png"></image>
+  <image wx:if="{{!home}}" class="back" src="../../images/arrow-left.png"></image>
+  <image wx:else class="back" src="../../images/home-on.png"></image>
 </view>
 <view class="box">
   <view class="top-mine">
@@ -8,17 +9,17 @@
 
     <view class="relation">
       <view class="mine-menu">
-        <view class="menu">
+        <view class="menu" bindtap="toNews" data-level="heart">
           <view class="menu-num">{{userInfo.heartCount || 0}}</view>
           <view class="menu-label">获赞</view>
         </view>
 
-        <view class="menu">
+        <view class="menu"  bindtap="toNews" data-level="follow">
           <view class="menu-num">{{userInfo.followCount || 0}}</view>
           <view class="menu-label">关注</view>
         </view>
 
-        <view class="menu">
+        <view class="menu"  bindtap="toNews" data-level="fans">
           <view class="menu-num">{{userInfo.fansCount || 0}}</view>
           <view class="menu-label">粉丝</view>
         </view>

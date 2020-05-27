@@ -42,6 +42,10 @@ Component({
         })
       }
     },
+    scroll: {
+      type: Boolean,
+      value: true,
+    },
     formShow: {
       type: Boolean,
       value: false,

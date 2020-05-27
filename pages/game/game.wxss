@@ -32,7 +32,7 @@
   align-items: center;
   flex-direction: column;
   position: absolute;
-  top: 860rpx;
+  top: 720rpx;
   right: 15rpx;
 }
 

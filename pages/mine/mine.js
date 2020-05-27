@@ -81,9 +81,16 @@ Page({
 
   onShareAppMessage: function () {
     let masterId = App.globalData.openid
+    let title = '阴阳师·式神台词语音'
+    let path = `/pages/index/index`
+    if (this.data.recordList){
+      let name = this.data.userInfo.show_name || this.data.userInfo.nick_name
+      title = `${name}の式神台词模仿录音`
+      path = `/pages/person/person?masterId=${masterId}`
+    }
     return {
-      title: '阴阳师·式神台词语音',
-      path: `/pages/person/person?masterId=${masterId}`,
+      title,
+      path,
     }
   },
 
@@ -140,6 +147,7 @@ Page({
   auth() {
     if (this.data.userInfo.auth_name != 'admini') return;
     let admini = !App.globalData.admini
+    if (admini) wx.vibrateLong()
     App.globalData.admini = admini
     this.setData({ admini })
   },
@@ -158,17 +166,16 @@ Page({
   toPerson(e) {
     let masterId = e.currentTarget.dataset.uid
     if (masterId == App.globalData.openid) return
-    wx.navigateTo({
-      url: `../person/person?masterId=${masterId}`,
-    })
+    let url = `../person/person?masterId=${masterId}`
+    App.toPage(url)
   },
   toNews(e) {
     if (!App.globalData.hasLogin) return
+    wx.vibrateShort()
     let level = e.currentTarget.dataset.level
     let { news, heartCount, followCount, fansCount } = this.data.userInfo
-    wx.navigateTo({
-      url: `../news/news?level=${level}&news=${news}&heartCount=${heartCount}&followCount=${followCount}&fansCount=${fansCount}`,
-    })
+    let url = `../news/news?level=${level}&news=${news}&heartCount=${heartCount}&followCount=${followCount}&fansCount=${fansCount}`
+    App.toPage(url)
     let openid = App.globalData.openid
     wx.request({
       url: `${host}/clearNews`,
@@ -218,6 +225,7 @@ Page({
     })
   },
 
+  // 按钮数据
   getUserInfo(e) {
     let userInfo = e.detail.userInfo
     if(!userInfo) return
@@ -259,6 +267,7 @@ Page({
       recordList[idx]["anListen"] = ""
       this._audioContextMaster.stop()
     } else {
+      wx.vibrateShort()
       this.setMasterStop()
       recordList[idx]["isListen"] = true
       recordList[idx]["listenStatus"] = "listen-on"
@@ -282,6 +291,7 @@ Page({
       recordList[idx]["btnRt"] = ""
       recordList[idx]["btnDelStyle"] = "btn-red-hidden"
     } else {
+      wx.vibrateShort()
       recordList[idx]["boxStyle"] = "btn-play-box-sm"
       recordList[idx]["btnRt"] = "rt-90"
       recordList[idx]["btnDelStyle"] = "btn-red"
@@ -301,6 +311,7 @@ Page({
     let curMaster = recordList[idx]
     let url = ''
     if (status == 0) {
+      wx.vibrateShort()
       url = `${host}/updateHeart`
       curMaster["heartStatus"] = 1
       curMaster["heart"] += 1
@@ -537,15 +548,13 @@ Page({
   toEdit(e) {
     let showName = e.currentTarget.dataset.name
     let motto = e.currentTarget.dataset.motto
-    wx.navigateTo({
-      url: `../edit/edit?showName=${showName}&motto=${motto}`,
-    })
+    let url = `../edit/edit?showName=${showName}&motto=${motto}`
+    App.toPage(url)
   },
   toDetail(e) {
     let fileId = e.currentTarget.dataset.id
-    wx.navigateTo({
-      url: `../detail/detail?fileId=${fileId}`,
-    })
+    let url = `../detail/detail?fileId=${fileId}`
+    App.toPage(url)
   },
   setBgColor() {
     let frontColor = !this._black ? '#ffffff' : '#000000'
@@ -560,4 +569,14 @@ Page({
     let avatar = this.data.userInfo.avatarUrl
     console.log(avatar)
   },
+  showAbout(){
+    this.setData({
+      aboutShow: true
+    })
+  },
+  closeAbout(){
+    this.setData({
+      aboutShow: false
+    })
+  }
 })

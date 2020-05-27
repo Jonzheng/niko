@@ -2,8 +2,8 @@ const COS = require('./lib/cos-sdk.js')
 const { host } = require('./utils/util')
 
 const Cos = new COS({
-  SecretId: '',
-  SecretKey: '',
+  SecretId: 'AKIDtfGm8pIo1Ur57BCE7vJ9tgVFVdaab45x',
+  SecretKey: 'AOSVQEvvpaFl8OU3Yv8B5pPo0SDzfFi2',
 })
 const AvatarBucket = 'avatar-1256378396'
 const RecordBucket = 'record-1256378396'
@@ -11,10 +11,8 @@ const Region = 'ap-guangzhou'
 
 App({
   onLaunch: function () {
-    // 展示本地存储能力
-    var logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
+    // 检查更新
+    this.checkUpdate();
     // iPhone X 设置
     this.setIpx()
 
@@ -66,9 +64,46 @@ App({
     this.globalData.sysInfo = wx.getSystemInfoSync();
     this.globalData.isIpx = this.globalData.sysInfo.model.includes('iPhone 11') || this.globalData.sysInfo.model.includes('iPhone X') || this.globalData.sysInfo.model.includes('unknown<iPhone')
   },
+  toPage(url) {
+    let pages = getCurrentPages();
+    if (pages.length > 9) {
+      wx.redirectTo({ url })
+    } else {
+      wx.navigateTo({ url })
+    }
+  },
+  checkUpdate() {
+    try {
+      let updateManager = wx.getUpdateManager()
+      console.log('========== checkUpdate ==========')
+      updateManager.onCheckForUpdate(res => {
+        console.log('========== onCheckForUpdate called ==========', res)
+        if (res.hasUpdate) {
+          wx.showToast({
+            icon: 'none',
+            title: '小程序需要更新'
+          })
+        }
+      })
+      updateManager.onUpdateReady(() => {
+        console.log('========== onUpdateReady called ==========')
+        wx.showModal({
+          title: '更新提示',
+          content: '新版本已经准备好，即将进行更新',
+          showCancel: false,
+          success: res => {
+            updateManager.applyUpdate()
+          }
+        })
+      })
+    } catch (e) {
+      console.log('========== checkUpdate failed ==========', e)
+    }
+  },
   initAvatar(userInfo){
     return new Promise((resolve, reject)=>{
       let { avatarUrl } = userInfo
+      avatarUrl = avatarUrl ? avatarUrl : userInfo.avatar_url
       let openid = this.globalData.openid
       wx.downloadFile({
         url: avatarUrl,
@@ -86,6 +121,12 @@ App({
             resolve(userInfo)
             this.updateUser(userInfo)
           })
+        },
+        fail: err=>{
+          console.log('download avatar fail!!!', err)
+          userInfo['avatarUrl'] = ''
+          userInfo['avatar_url'] = ''
+          // this.updateUser(userInfo)
         }
       })
     })

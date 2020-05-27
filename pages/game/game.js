@@ -366,9 +366,6 @@ Page({
   },
 
   loadRank(type, pageNo) {
-    this.setData({
-      requesting: true
-    })
     wx.request({
       url: `${host}/queryRank`,
       method: 'POST',
@@ -453,11 +450,11 @@ Page({
       ks_sed.pop()
       ks_all[row][col]["selected"] = false
     } else {
+      wx.vibrateShort()
       ks_sed.push([row, col])
       ks_all[row][col]["selected"] = true
       let cur = ks_all[row][col]['roma']
       let curSrc = SrcYuku + cur + '.wav'
-      console.log(curSrc)
       audioContextOri.src = curSrc
       audioContextOri.play()
     }
@@ -517,6 +514,7 @@ Page({
     var kon = !this.data.kon
     this.setData({ kon })
     if (kon) {
+      wx.vibrateShort()
       audioContextOri.src = SrcHshs
       audioContextOri.play()
     }
@@ -974,6 +972,7 @@ Page({
   },
 
   hideBoth: function (old_row, old_col, this_row, this_col, steps) {
+    wx.vibrateShort()
     var fields = this.data.fields
     var this_step = fields[this_row][this_col]
     var old_step = fields[old_row][old_col]
@@ -1288,6 +1287,7 @@ Page({
   },
 
   sakki() {
+    wx.vibrateShort()
     var skon = !this.data.skon
     this.setData({ skon })
     let curSrc = SrcYuku + this.data.sakki_roma + '.wav'

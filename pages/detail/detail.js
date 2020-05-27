@@ -47,6 +47,7 @@ Page({
     skill: '* * *',
     oriPlaying: false,
     recordList: [],
+    icon_omoz: 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/omoz_sm.png',
     icon_trash: "../../images/trash.png",
     icon_upload: "../../images/upload.png",
     icon_record: "../../images/record.png",
@@ -69,9 +70,9 @@ Page({
   },
 
   onLoad: function (options) {
-    //页面初始参数
     let { fileId } = options
     this.initPageData(fileId)
+    this._title = '式神录'
     this.setData({
       fileId,
       isIpx: App.globalData.isIpx,
@@ -83,6 +84,9 @@ Page({
 
   onHide: function () {
     wx.hideNavigationBarLoading()
+    this.setData({
+      showCode: false
+    })
   },
 
   onPullDownRefresh: function () {
@@ -197,6 +201,19 @@ Page({
     // this.getList();
   },
 
+  toggleCode() {
+    wx.vibrateShort()
+    let showCode = !this.data.showCode
+    let title = showCode ? '微信小程序·式神录' : '式神录'
+    this._title = title
+    this.setData({
+      showCode
+    })
+    wx.setNavigationBarTitle({
+      title,
+    })
+  },
+
   stopAllMedia() {
     this._audioContextOri.stop()
     this._audioContextMine.stop()
@@ -204,6 +221,7 @@ Page({
 
   nextSerifu() {
     if (this._loading) return
+    wx.vibrateShort()
     this.stopAllMedia()
     let fileId = this.data.fileId
     let list = this.data.list
@@ -357,7 +375,7 @@ Page({
           this._loading = false
           wx.hideNavigationBarLoading()
           wx.setNavigationBarTitle({
-            title: '式神录',
+            title: this._title,
           })
         }, 300)
         if (res && res.data) {
@@ -426,6 +444,7 @@ Page({
     let curAudio = this.data.curAudio
     this._audioContextOri.src = curAudio.src_audio
     if (!this.data.oriPlaying) {
+      wx.vibrateShort()
       this._audioContextOri.play()
     } else {
       this.stopOri()
@@ -452,6 +471,7 @@ Page({
         recordList[idx]["btnPoiStyle"] = "btn-red-hidden"
       }
     } else {
+      wx.vibrateShort()
       recordList[idx]["boxStyle"] = "btn-play-box-sm"
       recordList[idx]["btnRt"] = "rt-90"
       if (isSelf) {
@@ -481,6 +501,7 @@ Page({
     }
     this.stopOri()
     if (!this.data.isRecording) {
+      wx.vibrateShort()
       recorderManager.start(options)
     } else {
       recorderManager.stop()
@@ -569,9 +590,8 @@ Page({
         url: '/pages/mine/mine',
       })
     }
-    wx.navigateTo({
-      url: `../person/person?masterId=${masterId}`,
-    })
+    let url = `../person/person?masterId=${masterId}`
+    App.toPage(url)
   },
 
   listen(e) {
@@ -587,6 +607,7 @@ Page({
       recordList[idx]["anListen"] = ""
       this._audioContextMaster.stop()
     } else {
+      wx.vibrateShort()
       this.setMasterStop()
       recordList[idx]["isListen"] = true
       recordList[idx]["listenStatus"] = "listen-on"
@@ -609,6 +630,7 @@ Page({
     let curMaster = recordList[idx]
     let url = ''
     if (status == 0) {
+      wx.vibrateShort()
       url = `${host}/updateHeart`
       curMaster["heartShape"] = heartOn
       curMaster["heartStatus"] = 1

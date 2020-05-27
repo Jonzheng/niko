@@ -120,8 +120,8 @@ page{
 }
 
 .top-mine .relation{
-  width: 432rpx;
-  padding: 0 20rpx;
+  width: 466rpx;
+  padding: 0 10rpx;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -325,8 +325,8 @@ page{
   height: 50rpx;
 }
 .btn-share{
-  width: 46rpx;
-  height: 46rpx;
+  width: 50rpx;
+  height: 50rpx;
 }
 
 .text-del{
@@ -423,12 +423,11 @@ page{
 }
 
 .mine-right{
-  text-align: right;
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 100%;
-  width: 120rpx;
+  align-items: flex-end;
+  justify-content: center;
+  height: 80rpx;
+  width: 100rpx;
 }
 
 .icon-arrow{
