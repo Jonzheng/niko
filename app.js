@@ -2,8 +2,8 @@ const COS = require('./lib/cos-sdk.js')
 const { host } = require('./utils/util')
 
 const Cos = new COS({
-  SecretId: 'AKIDtfGm8pIo1Ur57BCE7vJ9tgVFVdaab45x',
-  SecretKey: 'AOSVQEvvpaFl8OU3Yv8B5pPo0SDzfFi2',
+  SecretId: '',
+  SecretKey: '',
 })
 const AvatarBucket = 'avatar-1256378396'
 const RecordBucket = 'record-1256378396'
@@ -44,8 +44,9 @@ App({
           // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
           wx.getUserInfo({
             success: res => {
-              console.log('success.globalData.hasLogin')
+              console.log('auth hasLogin', res.userInfo)
               this.globalData.hasLogin = true
+              this.globalData.avatarUrl = res.userInfo.avatarUrl
               // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
               // 所以此处加入 callback 以防止这种情况
               if (this.userInfoReadyCallback) {
@@ -101,45 +102,49 @@ App({
     }
   },
   initAvatar(userInfo){
+    console.log('initAvatar', userInfo)
     return new Promise((resolve, reject)=>{
       let { avatarUrl } = userInfo
-      avatarUrl = avatarUrl ? avatarUrl : userInfo.avatar_url
-      let openid = this.globalData.openid
+      avatarUrl = avatarUrl || this.globalData.avatarUrl
+      userInfo['nickName'] = userInfo.nickName || userInfo.nick_name
+      userInfo['nick_name'] = userInfo.nickName
+      userInfo['showName'] = userInfo.show_name
+      let openid = userInfo.openid || this.globalData.openid
       wx.downloadFile({
         url: avatarUrl,
         success: res => {
+          console.log(res)
           let { tempFilePath } = res
           let filename = `${openid}.png`
           this.uploadAvatar(filename, tempFilePath).then(data => {
             this.globalData.hasLogin = true
             let location = data.Location
             avatarUrl = `https://${location}`
-            console.log(data)
             userInfo['avatarUrl'] = avatarUrl
             userInfo['avatar_url'] = avatarUrl
-            userInfo['nick_name'] = userInfo.nickName
-            resolve(userInfo)
-            this.updateUser(userInfo)
+            this.updateUser(userInfo).then((res)=>{
+              resolve(res)
+            })
           })
         },
         fail: err=>{
           console.log('download avatar fail!!!', err)
-          userInfo['avatarUrl'] = ''
-          userInfo['avatar_url'] = ''
-          // this.updateUser(userInfo)
         }
       })
     })
   },
   updateUser(userInfo){
-    userInfo['openid'] = this.globalData.openid
-    wx.request({
-      method: 'post',
-      url: `${host}/updateUser`,
-      data: userInfo,
-      success: res => {
-        console.log(res)
-      }
+    return new Promise((resolve, reject) => {
+      userInfo['openid'] = userInfo.openid || this.globalData.openid
+      wx.request({
+        method: 'post',
+        url: `${host}/updateUser`,
+        data: userInfo,
+        success: res => {
+          userInfo = res.data[0]
+          resolve(userInfo)
+        }
+      })
     })
   },
   uploadRecord(filename, filePath) {

@@ -95,7 +95,7 @@ Page({
    */
   onShareAppMessage: function () {
     return {
-      title: '阴阳师·式神台词语音',
+      title: '阴阳师·式神台词&模仿录音',
       path: '/pages/index/index',
     }
   },

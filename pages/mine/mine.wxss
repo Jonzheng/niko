@@ -343,8 +343,10 @@ page{
 }
 
 .end-pd{
-  position: relative;
-  left: -15rpx;
+  position: absolute;
+  left: -30rpx;
+  right: 0;
+  bottom: 0;
 }
 
 .out-about{

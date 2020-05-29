@@ -117,6 +117,7 @@
 .sk-avatar{
   width: 120rpx;
   height: 120rpx;
+  border-radius: 50%;
 }
 
 .curr-title{
@@ -359,7 +360,7 @@
 .record-list{
   display: flex;
   flex-direction: column;
-  min-height: 360rpx;
+  min-height: 400rpx;
   margin-bottom: 100px;
 }
 .non-tips{

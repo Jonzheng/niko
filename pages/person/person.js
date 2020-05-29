@@ -1,5 +1,5 @@
 const App = getApp()
-const { trim, host, formatDate } = require('../../utils/util')
+const { trim, host, formatDate, deAvatar } = require('../../utils/util')
 
 Page({
 
@@ -38,7 +38,6 @@ Page({
     })
     this.getUser(masterId)
     this.getRecords(masterId)
-    // this.setBgColor()
   },
 
   onReady: function () {
@@ -53,13 +52,13 @@ Page({
   },
 
   onHide: function () {
-    // this.setBgColor()
+    if (this._audioContextMaster) {
+      this._audioContextMaster.stop()
+    }
   },
 
   onUnload: function () {
-    if (this._audioContextMaster){
-      this._audioContextMaster.stop()
-    }
+
   },
 
   onPullDownRefresh: function () {
@@ -72,7 +71,7 @@ Page({
 
   onShareAppMessage: function () {
     let masterId = this._masterId
-    let title = '阴阳师·式神台词语音'
+    let title = '阴阳师·式神台词&模仿语音'
     let path = `/pages/index/index`
     if (this.data.recordList) {
       let name = this.data.userInfo.show_name || this.data.userInfo.nick_name
@@ -100,6 +99,7 @@ Page({
       success: res => {
         if (res && res.data) {
           let userInfo = res.data
+          userInfo["deAvatar"] = deAvatar(openid)
           this.setData({
             userInfo
           })
@@ -376,6 +376,7 @@ Page({
       item['isOwner'] = App.globalData.openid == item.user_id
       item['isAuthor'] = item.user_id == curMaster.master_id
       item['dateStr'] = formatDate(item.c_date)
+      item['deAvatar'] = deAvatar(item.openid)
     }
     this.setData({
       inputValue: '',
@@ -527,6 +528,7 @@ Page({
     console.log(avatar)
   },
   follow(e) {
+    wx.vibrateShort()
     let suffix = (e == 'unFollow') ? e : 'follow'
     let openid = App.globalData.openid
     let followId = this._masterId

@@ -10,6 +10,9 @@
       <view class='top-option {{option == 1 ? "option-active":""}} {{top_hide ? "top-hide":""}}' bindtap="setting" data-option="1">假名设定</view>
       <view class='top-option {{option == 3 ? "option-active":""}} {{top_hide ? "top-hide":""}}' bindtap="setting" data-option="3">颜色设定</view>
       <view class='top-option {{option == 2 ? "option-active":""}} {{top_hide ? "top-hide":""}}' bindtap="setting" data-option="2">排行榜</view>
+      <button class='out-share {{!top_hide ? "top-hide":"an-fade-in"}}' open-type="share" size="mini">
+        <image class='btn-share {{!top_hide ? "top-hide":""}}' src="../../images/share.png"></image>
+      </button>
       <image class='top-setting {{top_hide ? "rt-90":""}}' src='{{icon_setting}}' bindtap="setting" data-option="0"></image>
     
     <view class='row-kana {{top_hide && sakki_roma != "" ? "kana-abs":"abs-hide"}}'>
@@ -59,7 +62,7 @@
         <!-- omoz-img -->
         <view class='box-omoz-img' hidden='{{!puzon}}'>
           <image class='omoz-sm omoz-spin' src='{{icon_omoz}}'></image>
-          <image class='omoz-avatar' src='{{userInfo.avatar_url}}'></image>
+          <image class='omoz-avatar' src='{{userInfo.avatar_url || userInfo.deAvatar}}'></image>
         </view>
       </view><!-- box-kana end-->
 
@@ -215,7 +218,7 @@
   <view class="row-player" hover-class='blue-hover'>
     <view class="rank-value rank-no">{{idx+1}}</view>
     <view class="rank-value width-player rank-player">
-      <image class='user-avatar' src='{{avatar_url}}'></image>
+      <image class='user-avatar' src='{{avatar_url || deAvatar}}'></image>
       <view class='box-user-name'>
         <view class='user-myco'>
           <block wx:for="{{colst}}" wx:key="mkey">

@@ -26,6 +26,30 @@
   color: #fff;
   z-index: 999;
 }
+.out-share{
+  position: absolute;
+  top: 26rpx;
+  right: 80rpx;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  width: 70rpx;
+  height: 70rpx;
+}
+.btn-share{
+  width: 70rpx;
+  height: 70rpx;
+}
+
+.an-fade-in{
+  animation: ke-fade-in 1s ease-out;
+  animation-fill-mode: forwards;
+}
+@keyframes ke-fade-in{
+  0%, 30%{opacity: 0}
+  50%{opacity: 0.8}
+  100%{opacity: 1}
+}
 
 .box-omoz-img{
   display: flex;

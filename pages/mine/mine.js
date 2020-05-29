@@ -1,5 +1,5 @@
 const App = getApp()
-const { trim, host, formatDate } = require('../../utils/util')
+const { trim, host, formatDate, deAvatar } = require('../../utils/util')
 
 Page({
 
@@ -26,7 +26,7 @@ Page({
   onLoad: function (options) {
     this.init()
     this.getUser()
-    // this.setBgColor()
+    this.getRecords()
   },
 
   onReady: function () {
@@ -34,41 +34,37 @@ Page({
     this._audioContextMaster.onEnded(() => {
       this.setMasterStop();
     });
-    setTimeout(()=>{
-      if (App.globalData.hasLogin && !this.data.userInfo.avatar_url){
-        console.log('reload...')
-        this.getUser()
+  },
+
+  onShow() {
+    let hasLogin = App.globalData.hasLogin
+    setTimeout(() => {
+      this.setData({ hasLogin })
+      if (hasLogin) {
+        let { newRecord, showName, motto } = App.globalData
+        if (!this.data.userInfo.avatar_url || newRecord || showName || motto){
+          console.log('reload...')
+          App.globalData.newRecord = false
+          App.globalData.showName = false
+          App.globalData.motto = false
+          this.getUser()
+          this.getRecords()
+        }
       }
     }, 600)
   },
 
-  onShow() {
-    this.getRecords()
-    let showName = App.globalData.showName ? App.globalData.showName : ''
-    if (showName){
-      let userInfo = this.data.userInfo
-      userInfo['show_name'] = showName
-      this.setData({ userInfo })
-      App.globalData.showName = ''
-    }
-    let motto = App.globalData.motto ? App.globalData.motto : ''
-    if (motto){
-      let userInfo = this.data.userInfo
-      userInfo['motto'] = motto
-      this.setData({ userInfo })
-      App.globalData.motto = ''
-    }
-  },
-
   onHide: function () {
-    // this.setBgColor()
+    if (this._audioContextMaster) {
+      this._audioContextMaster.stop()
+    }
     this.setData({
       requesting: false
     })
   },
 
   onUnload: function () {
-    this._audioContextMaster.stop()
+
   },
 
   onPullDownRefresh: function () {
@@ -81,9 +77,9 @@ Page({
 
   onShareAppMessage: function () {
     let masterId = App.globalData.openid
-    let title = '阴阳师·式神台词语音'
+    let title = '阴阳师·式神台词&模仿录音'
     let path = `/pages/index/index`
-    if (this.data.recordList){
+    if (this.data.recordList.length > 0){
       let name = this.data.userInfo.show_name || this.data.userInfo.nick_name
       title = `${name}の式神台词模仿录音`
       path = `/pages/person/person?masterId=${masterId}`
@@ -97,8 +93,8 @@ Page({
   /**
    * 自定函数
    */
-  getUser() {
-    let openid = App.globalData.openid
+  getUser(openid) {
+    openid = openid || App.globalData.openid
     wx.request({
       method: 'post',
       url: `${host}/getUser`,
@@ -106,9 +102,15 @@ Page({
       success: res => {
         if (res && res.data) {
           let userInfo = res.data
-          this.setData({
-            userInfo
-          })
+          if (!userInfo.avatar_url){
+            console.log('avatar_url empty!!!', userInfo)
+            this.updateAvatar(userInfo)
+          } else{
+            this.setData({
+              userInfo
+            })
+          }
+
         }
       }
     })
@@ -145,11 +147,21 @@ Page({
     // this.getList();
   },
   auth() {
+    console.log('auth')
     if (this.data.userInfo.auth_name != 'admini') return;
     let admini = !App.globalData.admini
     if (admini) wx.vibrateLong()
     App.globalData.admini = admini
     this.setData({ admini })
+  },
+  updateAvatar(userInfo) {
+    App.initAvatar(userInfo).then(data => {
+      console.log('updated!', data)
+      this.setData({
+        userInfo: data,
+        hasLogin: true
+      })
+    })
   },
   showAvatar(){
     wx.hideTabBar()
@@ -229,13 +241,7 @@ Page({
   getUserInfo(e) {
     let userInfo = e.detail.userInfo
     if(!userInfo) return
-    App.initAvatar(userInfo).then(data=>{
-      console.log(data)
-      this.setData({
-        userInfo: data,
-        hasLogin: true
-      })
-    })
+    this.updateAvatar(userInfo)
   },
 
   setMasterStop: function () {
@@ -405,6 +411,7 @@ Page({
       item['isOwner'] = App.globalData.openid == item.user_id
       item['isAuthor'] = item.user_id == curMaster.master_id
       item['dateStr'] = formatDate(item.c_date)
+      item['deAvatar'] = deAvatar(item.openid)
     }
     this.setData({
       inputValue: '',

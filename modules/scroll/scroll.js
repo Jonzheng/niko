@@ -163,20 +163,17 @@ Component({
 			if (this.data.mode === 'more') return;
 			if (oldVal === true && newVal === false) {
 				setTimeout(() => {
-          console.log('successShow: true')
 					this.setData({
 						successShow: true,
 						refreshStatus: 4,
 						move: this.data.scrollHeight2
 					});
 					setTimeout(() => {
-            console.log('successTran: true')
 						this.setData({
 							successTran: true,
 							move: this.data.scrollHeight1
 						});
 						setTimeout(() => {
-              console.log('refreshStatus: 1')
 							this.setData({
 								refreshStatus: 1,
 								successShow: false,
@@ -215,7 +212,6 @@ Component({
 			let successHeight = (windowWidth || 375) / 750 * 70;
 
 			this.createSelectorQuery().select("#refresh").boundingClientRect((res) => {
-        console.log('h:', res.height, successHeight)
         let move = res.height ? -res.height : -66
         this.setData({
           move,

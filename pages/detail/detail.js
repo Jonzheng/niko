@@ -1,7 +1,7 @@
 const App = new getApp()
 const RecordBucket = 'record-1256378396'
 const Region = 'ap-guangzhou'
-const { trim, host, formatDate } = require('../../utils/util')
+const { trim, host, formatDate, deAvatar } = require('../../utils/util')
 
 const recorderManager = wx.getRecorderManager()
 const options = {
@@ -22,7 +22,6 @@ const zanOn = "../../images/zan-on.png"
 const userId = 'ocVQY4-dF2m4IiYTTJZFo6k-NZbE'
 
 function _next() {
-  let that = this;
   let _progress = this.data.progress_record
   if (!this.data.isRecording) {
     return true;
@@ -34,8 +33,8 @@ function _next() {
   this.setData({
     progress_record: _progress + 2
   });
-  setTimeout(function () {
-    _next.call(that);
+  setTimeout( ()=> {
+    _next.call(this);
   }, 200);
 }
 
@@ -163,8 +162,9 @@ Page({
 
   onShareAppMessage() {
     let fileId = this.data.fileId
+    let cname = this.data.cname
     return {
-      title: '阴阳师·式神台词语音',
+      title: `${cname}·台词&模仿语音`,
       path: `/pages/detail/detail?fileId=${fileId}`,
     }
   },
@@ -333,6 +333,7 @@ Page({
   },
   initRecords(recordList) {
     for (let record of recordList) {
+      record["deAvatar"] = deAvatar(record.master_id)
       record["listenStatus"] = "listen-off"
       record["boxStyle"] = "btn-play-box"
       record["btnDelStyle"] = "btn-red-hidden"
@@ -381,9 +382,6 @@ Page({
         if (res && res.data) {
           let data = res.data
           let { list, audio, record } = data
-          console.log(list)
-          console.log(audio)
-          console.log(record)
           let curList = list.filter(i=>i.file_id == fileId)[0]
           let curAudio = audio[0]
           let recordList = record
@@ -393,7 +391,6 @@ Page({
           console.log(list)
           let shadow = curAudio.shadow.split(",").map((item) => { return item + 'rpx' })
           let srcVideo = curList.src_video.trim()
-          console.log(curList.src_video.length, srcVideo.length)
           this.setData({
             srcVideo,
             curAudio,
@@ -440,11 +437,11 @@ Page({
     })
   },
 
-  playOri: function () {
+  playOri() {
+    wx.vibrateShort()
     let curAudio = this.data.curAudio
     this._audioContextOri.src = curAudio.src_audio
     if (!this.data.oriPlaying) {
-      wx.vibrateShort()
       this._audioContextOri.play()
     } else {
       this.stopOri()
@@ -456,6 +453,7 @@ Page({
   },
 
   showMore(e) {
+    wx.vibrateShort()
     let currData = e.currentTarget.dataset
     let idx = currData.idx
     let recordList = this.data.recordList
@@ -471,7 +469,6 @@ Page({
         recordList[idx]["btnPoiStyle"] = "btn-red-hidden"
       }
     } else {
-      wx.vibrateShort()
       recordList[idx]["boxStyle"] = "btn-play-box-sm"
       recordList[idx]["btnRt"] = "rt-90"
       if (isSelf) {
@@ -488,8 +485,9 @@ Page({
 
   //录音
   startRecord: function () {
+    wx.vibrateShort()
     if (this.data.isPlaying) {
-      this.stopMyVoice()
+      this._audioContextMine.stop()
     }
     if (this.data.hasTmp) {
       this._tempFile = null
@@ -501,7 +499,6 @@ Page({
     }
     this.stopOri()
     if (!this.data.isRecording) {
-      wx.vibrateShort()
       recorderManager.start(options)
     } else {
       recorderManager.stop()
@@ -514,6 +511,7 @@ Page({
   },
 
   playMyVoice: function () {
+    wx.vibrateShort()
     if (this.data.isRecording) {
       return false
     }
@@ -658,7 +656,7 @@ Page({
 
   // 上传录音-- record-1256378396.cos.ap-guangzhou.myqcloud.com/ssr_gq_0_31588943189222.mp3
   uploadRecord() {
-    let that = this
+    wx.vibrateShort()
     let recordFile = this.data.recordFile
     console.log("recordFile:", recordFile)
     let masterId = App.globalData.openid
@@ -690,6 +688,7 @@ Page({
           data: { recordId, fileId, masterId, srcRecord },
           success: (res) => {
             console.log('saveRecord success:', res)
+            App.globalData.newRecord = true
             this._tempFile = null
             this.setData({
               hasTmp: false,
@@ -707,6 +706,7 @@ Page({
       item['isOwner'] = App.globalData.openid == item.user_id
       item['isAuthor'] = item.user_id == curMaster.master_id
       item['dateStr'] = formatDate(item.c_date)
+      item['deAvatar'] = deAvatar(item.openid)
     }
     this.setData({
       inputValue: '',
@@ -812,7 +812,6 @@ Page({
 
   //--留言点赞--
   updateZan: function (e) {
-    let that = this
     let currData = e.currentTarget.dataset
     const idx = currData["idx"]
     const midx = currData["midx"]
@@ -838,12 +837,13 @@ Page({
       data: { id, user_id, type },
       success: res => {
         console.log(res)
-        that.setData({ recordList })
+        this.setData({ recordList })
       }
     })
   },
 
   showOther() {
+    wx.vibrateShort()
     let rt90 = !this.data.rt90
     let otherShow = !this.data.otherShow
     this.setData({

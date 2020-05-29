@@ -58,7 +58,7 @@
 
 </view>
 <template name="an-list">
-  <image class="avatar" mode="aspectFill" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.openid}}"/>
+  <image class="avatar" mode="aspectFill" src="{{item.avatar_url || item.deAvatar}}" bindtap="toPerson" data-uid="{{item.openid}}"/>
   <view class="box-middle" catchtap="{{item.type == 'fans' || item.level == 'fans' || item.level=='follow' ? 'toPerson':'toDetail'}}"
     data-id="{{item.file_id}}" data-uid="{{item.openid}}">
     <view class="name" catchtap="toPerson" data-uid="{{item.openid}}">{{item.show_name || item.nick_name}}</view>
@@ -78,17 +78,17 @@
         <text class="content-label">@{{item.dateStr}}</text></view>
     </view>
   </view>
-  <view wx:if="{{news != -1}}" class="right"
+  <view class="right"
     catchtap="{{item.skCover ? 'toDetail': (item.level=='news' || item.level=='heart') ? 'toPerson':''}}"
     data-id="{{item.file_id}}" data-uid="{{item.openid}}">
     <image wx:if="{{item.skCover}}" class="avatar-sk" src="{{item.skCover}}"></image>
-    <view wx:if="{{item.level == 'follow' && item.both == 0}}" class="btn-follow-un"
+    <view wx:if="{{news != -1 && item.level == 'follow' && item.both == 0}}" class="btn-follow-un"
       catchtap="unFollow" data-uid="{{item.openid}}" data-idx="{{index}}">已关注</view>
-    <view wx:if="{{item.level == 'follow' && item.both == 1}}" class="btn-follow-un"
+    <view wx:if="{{news != -1 && item.level == 'follow' && item.both == 1}}" class="btn-follow-un"
       catchtap="unFollow" data-uid="{{item.openid}}" data-idx="{{index}}">互相关注</view>
-    <view wx:if="{{item.level == 'fans' && item.both == 0}}" class="btn-follow"
+    <view wx:if="{{news != -1 && item.level == 'fans' && item.both == 0}}" class="btn-follow"
       catchtap="follow" data-uid="{{item.openid}}" data-idx="{{index}}">+ 关注</view>
-    <view wx:if="{{item.level == 'fans' && item.both == 1}}" class="btn-follow-un"
+    <view wx:if="{{news != -1 && item.level == 'fans' && item.both == 1}}" class="btn-follow-un"
       catchtap="unFollow" data-uid="{{item.openid}}" data-idx="{{index}}">互相关注</view>
   </view>
 </template>

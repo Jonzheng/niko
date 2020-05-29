@@ -51,10 +51,19 @@ function formatDate(time) {
   }
 }
 
+/**
+ * 随机且固定的默认头像
+ */
+function deAvatar(openid) {
+  let randInt = openid.codePointAt(openid.length - 1) % 9
+  let avatar = `https://avatar-1256378396.cos.ap-guangzhou.myqcloud.com/de_avatar_${randInt}.png`
+  return avatar
+}
 
 module.exports = {
   host: host,
   trim: trim,
+  deAvatar,
   formatDate: formatDate,
   formatTime: formatTime
 }

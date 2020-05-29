@@ -1,7 +1,7 @@
 const App = new getApp()
 const audioContextOri = wx.createInnerAudioContext()
 
-const { host } = require('../../utils/util')
+const { host, deAvatar } = require('../../utils/util')
 const pageStart = 1
 
 const kana_a = [["kana_a", "a", "あ", "ア"], ["kana_a", "i", "い", "イ"], ["kana_a", "u", "う", "ウ"], ["kana_a", "e", "え", "エ"], ["kana_a", "o", "お", "オ"]]
@@ -144,7 +144,11 @@ Page({
   },
 
   onShareAppMessage: function () {
-
+    return {
+      title: '假名·连连看@式神录',
+      path: '/pages/game/game',
+      imageUrl: 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/title00.png'
+    }
   },
 
   getUserInfo(e) {
@@ -377,6 +381,7 @@ Page({
           let myco = rank.myco
           let colst = myco.split(",")
           rank["colst"] = colst
+          rank["deAvatar"] = deAvatar(rank.openid)
         }
         let ranks = type === 'more' ? this.data.ranks.concat(list) : list
         this.setData({
@@ -390,6 +395,7 @@ Page({
   },
 
   setting(e) {
+    wx.vibrateShort()
     if (!this.data.hasLogin) return
     var currData = e.currentTarget.dataset
     var option = currData.option

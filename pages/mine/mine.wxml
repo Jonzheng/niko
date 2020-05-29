@@ -36,7 +36,7 @@
 
 <view class="mine-body">
   <view class="userinfo">
-    <button wx:if="{{!hasLogin && canIUse}}" class="btn-user" open-type="getUserInfo" bindgetuserinfo="getUserInfo">呐、二次元入口</button>
+    <button wx:if="{{!hasLogin && canIUse}}" class="btn-user" open-type="getUserInfo" bindgetuserinfo="getUserInfo">二次元入口</button>
   </view>
 
   <pull-down id="scroll" wx:if="{{hasLogin}}"
@@ -50,7 +50,7 @@
 
   <view class="profile">
     <view class="box-line">
-      <view class="mine-name" bindlongtap="auth">{{userInfo.show_name || userInfo.nick_name}}</view>
+      <view class="mine-name" bindlongpress="auth">{{userInfo.show_name || userInfo.nick_name}}</view>
       <view class="icon-right" bindtap="toEdit" data-name="{{userInfo.show_name || userInfo.nick_name}}" data-motto="{{userInfo.motto}}">
         <image class="arrow" src="../../images/arrow-left.png"></image>
       </view>
@@ -158,8 +158,8 @@
 <action-sheet formShow="{{aboutShow}}" bind:clickMask="closeAbout" boxHeight="{{isIpx ? 800 : 720}}"
   formTitle="关于『式神录』" scroll="{{false}}">
   <view class="about-label">简介</view>
-  <view class="about-desc">式神录是我业余时间开发的一个小程序，纯粹是出于兴趣，所以如果你看到一些bug不要惊慌，如果你能截图反馈给我那就更好的啦。如果你觉得小程序还ok，那你可以多发几条录音、分享给你的朋友，让更多的人发现式神录，这样我也更有动力做维护和版本迭代。此版本后发布我会再先收集一波式神台词，记得常回来看崽儿们啦。</view>
-  <view class="about-label">分享</view>
+  <view class="about-desc">式神录是我业余时间开发的一个小程序，一来是出于兴趣，再者是为了技术实践，所以如果你遇到一些bug不要惊慌，如果你能截图反馈给我那就更好的啦。如果你觉得小程序还ok，那你可以多发几条录音、分享给你的朋友或寮群，让更多的人发现式神录。此版本后发布我会再先收集一波式神台词，记得常回来看崽儿们啦。</view>
+  <view class="about-label">传火</view>
   <view class="about-desc" style="text-indent:0">
     <button class="out-share" open-type="share" size="mini" bindtap="closeAbout">
       <image class="btn-share" src="../../images/share.png"></image>

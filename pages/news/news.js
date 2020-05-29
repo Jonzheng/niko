@@ -1,5 +1,5 @@
 const App = getApp()
-const { host, formatDate } = require('../../utils/util')
+const { host, formatDate, deAvatar } = require('../../utils/util')
 const tops = {
   "news": { api: "queryNews", idx: 0, total: 30 },
   "heart": { api: "queryHeart", idx: 1, total: 30 },
@@ -88,7 +88,10 @@ Page({
   },
 
   onShareAppMessage: function () {
-
+    return {
+      title: '阴阳师·式神台词&模仿录音',
+      path: '/pages/index/index',
+    }
   },
   back() {
     wx.navigateBack()
@@ -123,6 +126,7 @@ Page({
     this.getList('more', pageNo, level);
   },
   follow(e, followId='', idx=-1) {
+    wx.vibrateShort()
     let suffix = (e == 'unFollow') ? e : 'follow'
     let openid = App.globalData.openid
     followId = followId ? followId : e.currentTarget.dataset.uid
@@ -178,6 +182,7 @@ Page({
     list.map((item) => {
       item["level"] = level
       item["dateStr"] = formatDate(item.c_date)
+      item["deAvatar"] = deAvatar(item.openid)
       if (item.content){
         let pre = item.content.substr(0, 7)
         pre = (item.content.length > 5) ? pre + '...' : pre
@@ -262,10 +267,10 @@ Page({
     }, 0)
   },
   tabChange: function (e) {
+    wx.vibrateShort()
     let { index, value } = e.detail
     let level = value
     if (level == this._level) {
-      wx.vibrateShort()
       this.toTop()
       return;
     }

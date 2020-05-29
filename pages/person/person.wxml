@@ -5,7 +5,7 @@
 </view>
 <view class="box">
   <view class="top-mine">
-    <image class="avatar" src="{{ userInfo.avatar_url || detaultAvatar}}" bindtap="showAvatar"></image>
+    <image class="avatar" src="{{userInfo.avatar_url || userInfo.deAvatar}}" bindtap="showAvatar"></image>
 
     <view class="relation">
       <view class="mine-menu">
@@ -119,14 +119,14 @@
 </view>
 
 <view wx:if="{{avatarShow}}" class="avatar-mask" catchtap="hideAvatar">
-  <image class="avatar-detail" src="{{userInfo.avatar_url}}" mode="widthFix"></image>
+  <image class="avatar-detail" src="{{userInfo.avatar_url || userInfo.deAvatar}}" mode="widthFix"></image>
 </view>
 
 <action-sheet formShow="{{commShow}}" bind:clickMask="closeMask" bind:confirmInput="confirmInput" bind:blur="clearInput"
   hasInput="{{true}}" boxHeight="{{isIpx ? 900 : 720}}" inputValue="{{inputValue}}"
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="index">
-    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url}}"/>
+    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url || item.deAvatar}}"/>
     <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
       data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">
       <view class="comm-top">
