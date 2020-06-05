@@ -5,7 +5,7 @@
 </view>
 <view class="label">个性签名：</view>
 <view class="box">
-  <input class="in-name" value="{{motto}}" placeholder="" maxlength="30" bindinput='setMotto'></input>
+  <input class="in-name" value="{{motto}}" placeholder="" maxlength="32" bindinput='setMotto'></input>
 </view>
 
 <view class="box-btn">

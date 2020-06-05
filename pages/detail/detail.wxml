@@ -35,14 +35,6 @@
           <image class='omoz-sm omoz-spin' src='{{icon_omoz}}'></image>
           <image class='omoz-avatar' src='{{curAudio.avatar}}'></image>
         </view>
-        <!-- <view class='box-other {{show_other ? "other-show":""}}'>
-          <block wx:for="{{other_lst}}" wx:key="mkey">
-            <view class='sk-btn' data-fid='{{item.file_id}}' bindtap="reload" hover-class="space-hover">
-              <view class='sk-title'>{{item.title}}</view>
-              <view class='sk-serifu'>{{item.serifu}}</view>
-            </view>
-          </block>
-        </view> -->
 
       </view>
     <view wx:if="{{showVideo}}" class="video-mask" catchtap="hideVideo">
@@ -71,9 +63,10 @@
               <view class='{{oriPlaying ? "sound-stop" : "sound-play"}} '></view>
             </view>
             <view class="shadow-ori">
-            <view class='{{slider}}'></view>
-              <block wx:for="{{shadow}}" wx:key="mkey">
-                <view class="ele-ori" style="height:{{item}};transition: height 0.6s ease-in;"></view>
+              <block wx:for="{{shadow}}" wx:key="index">
+                <view class="ele-ori" style='height:{{item.height}}rpx;background:{{item.idx < oriIdx ? "#337ab7": "#bbb"}}'>
+                  <view hidden="{{oriIdx == 0 || item.idx != oriIdx}}" class="cursor"></view>
+                </view>
               </block>
             </view>
           </view>

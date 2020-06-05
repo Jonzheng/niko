@@ -28,6 +28,7 @@ const SrcHshs = 'https://link-1256378396.cos.ap-guangzhou.myqcloud.com/hshs.wav'
 
 Page({
   data: {
+    isIpx: App.globalData.isIpx,
     bucket: [],
     this_lefts: [],
     this_rights: [],
@@ -93,6 +94,7 @@ Page({
       })
     }, 3000)
     this.setData({
+      isIpx: App.globalData.isIpx,
       hasLogin: App.globalData.hasLogin,
       userInfo: App.globalData.userInfo
     })
@@ -304,6 +306,17 @@ Page({
         checkCoin,
       },
       success: (res)=> {
+        if (!this.data.isIpx){
+          this._tabBarHide = true
+          wx.hideTabBar({
+            fail: () => {
+              wx.showToast({
+                icon: 'none',
+                title: '函数调用失败，请更新微信',
+              })
+            }
+          })
+        }
         console.log(res)
         var rank = res.data[0]
         var best = Math.max(point, rank.point)
@@ -516,17 +529,21 @@ Page({
 
   },
 
-  switchKata: function () {
+  switchKata() {
+    wx.vibrateShort()
     var kon = !this.data.kon
     this.setData({ kon })
     if (kon) {
-      wx.vibrateShort()
       audioContextOri.src = SrcHshs
       audioContextOri.play()
     }
   },
 
-  initGame: function () {
+  initGame() {
+    if (this._tabBarHide){
+      this._tabBarHide = false
+      wx.showTabBar()
+    }
     var ks_ed = []
     var ks_no = []
     var ks_all = this.data.ks_all
@@ -639,7 +656,7 @@ Page({
       }
       var show_price = currData.price
       var myco = this.data.myco
-      if (myco.includes(key)) show_price = "已兑换"
+      if (myco && myco.includes(key)) show_price = "已兑换"
       var try_idx = 0
       var buy_log = ""
       var subCoin = 0
@@ -977,7 +994,7 @@ Page({
 
   },
 
-  hideBoth: function (old_row, old_col, this_row, this_col, steps) {
+  hideBoth(old_row, old_col, this_row, this_col, steps) {
     wx.vibrateShort()
     var fields = this.data.fields
     var this_step = fields[this_row][this_col]

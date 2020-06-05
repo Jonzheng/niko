@@ -43,7 +43,6 @@ Page({
   },
   setName(e){
     let showName = e.detail.value.trim()
-    showName = showName ? showName : this._showName
     this.setData({
       showName
     })
@@ -63,6 +62,7 @@ Page({
       wx.navigateBack()
       return
     }
+    let content = showName + motto
     wx.showLoading({
       icon: 'none',
       title: '正在保存...',
@@ -70,12 +70,19 @@ Page({
     wx.request({
       method: 'post',
       url: `${host}/updateProfile`,
-      data: { openid, showName, motto },
+      data: { openid, showName, motto, content },
       success: res => {
         wx.hideLoading()
-        App.globalData.showName = showName
-        App.globalData.motto = motto
-        wx.navigateBack()
+        if (res && res.data && res.data.code == 87014) {
+          wx.showModal({
+            title: '保存失败',
+            content: res.data.data,
+          })
+        }else{
+          App.globalData.showName = showName
+          App.globalData.motto = motto
+          wx.navigateBack()
+        }
       }
     })
   },

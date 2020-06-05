@@ -46,6 +46,7 @@ Page({
     skill: '* * *',
     oriPlaying: false,
     recordList: [],
+    oriIdx: 0,
     icon_omoz: 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/omoz_sm.png',
     icon_trash: "../../images/trash.png",
     icon_upload: "../../images/upload.png",
@@ -81,6 +82,12 @@ Page({
     setTimeout(() => { this.setData({ rt90: false }) }, 300)
   },
 
+  onShow() {
+    if (App.globalData.hasHeart){
+      this.getRecords()
+    }
+  },
+
   onHide: function () {
     wx.hideNavigationBarLoading()
     this.setData({
@@ -100,6 +107,9 @@ Page({
     this._audioContextOri.stop()
     this._audioContextMine.stop()
     this._audioContextMaster.stop()
+    this._audioContextOri.destroy()
+    this._audioContextMine.destroy()
+    this._audioContextMaster.destroy()
   },
 
   onReady: function () {
@@ -110,6 +120,16 @@ Page({
     // wx.setInnerAudioOption({ 'obeyMuteSwitch': false })
     // console.log('obeyMuteSwitch:',this._audioContextOri.obeyMuteSwitch)
     this._audioContextOri.onPlay(() => {
+      console.log(this._audioContextOri.currentTime)
+      let _len = this.data.shadow.length
+      this._oriIter = setInterval(()=>{
+        let curTime = this._audioContextOri.currentTime || 0
+        let idx = curTime / this._audioContextOri.duration * _len
+        let oriIdx = Math.round(idx)
+        this.setData({
+          oriIdx
+        })
+      }, 30)
       console.log("audioContextOri...")
       this.setData({
         slider: 'bar-end',
@@ -382,6 +402,7 @@ Page({
         if (res && res.data) {
           let data = res.data
           let { list, audio, record } = data
+          list = list || []
           let curList = list.filter(i=>i.file_id == fileId)[0]
           let curAudio = audio[0]
           let recordList = record
@@ -389,7 +410,7 @@ Page({
           this.initRecords(recordList)
           list.map((item)=> item['ser'] = trim(item.serifu))
           console.log(list)
-          let shadow = curAudio.shadow.split(",").map((item) => { return item + 'rpx' })
+          let shadow = curAudio.shadow.split(",").map((height, idx)=>{ return { idx, height } })
           let srcVideo = curList.src_video.trim()
           this.setData({
             srcVideo,
@@ -408,8 +429,31 @@ Page({
     })
   },
 
-  setOriStop: function () {
+  // 单独拉取record
+  getRecords() {
+    wx.showNavigationBarLoading()
+    let openid = App.globalData.openid
+    let fileId = this.data.fileId
+    wx.request({
+      url: `${host}/queryRecord`,
+      method: 'post',
+      data: { fileId, openid },
+      success: (res) => {
+        wx.hideNavigationBarLoading()
+        let { data } = res
+        this.initRecords(data)
+      }
+    })
+  },
+
+  setOriStop() {
+    this._audioContextOri.seek(0)
+    console.log('end', this._audioContextOri.currentTime)
+    if (this._oriIter > -1){
+      clearInterval(this._oriIter)
+    }
     this.setData({
+      oriIdx: 0,
       slider: 'bar-ori',
       oriPlaying: false,
     });
@@ -647,6 +691,7 @@ Page({
       method: 'post',
       data: { recordId, fileId, userId, masterId },
       success: ()=>{
+        App.globalData.hasHeart = true
         this.setData({
           recordList
         })
@@ -755,7 +800,13 @@ Page({
       data: { recordId, masterId, fileId, userId, content, reId, reName, reContent },
       success: (res)=> {
         console.log(res.data)
-        if (res) {
+        if (res && res.data && res.data.code == 87014) {
+          let content = res.data.data
+          wx.showModal({
+            title: '评论失败',
+            content,
+          })
+        } else {
           let commentList = res.data
           this.initCommentList(commentList)
         }

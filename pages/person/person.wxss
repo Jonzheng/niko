@@ -29,6 +29,7 @@ page{
 
 .mine-body{
   position: relative;
+  top: -10rpx;
   display: flex;
   flex-direction: column;
   z-index: 8;

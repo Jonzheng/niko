@@ -49,8 +49,11 @@ Page({
           App.globalData.motto = false
           this.getUser()
           this.getRecords()
+        } else if (App.globalData.hasHeart){
+          this.getRecords()
         }
       }
+      App.globalData.hasHeart = false
     }, 600)
   },
 
@@ -201,11 +204,12 @@ Page({
     })
   },
   getRecords() {
-    let masterId = App.globalData.openid
+    let openid = App.globalData.openid
+    let masterId = openid
     wx.request({
       url: `${host}/queryRecord`,
       method: 'post',
-      data: { masterId },
+      data: { masterId, openid },
       success: (res) => {
         this.setData({
           requesting: false
@@ -469,7 +473,13 @@ Page({
       data: { recordId, masterId, fileId, userId, content, reId, reName, reContent },
       success: (res) => {
         console.log(res.data)
-        if (res) {
+        if (res && res.data && res.data.code == 87014) {
+          let content = res.data.data
+          wx.showModal({
+            title: '评论失败',
+            content,
+          })
+        } else {
           let commentList = res.data
           this.initCommentList(commentList)
         }

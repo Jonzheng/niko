@@ -47,6 +47,7 @@ Page({
   },
 
   onShow: function () {
+    App.globalData.hasHeart = false
     wx.hideNavigationBarLoading()
     wx.setNavigationBarTitle({
       title: '式神录',
