@@ -60,7 +60,7 @@
   </view>
 
   <view class="box-records">
-    <view class="record-label">录音：</view>
+    <view class="record-label">cv模仿录音：</view>
     <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
     <block wx:for="{{recordList}}" wx:key="mkey">
       <view class="item-record">
@@ -82,11 +82,14 @@
                   </block>
                 </view>
               </view>
-              <view wx:if="{{item.status == 1}}" class="text-pub {{item.btnDelStyle}}"
-                bindtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="0">撤回</view>
-              <view wx:if="{{item.status == 0}}" class="text-pub {{item.btnDelStyle}}"
-                bindtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="1">发布</view>
-              <view class="text-del {{item.btnDelStyle}}" bindtap='delRecordConfirm' data-idx="{{index}}" data-rid="{{item.record_id}}">删除</view>
+              <block wx:if="{{item.btnShow}}">
+                <view wx:if="{{item.status == 1}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
+                  catchtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="0">撤回</view>
+                <view wx:if="{{item.status == 0}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
+                  catchtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="1">发布</view>
+                <view class="text-del {{item.btnShow ? 'btn-red':'btn-red-hidden'}}" catchtap='delRecordConfirm'
+                  data-idx="{{index}}" data-rid="{{item.record_id}}">删除</view>
+              </block>
             </view>
             <image hidden="{{!admini}}" src="{{icon_more}}" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
           </view>

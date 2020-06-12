@@ -48,6 +48,7 @@ Page({
 
   onShow: function () {
     App.globalData.hasHeart = false
+    App.globalData.downCount = 0
     wx.hideNavigationBarLoading()
     wx.setNavigationBarTitle({
       title: '式神录',
@@ -154,6 +155,8 @@ Page({
   },
 
   getList(type, pageNo, level='') {
+    if(this._lockQuery) return
+    this._lockQuery = true
     wx.showNavigationBarLoading()
     wx.setNavigationBarTitle({
       title: '加载中...',
@@ -165,6 +168,7 @@ Page({
       method: 'post',
       data: { level: level, pageNo: pageNo},
       complete: (res)=> {
+        this._lockQuery = false
         setTimeout(()=>{
           wx.hideNavigationBarLoading()
           wx.setNavigationBarTitle({

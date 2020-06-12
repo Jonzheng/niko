@@ -20,13 +20,16 @@ Page({
     anListen: '',
     isListen: false,
     listenStatus: 'listen-off',
-    btnDelStyle: 'btn-red-hidden',
+    btnShow: false,
   },
 
   onLoad: function (options) {
+    let openid = App.globalData.openid
     this.init()
-    this.getUser()
-    this.getRecords()
+    if (!openid) return this.login()
+    this.getUser(openid)
+    this.getRecords(openid)
+    App.getHeartSrc()
   },
 
   onReady: function () {
@@ -38,6 +41,7 @@ Page({
 
   onShow() {
     let hasLogin = App.globalData.hasLogin
+    let openid = App.globalData.openid
     setTimeout(() => {
       this.setData({ hasLogin })
       if (hasLogin) {
@@ -47,10 +51,10 @@ Page({
           App.globalData.newRecord = false
           App.globalData.showName = false
           App.globalData.motto = false
-          this.getUser()
-          this.getRecords()
+          this.getUser(openid)
+          this.getRecords(openid)
         } else if (App.globalData.hasHeart){
-          this.getRecords()
+          this.getRecords(openid)
         }
       }
       App.globalData.hasHeart = false
@@ -97,7 +101,6 @@ Page({
    * 自定函数
    */
   getUser(openid) {
-    openid = openid || App.globalData.openid
     wx.request({
       method: 'post',
       url: `${host}/getUser`,
@@ -125,6 +128,28 @@ Page({
       hasLogin: App.globalData.hasLogin
     })
   },
+  login(){
+    // 登录-后台注册或更新登录时间
+    wx.login({
+      success: res => {
+        // 发送 res.code 到后台换取 openId, sessionKey, unionId
+        let userCode = res.code
+        wx.request({
+          method: 'post',
+          url: `${host}/regist`,
+          data: { userCode: userCode },
+          success: res => {
+            if (res && res.data) {
+              let userInfo = res.data[0]
+              App.globalData.userInfo = userInfo
+              App.globalData.openid = userInfo.openid
+              this.getUser(userInfo.openid)
+            }
+          }
+        })
+      }
+    })
+  },
   init() {
     this.setData({
       isIpx: App.globalData.isIpx,
@@ -139,8 +164,8 @@ Page({
       end: false,
     })
     this.init()
-    this.getUser()
-    this.getRecords()
+    this.getUser(App.globalData.openid)
+    this.getRecords(App.globalData.openid)
   },
   // 加载更多
   more() {
@@ -148,6 +173,13 @@ Page({
       loadEnd: true
     })
     // this.getList();
+  },
+  playHeartSrc() {
+    App.getHeartSrc().then(heartSrc => {
+      this._ctx = wx.createInnerAudioContext()
+      this._ctx.src = heartSrc
+      this._ctx.play()
+    })
   },
   auth() {
     console.log('auth')
@@ -203,8 +235,7 @@ Page({
       }
     })
   },
-  getRecords() {
-    let openid = App.globalData.openid
+  getRecords(openid) {
     let masterId = openid
     wx.request({
       url: `${host}/queryRecord`,
@@ -224,8 +255,7 @@ Page({
     for (let record of recordList) {
       record["listenStatus"] = "listen-off"
       record["boxStyle"] = "btn-play-box"
-      record["btnDelStyle"] = "btn-red-hidden"
-      record["btnPoiStyle"] = "btn-red-hidden"
+      record["btnShow"] = false
       record["btnRt"] = ""
       record["dateStr"] = formatDate(record.c_date)
       record["ser"] = trim(record.serifu)
@@ -299,12 +329,12 @@ Page({
     if (recordList[idx]["btnRt"] == "rt-90") {
       recordList[idx]["boxStyle"] = "btn-play-box"
       recordList[idx]["btnRt"] = ""
-      recordList[idx]["btnDelStyle"] = "btn-red-hidden"
+      recordList[idx]["btnShow"] = false
     } else {
       wx.vibrateShort()
       recordList[idx]["boxStyle"] = "btn-play-box-sm"
       recordList[idx]["btnRt"] = "rt-90"
-      recordList[idx]["btnDelStyle"] = "btn-red"
+      recordList[idx]["btnShow"] = true
     }
     this.setData({
       recordList
@@ -321,6 +351,7 @@ Page({
     let curMaster = recordList[idx]
     let url = ''
     if (status == 0) {
+      this.playHeartSrc()
       wx.vibrateShort()
       url = `${host}/updateHeart`
       curMaster["heartStatus"] = 1
@@ -340,6 +371,9 @@ Page({
       method: 'post',
       data: { recordId, fileId: fid, userId, masterId },
       success: () => {
+        let userInfo = this.data.userInfo
+        userInfo['heartCount'] = status == 0 ? userInfo['heartCount'] + 1 : userInfo['heartCount'] - 1
+        this.setData({ userInfo })
         setTimeout(() => {
           this._updating = false
         }, 300)

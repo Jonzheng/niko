@@ -13,6 +13,7 @@ page{
 }
 
 .btn-circle{
+  position: relative;
   display: flex;
   flex-shrink: 0; /*固定大小*/
   background-color: #fff;
@@ -48,7 +49,6 @@ page{
 }
 
 .black-hover{
-  transform:scale(1.02, 1.02);
   box-shadow: 0 0 20rpx rgba(0, 0, 0, 0.2);
 }
 

@@ -56,8 +56,16 @@
   align-items: center;
   flex-direction: column;
   position: absolute;
-  top: 720rpx;
   right: 15rpx;
+}
+
+.tips-puzon{
+  position: absolute;
+  right: -80rpx;
+  color: #337ab7;
+  opacity: 0.8;
+  width: 320rpx;
+  font-size: 26rpx;
 }
 
 .omoz-avatar{

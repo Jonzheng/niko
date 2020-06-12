@@ -60,6 +60,7 @@ Page({
     kon: true,
     skon: false,
     puzon: false,
+    tipsPuzon: true,
     sakki_hira: "",
     sakki_kata: "",
     sakki_roma: "",
@@ -507,24 +508,32 @@ Page({
   },
 
   showPuz: function () {
-    var openid = App.globalData.openid
-    var puzon = !this.data.puzon
+    let openid = App.globalData.openid
+    let puzon = !this.data.puzon
+    let hasPuzon = wx.getStorageSync('hasPuzon')
+    wx.setStorageSync('hasPuzon', true)
     if (puzon) {
       wx.request({
         url: `${host}/queryRank`,
         method: 'POST',
         data: { openid },
         success: (res)=> {
-          var rank = res.data
+          let rank = res.data
           if (!rank) return
-          var re_puz = rank.puz
+          let re_puz = rank.puz
           this.setPuzMap(re_puz)
-          this.setData({ puzon })
+          this.setData({
+            tipsPuzon: !hasPuzon,
+            puzon
+          })
         }
       });
 
     } else {
-      this.setData({ puzon })
+      this.setData({
+        tipsPuzon: !hasPuzon,
+        puzon
+      })
     }
 
   },

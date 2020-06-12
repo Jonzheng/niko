@@ -80,6 +80,7 @@ Page({
       hasLogin: App.globalData.hasLogin,
     })
     setTimeout(() => { this.setData({ rt90: false }) }, 300)
+    App.getHeartSrc()
   },
 
   onShow() {
@@ -147,6 +148,19 @@ Page({
 
     this._audioContextMaster.onEnded(() => {
       this.setMasterStop();
+      let tipsRecord = wx.getStorageSync('tipsRecord101')
+      if (!tipsRecord) {
+        wx.setStorageSync('tipsRecord101', true)
+        setTimeout(() => {
+          this.setData({ tipsRecord: '轮到你了' })
+          setTimeout(() => {
+            this.setData({ tipsRecord: '轮到你了, 网友!' })
+            setTimeout(() => {
+              this.setData({ tipsRecord: '' })
+            }, 6000)
+          }, 2000)
+        }, 500)
+      }
     });
 
     this._audioContextMine.onEnded(() => {
@@ -219,6 +233,13 @@ Page({
     console.log('-the end-')
     this.setData({end: true})
     // this.getList();
+  },
+  playHeartSrc(){
+    App.getHeartSrc().then(heartSrc => {
+      this._ctx = wx.createInnerAudioContext()
+      this._ctx.src = heartSrc
+      this._ctx.play()
+    })
   },
 
   toggleCode() {
@@ -325,10 +346,12 @@ Page({
           let value = word.substr(0, word.length - 1)
           value = idx == serifu_sp.length - 1 ? word : value
           for (let w of value){
-            words.push({value:w})
+            words.push({ value: w })
           }
           pre = word.substr(word.length - 1, word.length)
-        } else{
+        } else if (idx == serifu_sp.length - 1){
+          words.push({ value: word })
+        } else {
           pre = word
         }
       } else { //平假注音
@@ -356,8 +379,7 @@ Page({
       record["deAvatar"] = deAvatar(record.master_id)
       record["listenStatus"] = "listen-off"
       record["boxStyle"] = "btn-play-box"
-      record["btnDelStyle"] = "btn-red-hidden"
-      record["btnPoiStyle"] = "btn-red-hidden"
+      record["btnShow"] = false
       record["btnRt"] = ""
       record["dateStr"] = formatDate(record.c_date)
       record["isMine"] = record.master_id == App.globalData.openid
@@ -457,6 +479,20 @@ Page({
       slider: 'bar-ori',
       oriPlaying: false,
     });
+
+    let tipsRecord = wx.getStorageSync('tipsRecord')
+    if (!tipsRecord){
+      wx.setStorageSync('tipsRecord', true)
+      setTimeout(()=>{
+        this.setData({ tipsRecord: '录音模仿一下吧' })
+        setTimeout(()=>{
+          this.setData({ tipsRecord: '录音模仿一下吧, 网友!' })
+          setTimeout(() => {
+            this.setData({ tipsRecord: '' })
+          }, 6000)
+        }, 2000)
+      }, 500)
+    }
   },
 
   setMasterStop: function () {
@@ -474,7 +510,7 @@ Page({
     }
   },
 
-  setMineStop: function () {
+  setMineStop() {
     this.setData({
       isPlaying: false,
       isPlayed: true
@@ -508,17 +544,13 @@ Page({
       recordList[idx]["boxStyle"] = "btn-play-box"
       recordList[idx]["btnRt"] = ""
       if (isSelf) {
-        recordList[idx]["btnDelStyle"] = "btn-red-hidden"
-      } else {
-        recordList[idx]["btnPoiStyle"] = "btn-red-hidden"
+        recordList[idx]["btnShow"] = false
       }
     } else {
       recordList[idx]["boxStyle"] = "btn-play-box-sm"
       recordList[idx]["btnRt"] = "rt-90"
       if (isSelf) {
-        recordList[idx]["btnDelStyle"] = "btn-red"
-      } else {
-        recordList[idx]["btnPoiStyle"] = "btn-red"
+        recordList[idx]["btnShow"] = true
       }
     }
     this.setData({
@@ -528,18 +560,11 @@ Page({
 
 
   //录音
-  startRecord: function () {
+  startRecord() {
     wx.vibrateShort()
+    this.setData({ tipsRecord: '' })
     if (this.data.isPlaying) {
       this._audioContextMine.stop()
-    }
-    if (this.data.hasTmp) {
-      this._tempFile = null
-      this.setData({
-        hasTmp: false,
-        progress_record: 0
-      })
-      return
     }
     this.stopOri()
     if (!this.data.isRecording) {
@@ -551,14 +576,21 @@ Page({
         hasTmp: true,
       })
     }
-
   },
 
-  playMyVoice: function () {
+  clearTemp() {
     wx.vibrateShort()
-    if (this.data.isRecording) {
-      return false
-    }
+    this._tempFile = null
+    this.setData({
+      hasTmp: false,
+      progress_record: 0
+    })
+    return
+  },
+
+  playMyVoice() {
+    wx.vibrateShort()
+    if (this.data.isRecording) return
     if (this._tempFile) {
       let recordFile = this._tempFile.tempFilePath
       console.log('recordFile:', recordFile)
@@ -572,7 +604,6 @@ Page({
       } else {
         this._audioContextMine.stop()
       }
-
     }
   },
 
@@ -665,6 +696,8 @@ Page({
 
   //--点心--
   updateHeart(e) {
+    if(this._lockHeart) return
+    this._lockHeart = true
     let currData = e.currentTarget.dataset
     let { idx, status } = currData
     let userId = App.globalData.openid
@@ -672,6 +705,7 @@ Page({
     let curMaster = recordList[idx]
     let url = ''
     if (status == 0) {
+      this.playHeartSrc()
       wx.vibrateShort()
       url = `${host}/updateHeart`
       curMaster["heartShape"] = heartOn
@@ -695,6 +729,9 @@ Page({
         this.setData({
           recordList
         })
+        setTimeout(() => {
+          this._lockHeart = false
+        }, 300)
       }
     })
   },

@@ -20,7 +20,7 @@ Page({
     anListen: '',
     isListen: false,
     listenStatus: 'listen-off',
-    btnDelStyle: 'btn-red-hidden',
+    btnShow: false,
   },
 
   onLoad: function (options) {
@@ -38,6 +38,7 @@ Page({
     })
     this.getUser(masterId)
     this.getRecords(masterId)
+    App.getHeartSrc()
   },
 
   onReady: function () {
@@ -133,6 +134,13 @@ Page({
     })
     // this.getList();
   },
+  playHeartSrc() {
+    App.getHeartSrc().then(heartSrc => {
+      this._ctx = wx.createInnerAudioContext()
+      this._ctx.src = heartSrc
+      this._ctx.play()
+    })
+  },
   toNews(e) {
     if (!App.globalData.hasLogin) return
     wx.vibrateShort()
@@ -185,8 +193,7 @@ Page({
     for (let record of recordList) {
       record["listenStatus"] = "listen-off"
       record["boxStyle"] = "btn-play-box"
-      record["btnDelStyle"] = "btn-red-hidden"
-      record["btnPoiStyle"] = "btn-red-hidden"
+      record["btnShow"] = false
       record["btnRt"] = ""
       record["dateStr"] = formatDate(record.c_date)
       record["ser"] = trim(record.serifu)
@@ -264,12 +271,12 @@ Page({
     if (recordList[idx]["btnRt"] == "rt-90") {
       recordList[idx]["boxStyle"] = "btn-play-box"
       recordList[idx]["btnRt"] = ""
-      recordList[idx]["btnDelStyle"] = "btn-red-hidden"
+      recordList[idx]["btnShow"] = false
     } else {
       wx.vibrateShort()
       recordList[idx]["boxStyle"] = "btn-play-box-sm"
       recordList[idx]["btnRt"] = "rt-90"
-      recordList[idx]["btnDelStyle"] = "btn-red"
+      recordList[idx]["btnShow"] = true
     }
     this.setData({
       recordList
@@ -286,6 +293,7 @@ Page({
     let curMaster = recordList[idx]
     let url = ''
     if (status == 0) {
+      this.playHeartSrc()
       wx.vibrateShort()
       url = `${host}/updateHeart`
       curMaster["heartStatus"] = 1
@@ -305,6 +313,9 @@ Page({
       method: 'post',
       data: { recordId, fileId: fid, userId, masterId },
       success: () => {
+        let userInfo = this.data.userInfo
+        userInfo['heartCount'] = status == 0 ? userInfo['heartCount'] + 1 : userInfo['heartCount'] - 1
+        this.setData({ userInfo })
         App.globalData.hasHeart = true
         setTimeout(() => {
           this._updating = false

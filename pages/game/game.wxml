@@ -44,6 +44,7 @@
     <view class='box-setting' hidden='{{top_hide}}'>
 
       <view class='box-kana' hidden='{{option != 1}}'>
+        <view wx:if="{{tipsPuzon}}" class="tips-puzon" style="top:140rpx;">长按方块查看练度</view>
         <block wx:for="{{ks_all}}" wx:key="mkey" wx:for-index="row">
           <template is="all-kana" data="{{item,row,is_max,puzon,puz_map}}"/>
         </block>
@@ -60,7 +61,7 @@
         </view>
 
         <!-- omoz-img -->
-        <view class='box-omoz-img' hidden='{{!puzon}}'>
+        <view wx:if="{{puzon}}" class='box-omoz-img' style="top:{{isIpx?720:620}}rpx;">
           <image class='omoz-sm omoz-spin' src='{{icon_omoz}}'></image>
           <image class='omoz-avatar' src='{{userInfo.avatar_url || userInfo.deAvatar}}'></image>
         </view>

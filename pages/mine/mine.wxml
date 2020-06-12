@@ -65,7 +65,7 @@
       {{userInfo.news}}条未读信息
       <image class="icon-next" src="../../images/news-next.png"></image>
     </view>
-    <view class="record-label">录音：</view>
+    <view class="record-label">cv模仿录音：</view>
     <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
     <block wx:for="{{recordList}}" wx:key="mkey">
       <view class="item-record">
@@ -75,7 +75,7 @@
           <view class="box-line">
             <view class="re-width">
               <view class="{{item.boxStyle}} {{item.anListen}}"
-                bindtap="listen" data-idx="{{index}}" data-rid="{{item.record_id}}">
+                catchtap="listen" data-idx="{{index}}" data-rid="{{item.record_id}}">
                 <view class='box-paly-btn'>
                   <view hidden="{{item.isListen}}" class="btn-one"></view>
                   <view class="btn-two {{item.listenStatus}}"></view>
@@ -87,11 +87,14 @@
                   </block>
                 </view>
               </view>
-              <view wx:if="{{item.status == 1}}" class="text-pub {{item.btnDelStyle}}"
-                bindtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="0">撤回</view>
-              <view wx:if="{{item.status == 0}}" class="text-pub {{item.btnDelStyle}}"
-                bindtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="1">发布</view>
-              <view class="text-del {{item.btnDelStyle}}" bindtap='delRecordConfirm' data-idx="{{index}}" data-rid="{{item.record_id}}">删除</view>
+              <block wx:if="{{item.btnShow}}">
+                <view wx:if="{{item.status == 1}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
+                  catchtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="0">撤回</view>
+                <view wx:if="{{item.status == 0}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
+                  catchtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="1">发布</view>
+                <view class="text-del {{item.btnShow ? 'btn-red':'btn-red-hidden'}}" catchtap='delRecordConfirm'
+                  data-idx="{{index}}" data-rid="{{item.record_id}}">删除</view>
+              </block>
             </view>
             <image src="{{icon_more}}" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
           </view>
@@ -171,5 +174,5 @@
       <image class="btn-contact" src="../../images/talk.png"></image>
     </button>
   </view>
-  <view class="non-tips end-pd">※ 2020-06-03 郑三刀 ※</view>
+  <view class="non-tips end-pd">※ 2020-06-12 郑三刀 ※</view>
 </action-sheet>

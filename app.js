@@ -189,10 +189,51 @@ App({
       console.log(err || data);
     });
   },
+  getHeartSrc() {
+    return new Promise((resolve, reject) => {
+      let url = 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/ds_heart.wav'
+      if (this.globalData.downCount > 3){
+        resolve(url)
+        return
+      }
+      let heartSrc = wx.getStorageSync('heartSrc')
+      console.log('heartSrc:', this.globalData.downCount, !heartSrc, heartSrc)
+      if (!heartSrc) {
+        wx.downloadFile({
+          url: url,
+          success: (res) => {
+            if (res && res.tempFilePath) {
+              let fs = wx.getFileSystemManager()
+              heartSrc = res.tempFilePath
+              wx.setStorageSync('heartSrc', heartSrc)
+              resolve(heartSrc)
+            }
+          },
+          fail: (err)=>{
+            console.log(err)
+          }
+        })
+      } else { // 判断缓存文件是否可用
+        wx.getFileInfo({
+          filePath: heartSrc,
+          complete: (info) => {
+            if (info && info.size > 0){
+              resolve(heartSrc)
+            }else{
+              wx.setStorageSync('heartSrc', false)
+              this.globalData.downCount += 1
+              this.getHeartSrc()
+            }
+          }
+        })
+      } // end 判断缓存文件是否可用
+    })
+  },
   globalData: {
     Cos,
     isIpx: false,
     admini: false,
+    downCount: 0,
     userInfo: null
   }
 })
