@@ -70,20 +70,82 @@
   }
 }
 
-.tips-record{
-  position: absolute;
-  top: -65rpx;
-  color: #337ab7;
-  opacity: 0.8;
-  width: 320rpx;
+.an-scale {
+  animation: anScale 3s linear infinite;
 }
 
-.tips-listen{
+@keyframes anScale {
+  25%{transform: translate(3rpx, 0)}
+  75%{transform: translate(-3rpx, 0)}
+}
+
+.box-tips{
+  display: flex;
+  align-items: center;
+  align-content: center;
+  width: 750rpx;
+  font-size: 28rpx;
+  z-index: 3;
+}
+.item-tips{
+  min-width: 215rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.item-tips-m{
+  min-width: 320rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tips-record{
+  position: relative;
+  color: #337ab7;
+  border-bottom: 1rpx solid #337ab7;
+  background: #F7F8FA;
+  border-radius: 8rpx;
+  padding: 12rpx;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tips-tri {
+  width: 30rpx;
+  height: 30rpx;
   position: absolute;
-  top: -65rpx;
-  color: rgb(222, 111, 44);
-  opacity: 0.9;
-  width: 320rpx;
+  bottom: -15rpx;
+  transform: rotate(-315deg);
+  background: #F7F8FA;
+  border-right: 1rpx solid #337ab7;
+  border-bottom: 1rpx solid #337ab7;
+  z-index: -1;
+}
+
+.tips-word{
+  line-height: 36rpx;
+  z-index: 1;
+}
+
+.an-out {
+  animation: fadeOut 10s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeOut {
+  0%, 25%{
+    opacity: 0.9;
+    width: 220rpx;
+  }
+  28%, 90%{
+    width: 320rpx;
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .box-line{
@@ -450,10 +512,13 @@
 }
 .fixed-bottom{
   position:fixed;
-  text-align: center;
   left: 0;
   right: 0;
   bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .box-list{
@@ -470,6 +535,7 @@
   padding-bottom: 8rpx;
   opacity: 0.95;
   background-color: #ffffff;
+  z-index: 2;
 }
 
 .bar-ori{
@@ -558,6 +624,14 @@
   overflow: hidden;
 }
 
+.box-line .serifu{
+  color: #337ab7;
+  line-height: 60rpx;
+  width: 660rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .box-line .nickname{
   display: flex;
   align-items: center;
@@ -834,7 +908,7 @@
   flex-direction: column;
   margin-top: 10rpx;
   border-bottom: 3rpx solid rgba(0, 0, 255, 0.3);
-  height: 200rpx;
+  min-height: 200rpx;
 }
 
 .record-left{

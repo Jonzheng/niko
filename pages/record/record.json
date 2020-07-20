@@ -1,9 +1,9 @@
 {
-  "navigationBarTitleText": "式神录",
+  "navigationBarTitleText": "式神录※模仿录音",
   "disableScroll": true,
   "enablePullDownRefresh": false,
   "usingComponents": {
     "scroll": "/modules/scroll/scroll",
-    "ec-canvas": "/modules/ec-canvas/ec-canvas"
+    "action-sheet": "/modules/action-sheet/action-sheet"
   }
 }

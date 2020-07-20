@@ -4,11 +4,118 @@
   overflow: hidden;
 }
 
+.box-result{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.box-chart{
+  width: 730rpx;
+  height: 600rpx;
+}
+
+.bar-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.box-round{
+  margin: 0 82rpx 0 36rpx;
+  padding: 6rpx 0;
+  height: 60rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  border-left: 3rpx solid #666;
+}
+
+.box-round .point{
+  background-color:rgba(255, 0, 0, 0.6);
+  transition: all .3s ease-out;
+  height: 100%;
+  margin: 3rpx 0;
+  text-align: right;
+}
+
+.box-round .spend{
+  background-color:rgba(0, 0, 255, 0.6);
+  transition: all .3s ease-out;
+  height: 100%;
+  margin: 3rpx 0;
+  text-align: right;
+}
+
+.box-round .gold{
+  background-color:rgba(255, 123, 0, 0.6);
+  transition: all .3s ease-out;
+  height: 100%;
+  margin: 3rpx 0;
+  text-align: right;
+}
+
+.box-round .hide{
+  margin: 0;
+  height: 0;
+  width: 0;
+  background-color: transparent;
+}
+
+.box-puzs{
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  width: 730rpx;
+  padding: 10rpx 36rpx;
+}
+
+.box-puzs .item{
+  display: flex;
+  align-items: center;
+  width: 200rpx;
+  color: #777;
+}
+
+.item-hira::after{
+  content: "—";
+  color: #bbb;
+}
+
+.item-kata::after{
+  content: "：";
+  color: #bbb;
+}
+
+.item-count{
+  color: #7b44e2;
+}
+
+.mg-bottom{
+  margin-bottom: 10rpx;
+}
+
+.be-sp::before{
+  content: "：";
+  color: #bbb;
+}
+
+.box-puzs .co-point{
+  color: rgba(255, 0, 0, 0.6);
+}
+
+.box-puzs .co-spend{
+  color: rgba(0, 0, 255, 0.6);
+}
+
+.box-puzs .co-gold{
+  color: rgba(255, 123, 0, 0.6);
+}
+
 .top-box{
   display: flex;
   align-items: center;
   padding: 16rpx 16rpx;
-  margin: 10rpx 3rpx;
+  margin: 1rpx 3rpx;
   height: 66rpx;
   border-top: 3rpx solid #ddd;
   border-bottom: 3rpx solid #ddd;
@@ -28,7 +135,6 @@
 }
 .out-share{
   position: absolute;
-  top: 26rpx;
   right: 80rpx;
   display: flex;
   align-items: center;
@@ -51,6 +157,15 @@
   100%{opacity: 1}
 }
 
+.mine-avatar{
+  position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  top: 36rpx;
+  right: 12rpx;
+  z-index: -1;
+}
 .box-omoz-img{
   display: flex;
   align-items: center;
@@ -144,7 +259,7 @@
 
 .top-hide{
   top: -111rpx;
-  transition: all 0.3s ease-in;
+  transition: top 0.1s ease-in;
 }
 
 .option-active{
@@ -253,19 +368,26 @@
   border-bottom: 1rpx solid #eee;
 }
 
+.top-tips{
+  position: absolute;
+  left: 10rpx;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 10rpx black;
+  border-radius: 8rpx;
+}
+
 .tips-label{
-  padding: 3rpx 10rpx; 
-  color: #999;
+  padding: 16rpx;
+  color: #fff;
 }
 .tips-show{
   opacity: 1;
-  width: 100%;
-  transition: all 0.3s ease-in;
+  transition: all 0.5s ease-in;
 }
 .tips-hide{
   opacity: 0;
   width: 0;
-  transition: all 0.5s ease-in;
+  transition: all 0.2s ease-in;
 }
 .item-desc{
   margin: 10rpx 0;
@@ -455,7 +577,6 @@
 .user-name{
   color: #999;
   font-size: 28rpx;
-  height: 36rpx;
   width: 275rpx;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -495,8 +616,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: none;
-  height: 88rpx;
 }
 
 .mg-top{
@@ -510,38 +629,32 @@
 
 .btn-out{
   display:flex;
-  flex: none;
-  padding: 0 3rpx;
   background-color:#fff;
-  border:1px solid #ccc;
-  box-shadow:0px 0px 10rpx #999;
+  box-shadow:0px 0px 16rpx #999;
   justify-content:center;
   align-items:center;
-  height: 0;
-  opacity: 0;
-  transition: all 0.2s ease-out;
 }
 
 .btn-show{
-  height:88rpx;
+  height: 76rpx;
+  width: 160rpx;
   opacity: 1;
   transition: all 0.3s ease-in;
 }
 
 .btn-continue{
+  width: 100%;
+  height: 100%;
   display:flex;
   flex: none;
-  background-color:#dedede;
-  height:80rpx;
-  padding: 0 50rpx;
-  border:1px solid #ddd;
-  box-shadow:0px 0px 10rpx #fff inset;
+  background-color:rgba(255, 0, 0, 0.6);
+  border:1px solid #fff;
+  box-shadow:0px 0px 16rpx #fff inset;
   border-radius: 5rpx;
   justify-content:center;
   align-items:center;
   font-weight: bold;
-  font-size: 16px;
-  color: #555;
+  color: #fff;
 }
 
 .step-box{
@@ -728,7 +841,6 @@
 
 .kana-abs{
   position: absolute;
-  top: 15rpx;
   left: 44%;
   transition: top 0.3s ease-in;
 }

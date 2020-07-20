@@ -161,7 +161,7 @@
 <action-sheet formShow="{{aboutShow}}" bind:clickMask="closeAbout" boxHeight="{{isIpx ? 800 : 720}}"
   formTitle="关于『式神录』" scroll="{{false}}">
   <view class="about-label">简介</view>
-  <view class="about-desc">式神录是我业余时间开发的一个小程序，一来是出于兴趣，再者是为了技术实践，所以如果你遇到一些bug不要惊慌，如果你能截图反馈给我那就更好的啦。如果你觉得小程序还ok，那你可以多发几条录音、分享给你的朋友或寮群，让更多的人发现式神录。此版本后发布我会再先收集一波式神台词，记得常回来看崽儿们啦。</view>
+  <view class="about-desc">式神录是我业余时间开发的一个小程序，一来是出于兴趣，再者是为了技术实践，如果你遇到一些bug可以点击下面的反馈按钮，截图反馈给我，24小时在线陪聊。如果你觉得小程序还ok，那你可以多发几条录音、分享给你的朋友或寮群，让更多的人发现式神录。记得常回来看崽崽啦。</view>
   <view class="about-label">传火</view>
   <view class="about-desc" style="text-indent:0">
     <button class="out-share" open-type="share" size="mini" bindtap="closeAbout">
@@ -174,5 +174,5 @@
       <image class="btn-contact" src="../../images/talk.png"></image>
     </button>
   </view>
-  <view class="non-tips end-pd">※ 2020-06-12 郑三刀 ※</view>
+  <view class="non-tips end-pd">※ 2020-07-14 郑三刀 ※</view>
 </action-sheet>

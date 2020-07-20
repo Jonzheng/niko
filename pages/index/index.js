@@ -47,7 +47,7 @@ Page({
   },
 
   onShow: function () {
-    App.globalData.hasHeart = false
+    App.globalData.hasUpdate = false
     App.globalData.downCount = 0
     wx.hideNavigationBarLoading()
     wx.setNavigationBarTitle({
@@ -169,7 +169,9 @@ Page({
       data: { level: level, pageNo: pageNo},
       complete: (res)=> {
         this._lockQuery = false
+        this.setData({ spin: false })
         setTimeout(()=>{
+          this.setData({ spin: true })
           wx.hideNavigationBarLoading()
           wx.setNavigationBarTitle({
             title: '式神录',
@@ -318,5 +320,9 @@ Page({
         scrollTop: 0,
       })
     }, 0)
-  }
+  },
+  toRecord(e) {
+    let url = `../record/record`
+    App.toPage(url)
+  },
 })

@@ -17,6 +17,14 @@
   width: 320rpx;
 }
 
+.to-record{
+  color: #4a5fe2;
+  padding: 20rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 0 3rpx #dddddd;
+}
 
 .cells {
   background: #ffffff;
@@ -71,4 +79,13 @@
   height: 24rpx;
   width: 30rpx;
   opacity: 1;
+}
+
+.tr-spin{
+  transform: rotate(0);
+  transition: transform .2s ease-in;
+}
+
+.tr-end{
+  transform: rotate(-360deg);
 }

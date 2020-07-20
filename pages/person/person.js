@@ -24,8 +24,19 @@ Page({
   },
 
   onLoad: function (options) {
-    console.log('onload:', options)
     let { masterId } = options
+    if (!App.globalData.openid) {
+      setTimeout(()=>{
+        App.initOpenid().then(openid => {
+          console.log('App.initOpenid():', openid)
+          App.globalData.openid = openid
+          let url = `../person/person?masterId=${masterId}`
+          wx.redirectTo({ url })
+        })
+      }, 600)
+      return
+    }
+
     this._masterId = masterId
     if (App.globalData.openid == this._masterId) {
       return wx.switchTab({
@@ -50,8 +61,10 @@ Page({
   },
 
   onShow: function () {
-    if (App.globalData.hasHeart) {
+    if (App.globalData.hasUpdate) {
       this.getRecords(this._masterId)
+      let pages = getCurrentPages()
+      App.globalData.hasUpdate = pages.length > 2
     }
   },
 
@@ -96,6 +109,9 @@ Page({
     let mineId = App.globalData.openid
     console.log('openid:', mineId)
     if (!mineId) return
+    wx.showLoading({
+      title: '加载中...',
+    })
     wx.request({
       method: 'post',
       url: `${host}/getUser`,
@@ -108,6 +124,9 @@ Page({
             userInfo
           })
         }
+      },
+      complete: ()=>{
+        wx.hideLoading()
       }
     })
     let admini = App.globalData.admini
@@ -172,19 +191,24 @@ Page({
   },
 
   getRecords(masterId) {
+    if (this._loading) return
+    this._loading = true
     let openid = App.globalData.openid
     wx.request({
       url: `${host}/queryRecord`,
       method: 'post',
       data: { masterId, openid },
       success: (res) => {
-        this.setData({
-          requesting: false
-        })
         let { data } = res
         data = data || []
         let recordList = data.filter((item)=>{return item.status == 1 || this.data.admini})
         this.initRecords(recordList)
+      },
+      complete: (res) => {
+        this._loading = false
+        this.setData({
+          requesting: false
+        })
       }
     })
   },
@@ -213,8 +237,10 @@ Page({
     let userInfo = e.detail.userInfo
     if (!userInfo) return
     App.initAvatar(userInfo).then(data => {
+      wx.showToast({
+        title: '登录成功',
+      })
       this.setData({
-        userInfo: data,
         hasLogin: true
       })
     })
@@ -316,7 +342,7 @@ Page({
         let userInfo = this.data.userInfo
         userInfo['heartCount'] = status == 0 ? userInfo['heartCount'] + 1 : userInfo['heartCount'] - 1
         this.setData({ userInfo })
-        App.globalData.hasHeart = true
+        App.globalData.hasUpdate = true
         setTimeout(() => {
           this._updating = false
         }, 300)
@@ -337,6 +363,7 @@ Page({
       method: 'post',
       data: { recordId, status },
       success: (res) => {
+        App.globalData.hasUpdate = true
         setTimeout(()=>{
           this._updating = false
         }, 300)
@@ -358,6 +385,7 @@ Page({
       method: 'post',
       data: { recordId, masterId },
       success: (res) => {
+        App.globalData.hasUpdate = true
         App.cosDelete(recordId)
         console.log(res)
       }
@@ -442,6 +470,7 @@ Page({
       method: 'POST',
       data: { recordId, masterId, fileId, userId, content, reId, reName, reContent },
       success: (res) => {
+        App.globalData.hasUpdate = true
         console.log(res.data)
         if (res && res.data && res.data.code == 87014) {
           let content = res.data.data
@@ -488,6 +517,7 @@ Page({
       method: 'POST',
       data: { recordId, userId, commId },
       success: (res) => {
+        App.globalData.hasUpdate = true
         this.clearInput()
         console.log(res.data)
         if (res) {

@@ -175,10 +175,11 @@ page{
 }
 .box-col .serifu{
   color: #337ab7;
-  height: 50rpx;
+  line-height: 60rpx;
   width: 660rpx;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .re-width{

@@ -2,8 +2,8 @@ const COS = require('./lib/cos-sdk.js')
 const { host } = require('./utils/util')
 
 const Cos = new COS({
-  SecretId: '',
-  SecretKey: '',
+  SecretId: 'AKIDWibBTXGkvtZx6yIqtfCPLzLYP5ORQlrg',
+  SecretKey: 'f2B2ZolRouiETQFeCSQ6UbVKjtuLUWHl',
 })
 const AvatarBucket = 'avatar-1256378396'
 const RecordBucket = 'record-1256378396'
@@ -15,28 +15,7 @@ App({
     this.checkUpdate();
     // iPhone X 设置
     this.setIpx()
-
-    // 登录-后台注册或更新登录时间
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        let userCode = res.code
-        console.log(res)
-        wx.request({
-          method: 'post',
-          url: `${host}/regist`,
-          data: { userCode: userCode },
-          success: res => {
-            if (res && res.data){
-              let userInfo = res.data[0]
-              this.globalData.userInfo = userInfo
-              this.globalData.openid = userInfo.openid
-            }
-          }
-        })
-      }
-    })
-
+    this.initOpenid()
     // 获取用户信息
     wx.getSetting({
       success: res => {
@@ -100,6 +79,37 @@ App({
     } catch (e) {
       console.log('========== checkUpdate failed ==========', e)
     }
+  },
+  initOpenid() {
+    return new Promise((resolve, reject) => {
+      if (this.globalData.openid){
+        return resolve(this.globalData.openid)
+      }
+      // 登录-后台注册或更新登录时间
+      wx.login({
+        success: res => {
+          // 发送 res.code 到后台换取 openId, sessionKey, unionId
+          let userCode = res.code
+          console.log(res)
+          wx.request({
+            method: 'post',
+            url: `${host}/regist`,
+            data: { userCode: userCode },
+            success: res => {
+              if (res && res.data) {
+                let userInfo = res.data[0]
+                this.globalData.userInfo = userInfo
+                this.globalData.openid = userInfo.openid
+                return resolve(userInfo.openid)
+              }
+            },
+            fail: (err)=>{
+              reject(err)
+            }
+          })
+        }
+      })
+    })
   },
   initAvatar(userInfo){
     console.log('initAvatar', userInfo)

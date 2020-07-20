@@ -1,0 +1,110 @@
+  <button wx:if="{{!hasLogin && canIUse}}" class="get-user"
+    size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
+  </button>
+  <view class="box-avatars" bind:touchstart="moveStart" bind:touchend="moveEnd">
+    <view class="ava-container" style="transform: rotateY({{rotY}}deg)">
+      <block wx:for="{{avatars}}" wx:key="index">
+        <view class="out-avatar" catchtap="autoRot" data-uid="{{item.openid}}"
+            style="transform: rotateY({{index *20}}deg) translateZ(320rpx)">
+          <image class="avatar {{isReady ? 'an-spin':''}}" src="{{isReady ? item.url: ''}}"></image>
+        </view>
+      </block>
+    </view>
+  </view>
+  <scroll id="scroll"
+      requesting="{{requesting}}"
+      empty-show="{{emptyShow}}"
+      end="{{end}}"
+      listCount="{{recordList.length}}"
+      scrollTop="{{scrollTop}}"
+      scrollAnimation="{{scrollAnimation}}"
+      has-top="{{hasTop}}"
+      enable-back-to-top="{{enableBackToTop}}"
+      refresh-size="{{refreshSize}}"
+      top-size="{{topSize}}"
+      bottom-size="{{bottomSize}}"
+      color="{{color}}"
+      bind:refresh="refresh"
+      bind:more="more">
+      <view class="record-list box-pd">
+        <block wx:for="{{recordList}}" wx:key="mkey">
+          <template is="ele-master" data="{{...item,index,icon_more,icon_comm,icon_zan_em,icon_zan_fu}}"/>
+        </block>
+      </view>
+  </scroll>
+
+<action-sheet formShow="{{commShow}}" bind:clickMask="closeMask" bind:confirmInput="confirmInput" bind:blur="clearInput"
+  hasInput="{{true}}" boxHeight="{{isIpx ? 900 : 720}}" inputValue="{{inputValue}}"
+  inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
+  <view class="comm-item" wx:for="{{commentList}}" wx:key="index">
+    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url || item.deAvatar}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
+    <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
+      data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">
+      <view class="comm-top">
+        <view class="name">{{item.show_name || item.nick_name}}<view wx:if="{{item.isAuthor}}" class="comm-author">up</view></view>
+        <view class="time">{{item.dateStr}}</view>
+      </view>
+      <view wx:if="{{item.re_id}}" class="comm-re">
+        <text class="">{{item.re_name ? ' 回复 '+item.re_name+'：': ''}}</text>{{item.re_content || ' ** 原评论已被删除 ** '}}
+      </view>
+
+      <view class="comm-content">
+        <view class="content">{{item.content}}</view>
+        <view class="btn" wx:if="{{item.isOwner}}" catchtap="delCommConfirm"
+          data-cid="{{item.id}}" data-rid="{{item.record_id}}" data-content="{{item.content}}">删除
+        </view>
+      </view>
+
+    </view>
+  </view>
+  <view class="non-tips" wx:if="{{commentList.length > 0}}">-- end --</view>
+</action-sheet>
+
+<button class="share" open-type="share" size="mini" style="bottom:{{isIpx?80:60}}rpx">
+  <image src="../../images/share.png"></image>
+</button>
+
+<template name="ele-master">
+  <view class="box-record">
+    <view class="box-line">
+      <view class="serifu" bindtap="toDetail" data-id="{{file_id}}">{{ser || '* * *'}}</view>
+    </view>
+    <view class="box-line">
+      <view class="nickname">{{show_name || nick_name}}</view>
+      <view class="date">{{dateStr}}</view>
+    </view>
+    <view class="box-line">
+      <image src="{{avatar_url || deAvatar}}" class="re-avatar"
+      bindtap="toPerson" data-uid="{{openid}}"></image>
+      <view class="tri"></view>
+      <view class="re-width">
+        <view class="{{boxStyle}} {{anListen}}"
+          catchtap="listen" data-idx="{{index}}" data-rid="{{record_id}}">
+          <view class='box-paly-btn'>
+            <view hidden="{{isListen}}" class="btn-one"></view>
+            <view class="btn-two {{listenStatus}}"></view>
+            <view hidden="{{isListen}}" class="btn-three"></view>
+          </view>
+          <view class='box-record-right'>
+            <block wx:for="{{isLoading}}" wx:key="mkey">
+              <view class="play-foo" style="animation: scay 2s infinite {{item}}s;"></view>
+            </block>
+          </view>
+        </view>
+        <view wx:if="{{btnShow}}" class="text-pub {{btnShow ? 'btn-re':'btn-re-hide'}}" catchtap='delRecordConfirm'
+          data-idx="{{index}}" data-rid="{{record_id}}">撤回</view>
+      </view>
+      <image wx:if="{{isMine}}" src="{{icon_more}}" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
+    </view>
+    <view class="box-line flex-right">
+      <view class="menu-comm" bindtap='updateHeart' data-idx="{{index}}" data-fid="{{file_id}}" data-status="{{heart_ud}}">
+        <view class="text-heart">{{heart}}</view>
+        <image src="../../images/heart-{{heart_ud ? 'on' : 'off'}}.png" class="sm-icon"></image>
+      </view>
+      <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-fid="{{file_id}}">
+        <view class="text-heart">{{comm}}</view>
+        <image src="{{icon_comm}}" class="icon-comm"></image>
+      </view>
+    </view>
+  </view>
+</template>

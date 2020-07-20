@@ -3,9 +3,9 @@
       size="mini" bindgetuserinfo="getUserInfo">点击授权</button>
 
     <view class='top-box'>
-      <view class='box-point'>
-        <view class='top-label {{!top_hide ? "top-hide":""}}'>旋转:</view>
-        <view class='top-value {{!top_hide ? "top-hide":""}}'>{{spin_count}}</view>
+      <view hidden="{{showResult}}" class='box-point'>
+        <view class='top-label {{!top_hide || tip ? "top-hide":""}}'>旋转:</view>
+        <view class='top-value {{!top_hide || tip ? "top-hide":""}}'>{{spinCount}}</view>
       </view>
       <view class='top-option {{option == 1 ? "option-active":""}} {{top_hide ? "top-hide":""}}' bindtap="setting" data-option="1">假名设定</view>
       <view class='top-option {{option == 3 ? "option-active":""}} {{top_hide ? "top-hide":""}}' bindtap="setting" data-option="3">颜色设定</view>
@@ -15,7 +15,7 @@
       </button>
       <image class='top-setting {{top_hide ? "rt-90":""}}' src='{{icon_setting}}' bindtap="setting" data-option="0"></image>
     
-    <view class='row-kana {{top_hide && sakki_roma != "" ? "kana-abs":"abs-hide"}}'>
+    <view hidden="{{showResult || tip}}" class='row-kana {{top_hide && sakki_roma != "" ? "kana-abs":"abs-hide"}}'>
       <view class='col-kana' hover-class='kana-hover' bindtap="sakki">
         <view class='col-hira kata-color'>{{skon ? sakki_kata : sakki_hira}}</view>
         <view class="col-kama">
@@ -25,20 +25,55 @@
       </view>
     </view>
 
+    <view wx:if="{{hasLogin && !showResult && tip && top_hide}}" class="top-tips">
+      <view class='tips-label'>※{{tip}}</view>
+    </view>
+
     </view><!-- top-box end-->
 
   <view class='box-body'>
 
     <view class='box-link' hidden='{{!top_hide}}'>
 
-      <block wx:for="{{fields}}" wx:key="mkey" wx:for-index="idx">
+      <block wx:if="{{!showResult}}" wx:for="{{fields}}" wx:key="mkey" wx:for-index="idx">
         <template is="level-1" data="{{item,idx,cosmap,bgc}}"/>
       </block>
-      <view class='box-row mg-top' hidden="{{!btn_show}}">
-        <view class='btn-out {{btn_show ? "btn-show":""}}'>
-          <view class='btn-continue' hover-class='step-hover' bindtap="initGame">继 续</view>
+
+      <view hidden="{{!showResult}}" class="box-result">
+        <view class='mine-avatar'>
+          <image class='omoz-sm omoz-spin' src='{{icon_omoz}}'></image>
+          <image class='omoz-avatar' src='{{userInfo.avatar_url || userInfo.deAvatar}}'></image>
+        </view>
+
+        <view class="box-chart">
+          <ec-canvas id="mychart" canvas-id="mychart-bar" class="bar-chart" ec="{{ ec }}"></ec-canvas>
+        </view>
+
+        <view class="box-round">
+          <view class="point {{pointHide ? 'hide':''}}" style="width:{{pointHide ? 0:pointPercent}}%"></view>
+          <view class="spend {{spendHide ? 'hide':''}}" style="width:{{spendHide ? 0:spendPercent}}%"></view>
+          <view class="gold {{goldHide ? 'hide':''}}" style="width:{{goldHide ? 0:glodPercent}}%"></view>
+        </view>
+        <view class="box-puzs">
+          <view class="item mg-bottom">分数<view class="co-point be-sp">{{point}}</view></view>
+          <view class="item mg-bottom">耗时<view class="co-spend be-sp">{{spend}}s</view></view>
+          <view class="item mg-bottom">金币<view class="co-gold be-sp">+{{checkCoin}}</view></view>
+          <block wx:for="{{ksOri}}" wx:key='index'>
+            <view class="item">
+              <view class="item-hira">{{item.hira}}</view>
+              <view class="item-kata">{{item.kata}}</view>
+              <view class="item-count" style="opacity: {{0.5 + item.count / 16}}">{{item.count || 0}}</view>
+            </view>
+          </block>
+        </view>
+        <view class='box-row'>
+          <view class='btn-out btn-show'>
+            <view class='btn-continue' hover-class='step-hover' bindtap="initGame">继 续</view>
+          </view>
         </view>
       </view>
+      <!-- box-result end-->
+
     </view><!-- box-link end-->
 
     <view class='box-setting' hidden='{{top_hide}}'>
@@ -161,7 +196,6 @@
 
         </view>
 
-
         <view class="shop-line"></view>
         <view class="shop-title">※道具商店※</view>
         <view class="shop-line"></view>
@@ -195,7 +229,6 @@
     </view><!-- box-setting end-->
 
   </view><!-- box-body end-->
-  <view hidden='{{!top_hide || !hasLogin}}' class='tips-label {{tipsClass}}'>※{{tip}}</view>
 
 </view><!-- box-page end-->
 

@@ -21,10 +21,79 @@ const max_col = 8
 const max_sed = 15
 const least_sed = 10
 const half_sed = 40
-const total_step = 80
+const totalStep = 80
 
 const SrcYuku = 'https://link-1256378396.cos.ap-guangzhou.myqcloud.com/yuku_'
 const SrcHshs = 'https://link-1256378396.cos.ap-guangzhou.myqcloud.com/hshs.wav'
+
+import * as echarts from '../../modules/ec-canvas/echarts';
+
+function setOption(chart, points, spends, golds) {
+  let option = {
+    color: ['rgba(255, 0, 0, 0.6)', 'rgba(0, 0, 255, 0.6)', 'rgba(255, 123, 0, 0.6)'],
+    textStyle: {
+      color: '#999'
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+      },
+      confine: true
+    },
+    legend: {
+      data: ['分数', '耗时', '金币']
+    },
+    grid: {
+      left: '5%',
+      right: '12%',
+      bottom: 25,
+    },
+    xAxis: [
+      {
+        type: 'category',
+        data: ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%'],
+        name: '排名',
+        axisLabel: {
+          align: 'left',
+          fontSize: 10,
+          interval: 0,
+          rotate: 0
+        }
+      }
+    ],
+    yAxis: [
+      {
+        name: '人数',
+        type: 'value',
+        splitLine: {
+          show: false
+        },
+        axisLabel: {
+          show: false
+        }
+      }
+    ],
+    series: [
+      {
+        name: '分数',
+        type: 'bar',
+        data: points
+      },
+      {
+        name: '耗时',
+        type: 'bar',
+        data: spends
+      },
+      {
+        name: '金币',
+        type: 'bar',
+        data: golds
+      },
+    ]
+  };
+  chart.setOption(option);
+}
 
 Page({
   data: {
@@ -36,11 +105,7 @@ Page({
     this_downs: [],
     ks_sed: [],
     level: 1,
-    spin_count: 0,
-    hita_count: 0,
-    sed_size: 10,
-    st_hint: 0,
-    rest_count: total_step,
+    spinCount: 0,
     icon_setting: "../../images/set.png",
     icon_omoz: 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/omoz_sm.png',
     bgk_ori: [{ "key": "ka", "word": "か", "price": 100 }, { "key": "ki", "word": "き", "price": 1000 }, { "key": "ku", "word": "く", "price": 1000 }, { "key": "ke", "word": "け", "price": 1000 }, { "key": "ko", "word": "こ", "price": 10000 }],
@@ -48,10 +113,7 @@ Page({
     myclst: [{ "key": "no", "word": "" }],
     bgc: { "no": "step-bg-no", "ka": "step-bg-ka", "ki": "step-bg-ki", "ku": "step-bg-ku", "ke": "step-bg-ke", "ko": "step-bg-ko" },
     cosmap: { "hira": "no", "kata": "no", "space": "no" },
-    tipsClass: 'tips-hide',
     tip: '',
-    spend: 0,
-    remind: 0,
     tips: ['方块的颜色和假名都可以自由设定', '加油，手指！'],
     option: 1,
     top_hide: true,
@@ -77,38 +139,37 @@ Page({
     refreshSize: 0,
     topSize: 0,
     bottomSize: 220,
+    showChart: false,
+    ec: {
+      lazyLoad: true
+    }
   },
 
   onLoad(options) {
+    if (!App.globalData.openid) {
+      setTimeout(()=>{
+        App.initOpenid().then(openid => {
+          console.log('App.initOpenid():', openid)
+          App.globalData.openid = openid
+          this.onLoad()
+        })
+      }, 600)
+      return
+    }
     this._pageNo = pageStart
-    let tips = this.data.tips
-    let count_it = setInterval(()=> {
-      this.data.spend += 3
-      if (this.data.spend % 18 == 0) {
-        let ridx = parseInt(Math.random() * tips.length)
-        ridx = Math.min(ridx, tips.length - 1)
-        let tip = tips[ridx]
-        this.setData({ tipsClass: 'tips-show', tip })
-      }
-      this.setData({
-        count_it,
-      })
-    }, 3000)
     this.setData({
       isIpx: App.globalData.isIpx,
       hasLogin: App.globalData.hasLogin,
       userInfo: App.globalData.userInfo
-    })
-  },
-
-  onReady: function () {
-    this.initKanaRows()
+    }) 
     let openid = App.globalData.openid
+    console.log('onLoad_openid', openid)
+    this.initKanaRows()
     wx.request({
       url: `${host}/queryRank`,
       method: 'POST',
       data: { openid },
-      success: (res)=> {
+      success: (res) => {
         let rank = res.data
         if (rank) {
           let cosmap = this.data.cosmap
@@ -125,17 +186,20 @@ Page({
     });
   },
 
+  onReady: function () {
+    this._echartsComponnet = this.selectComponent('#mychart')
+  },
+
   onShow: function () {
 
   },
 
   onHide: function () {
-
+    if (this._tipsIt > -1) this._tipsIt = clearInterval(this._tipsIt)
   },
 
   onUnload: function () {
-    var count_it = this.data.count_it
-    clearInterval(count_it)
+
   },
 
   onPullDownRefresh: function () {
@@ -158,7 +222,9 @@ Page({
     let userInfo = e.detail.userInfo
     if (!userInfo) return
     App.initAvatar(userInfo).then(data => {
-      console.log(data)
+      wx.showToast({
+        title: '登录成功',
+      })
       this.setData({
         userInfo: data,
         hasLogin: true
@@ -210,124 +276,157 @@ Page({
     })
   },
 
-  loadGame: function (new_fields) {
-    var that = this
-    var fields = []
-    that.setData({
+  loadGame(new_fields) {
+    let fields = []
+    this._selectedSize = this._selectedSize || 10
+    this._restStep = totalStep
+    this._hitaCount = 0
+    this._puzs = []
+    this._remind = 0
+    this._spend = 0
+    this._gap = 0
+    this.setData({
       fields,
+      tip: '',
       sakki_roma: "",
       bucket: [],
-      puzs: [],
       level: 1,
-      spin_count: 0,
-      hita_count: 0,
-      rest_count: total_step,
+      spinCount: 0,
     })
-    var it = setInterval(function () {
-      var row = new_fields.shift()
+    this._it = setInterval(()=> {
+      let row = new_fields.shift()
       if (!row) {
-        clearInterval(it)
+        clearInterval(this._it)
         return
       }
       fields.push(row)
       //fields = []
-      that.setData({ fields })
+      this.setData({ fields })
     }, 120)
+    this.autoTips()
   },
 
+  initBarChart(points, spends, glods){
+    console.log(this._echartsComponnet)
+    this._echartsComponnet.init((canvas, width, height, dpr) => {
+      // 获取组件的 canvas、width、height 后的回调函数
+      // 在这里初始化图表
+      const chart = echarts.init(canvas, null, {
+        width: width || 365,
+        height: height || 300,
+        devicePixelRatio: dpr // new
+      });
+      setOption(chart, points, spends, glods);
+      chart.on('legendselectchanged', (params)=> {
+        if(params.name == '分数'){
+          this.setData({ pointHide: !params.selected[params.name] })
+        } else if (params.name == '金币'){
+          this.setData({ goldHide: !params.selected[params.name] })
+        } else if (params.name == '耗时') {
+          this.setData({ spendHide: !params.selected[params.name] })
+        }
+      })
 
+      // 将图表实例绑定到 this 上，可以在其他成员函数（如 dispose）中访问
+      this.chart = chart;
 
+      this.setData({
+        isLoaded: true
+      });
+      // 注意这里一定要返回 chart 实例，否则会影响事件处理等
+      return chart;
+    });
+
+  },
   initResult() {
-    var fields = this.data.fields
-    var spin_count = this.data.spin_count
-    var hita_count = this.data.hita_count
-    var sed_size = this.data.sed_size
-    sed_size = Math.max(sed_size, 10)
-    var point = Math.round((spin_count + hita_count * 10) * sed_size / 10)
-    var checkCoin = Math.round(point * 1.2 / 10)
-    var new_fields = fields
-    new_fields[0][0]["word"] = "旋"
-    new_fields[0][1]["word"] = "转"
-    new_fields[0][2]["word"] = "方"
-    new_fields[0][3]["word"] = "块"
-
-    new_fields[1][2]["word"] = "" + parseInt(spin_count / 1000 % 10)
-    new_fields[1][3]["word"] = "" + parseInt(spin_count / 100 % 10)
-    new_fields[1][4]["word"] = "" + parseInt(spin_count / 10 % 10)
-    new_fields[1][5]["word"] = "" + spin_count % 10
-
-    new_fields[2][0]["word"] = "异"
-    new_fields[2][1]["word"] = "名"
-    new_fields[2][2]["word"] = "连"
-    new_fields[2][3]["word"] = "接"
-    new_fields[3][2]["word"] = "" + parseInt(hita_count / 10 % 10)
-    new_fields[3][3]["word"] = "" + hita_count % 10
-
-    new_fields[4][0]["word"] = "假"
-    new_fields[4][1]["word"] = "名"
-    new_fields[4][2]["word"] = "数"
-    new_fields[4][3]["word"] = "量"
-    new_fields[5][2]["word"] = "" + parseInt(sed_size / 10 % 10)
-    new_fields[5][3]["word"] = "" + sed_size % 10
-
-    new_fields[6][0]["word"] = "得"
-    new_fields[6][1]["word"] = "分"
-    new_fields[7][2]["word"] = "" + parseInt(point / 1000 % 10)
-    new_fields[7][3]["word"] = "" + parseInt(point / 100 % 10)
-    new_fields[7][4]["word"] = "" + parseInt(point / 10 % 10)
-    new_fields[7][5]["word"] = "" + point % 10
-
-    new_fields[8][0]["word"] = "最"
-    new_fields[8][1]["word"] = "高"
-
-    new_fields[10][0]["word"] = "金"
-    new_fields[10][1]["word"] = "币"
-    new_fields[10][2]["word"] = "+"
-    new_fields[10][3]["word"] = "" + parseInt(checkCoin / 100 % 10)
-    new_fields[10][4]["word"] = "" + parseInt(checkCoin / 10 % 10)
-    new_fields[10][5]["word"] = "" + checkCoin % 10
-
-    var openid = App.globalData.openid
-
+    clearInterval(this._spendIt)
+    let spend = this._spend
+    let spinCount = this.data.spinCount
+    let point = Math.round((spinCount + this._hitaCount * 10) * this._selectedSize / 10)
+    let checkCoin = Math.round(point * 1.2 / 10)
     //解锁假名
-    var puzs = this.data.puzs
-    var puz = ""
-    if (puzs && puzs.size > 0) {
-      puz = Array.from(puzs) + ""
+    let ksOri = this.data.ksOri
+    for (let roma of this._puzs){
+      ksOri.map(it=> {
+        it.count = it.count || 0
+        it.count = it.roma == roma ? it.count + 1 : it.count
+      })
     }
+    console.log(spend, ksOri)
+    let puz = this._puzs.join()
     console.log(puz)
+    
+    wx.showNavigationBarLoading()
     wx.request({
       url: `${host}/saveRank`,
       method: 'POST',
       data: {
-        openid,
+        openid: App.globalData.openid,
         point,
+        spend,
         status: 1,
         puz,
         checkCoin,
       },
       success: (res)=> {
-        if (!this.data.isIpx){
-          this._tabBarHide = true
-          wx.hideTabBar({
-            fail: () => {
-              wx.showToast({
-                icon: 'none',
-                title: '函数调用失败，请更新微信',
-              })
-            }
-          })
+        let data = res.data
+        let _points = []
+        let _spends = []
+        let _glods = []
+        let points = []
+        let spends = []
+        let glods = []
+        let myTotalCoin = checkCoin
+        for (let it of data){
+          _points.push(it.point)
+          _spends.push(it.spend > 0 ? it.spend : 320 - Math.round(it.point / 10 + it.round / 2))
+          _glods.push(it.total_coin)
+          myTotalCoin = it.openid == App.globalData.openid ? it.total_coin + checkCoin : myTotalCoin
         }
-        console.log(res)
-        var rank = res.data[0]
-        var best = Math.max(point, rank.point)
-        new_fields[9][2]["word"] = "" + parseInt(best / 1000 % 10)
-        new_fields[9][3]["word"] = "" + parseInt(best / 100 % 10)
-        new_fields[9][4]["word"] = "" + parseInt(best / 10 % 10)
-        new_fields[9][5]["word"] = "" + best % 10
-        this.loadGame(new_fields)
+        console.log(App.globalData.openid, myTotalCoin, _spends)
+        let _maxPoint = Math.max.apply(Math, _points)
+        let _maxSpend = Math.max.apply(Math, _spends)
+        let _maxGlod = Math.max.apply(Math, _glods)
+        let _minPoint = Math.min.apply(Math, _points)
+        let _minSpend = Math.min.apply(Math, _spends)
+        let _minGlod = Math.min.apply(Math, _glods)
+        let _spPoint = (_maxPoint - _minPoint) / 10
+        let _spSpend = (_maxSpend - _minSpend) / 10
+        let _spGlod = (_maxGlod - _minGlod) / 10
+        let pointPercent = point / _maxPoint * 100
+        let spendPercent = spend / _maxSpend * 100
+        let glodPercent = myTotalCoin / _maxGlod * 100
+        console.log(pointPercent, spendPercent, glodPercent)
+        console.log('max:', _maxPoint, _maxSpend, _maxGlod)
+        pointPercent = pointPercent > 100 ? 100 : pointPercent
+        spendPercent = spendPercent > 100 ? 100 : spendPercent
+        glodPercent = glodPercent > 100 ? 100 : glodPercent
+        for (let i=0;i<10;i++){
+          console.log(i, i * _spGlod + _minGlod, '~', (i + 1) * _spGlod + _minGlod)
+          let p = _points.filter(it => { return it >= i * _spPoint + _minPoint && it <= (i + 1) * _spPoint + _minPoint }).length
+          points.push(p)
+          let s = _spends.filter(it => { return it >= i * _spSpend + _minSpend && it <= (i + 1) * _spSpend + _minSpend }).length
+          spends.push(s)
+          let g = _glods.filter(it => { return it >= i * _spGlod + _minGlod && it <= (i + 1) * _spGlod + _minGlod }).length
+          glods.push(g)
+        }
+        console.log(points, spends, glods)
+        this.initBarChart(points, spends, glods)
+        this.setData({
+          ksOri,
+          spend,
+          point,
+          checkCoin,
+          pointPercent,
+          spendPercent,
+          glodPercent,
+          showResult: true,
+        })
+      },
+      complete: (res) => {
+        wx.hideNavigationBarLoading()
       }
-    });
+    })
 
   },
 
@@ -411,6 +510,8 @@ Page({
   setting(e) {
     wx.vibrateShort()
     if (!this.data.hasLogin) return
+    this._gap = 0
+    this._remind = 0
     var currData = e.currentTarget.dataset
     var option = currData.option
     if (option == 0) { //icon-setting
@@ -441,7 +542,7 @@ Page({
       this.checkRank(0, 0)
       this.setData({ option: 3 })
     }
-    this.setData({ oldCoin: 0, subCoin: 0, buy_log: "" })
+    this.setData({ oldCoin: 0, subCoin: 0, buy_log: "", tip: '' })
   },
   // 刷新数据
   refresh() {
@@ -485,9 +586,9 @@ Page({
       ks_all[n_row][n_col]["selected"] = false
     }
 
-    var sed_size = ks_sed.length
-    var is_max = sed_size == max_sed
-    this.setData({ ks_all, ks_sed, is_max, sed_size })
+    this._selectedSize = ks_sed.length
+    var is_max = this._selectedSize == max_sed
+    this.setData({ ks_all, ks_sed, is_max })
   },
 
   setPuzMap: function (puz) {
@@ -553,9 +654,9 @@ Page({
       this._tabBarHide = false
       wx.showTabBar()
     }
-    var ks_ed = []
-    var ks_no = []
-    var ks_all = this.data.ks_all
+    let ks_ed = []
+    let ks_no = []
+    let ks_all = this.data.ks_all
     for (let rows of ks_all) {
       for (let step of rows) {
         if (step.selected) {
@@ -566,33 +667,32 @@ Page({
       }
     }
 
-    ks_no.sort(function () { return (Math.random() - 0.5) })
+    ks_no.sort(()=> { return (Math.random() - 0.5) })
 
-    var fill_size = least_sed - ks_ed.length
+    let fill_size = least_sed - ks_ed.length
     fill_size = fill_size > 0 ? fill_size : 0
-    var ks_fill = ks_no.slice(0, fill_size)
+    let ks_fill = ks_no.slice(0, fill_size)
     //concat(ks_fill)
     ks_ed.push(...ks_fill)
-    var ks_ori = ks_ed.concat()
+    let ksOri = ks_ed.concat()
     while (ks_ed.length < half_sed) {
       ks_ed = ks_ed.concat(ks_ed)
     }
     ks_ed = ks_ed.slice(0, half_sed)
-    ks_ed.sort(function () { return (Math.random() - 0.5) })
-    var t_kanas = ks_ed.concat()
-    t_kanas.sort(function () { return (Math.random() - 0.5) })
+    ks_ed.sort(()=> { return (Math.random() - 0.5) })
+    let t_kanas = ks_ed.concat()
+    t_kanas.sort(()=> { return (Math.random() - 0.5) })
     //console.log(ks_ed.length)
-    this.setData({ top_hide: true, btn_show: false, ks_ori })
+    this.setData({ top_hide: true, showResult: false, ksOri })
     this.initFields(ks_ed, t_kanas)
   },
 
-  initFields: function (kanas, t_kanas) {
-    //total_step = kanas + t_kanas
-    var pos_map = {}
-    var new_fields = []
-    var kon = this.data.kon
+  initFields(kanas, t_kanas) {
+    let pos_map = {}
+    let new_fields = []
+    let kon = this.data.kon
     for (let row = 0; row < max_row; row++) {
-      var rows = []
+      let rows = []
       for (let col = 0; col < max_col; col++) {
         var kana = {}
         var space1 = (row == 6 && col > 0 && col < max_col - 1)
@@ -619,7 +719,7 @@ Page({
           pos_map[roma] = [[row, col]]
         }
 
-        var step = { row, col, roma, hira, kata, word, kton }
+        let step = { row, col, roma, hira, kata, word, kton }
         rows.push(step)
       }
       new_fields.push(rows)
@@ -684,7 +784,7 @@ Page({
     this.setData({ stn })
   },
 
-  buy: function (e) {
+  buy(e) {
     var co_key = this.data.co_key
     var currData = e.currentTarget.dataset
     var key = currData.key
@@ -740,7 +840,9 @@ Page({
     }
   },
 
-  buyColor: function (color, coin, price) {
+  buyColor(color, coin, price) {
+    if (this._buyLock) return
+    this._buyLock = true
     var openid = App.globalData.openid
     var balance = coin - price
     var subCoin = price
@@ -756,6 +858,9 @@ Page({
         var buy_log = "兑换成功!"
         this.setData({ subCoin, buy_log, show_price })
         this.initColor(rank)
+      },
+      complete: ()=>{
+        this._buyLock = false
       }
     });
   },
@@ -1006,19 +1111,13 @@ Page({
   hideBoth(old_row, old_col, this_row, this_col, steps) {
     wx.vibrateShort()
     var fields = this.data.fields
-    var this_step = fields[this_row][this_col]
-    var old_step = fields[old_row][old_col]
+    var thisStep = fields[this_row][this_col]
+    var oldStep = fields[old_row][old_col]
     //解锁假名
-    if (this_step["word"] != old_step["word"]) {
-      var puzs = this.data.puzs
-      var roma = this_step["roma"]
-      if (puzs && puzs.size > 0) {
-        puzs.add(roma)
-      } else {
-        puzs = new Set([roma])
-      }
-      this.setData({ puzs })
-      this.data.hita_count += 1
+    if (thisStep["word"] != oldStep["word"]) {
+      var roma = thisStep["roma"]
+      this._puzs.push(roma)
+      this._hitaCount += 1
     }
     var sold = old_row + "," + old_col
     var sthis = this_row + "," + this_col
@@ -1026,26 +1125,26 @@ Page({
     steps = steps.concat(both)
     this.passStep(steps)
 
-    let cur = this_step["roma"]
+    let cur = thisStep["roma"]
     let curSrc = SrcYuku + cur + '.wav'
     console.log(curSrc)
     audioContextOri.src = curSrc
     audioContextOri.play()
 
-    var sakki_roma = this_step["roma"]
-    var sakki_hira = this_step["hira"]
-    var sakki_kata = this_step["kata"]
+    var sakki_roma = thisStep["roma"]
+    var sakki_hira = thisStep["hira"]
+    var sakki_kata = thisStep["kata"]
 
     //if(steps.length > 2 && this.data.auto){
     //  this.autoLink(this_row, this_col)
     //}
 
-    this_step["word"] = ""
-    old_step["word"] = ""
-    this_step["active"] = false
-    old_step["active"] = false
-    this_step["roma"] = sthis
-    old_step["roma"] = sold
+    thisStep["word"] = ""
+    oldStep["word"] = ""
+    thisStep["active"] = false
+    oldStep["active"] = false
+    thisStep["roma"] = sthis
+    oldStep["roma"] = sold
 
     this.setData({
       fields,
@@ -1054,10 +1153,15 @@ Page({
       sakki_hira,
       sakki_kata,
     })
+    if (this._spend == 0){
+      this._spendIt = setInterval(it=>{
+        this._spend += 1
+      }, 1000)
+    }
     return true
   },
 
-  passStep: function (steps) {
+  passStep(steps) {
     var fields = this.data.fields
     for (let step of steps) {
       var rc = step.split(",")
@@ -1066,15 +1170,14 @@ Page({
       fields[row][col]["on"] = !fields[row][col]["on"]
     }
     //记录分数用
-    var spin_count = this.data.spin_count
-    var rest_count = this.data.rest_count
-    rest_count -= 2
-    var to_spin = spin_count + steps.length
+    let spinCount = this.data.spinCount
+    let endCount = spinCount + steps.length
+    this._restStep -= 2
 
-    var spit = setInterval(() => {
-      if (spin_count < to_spin) {
-        spin_count += 1
-        this.setData({ spin_count })
+    let spit = setInterval(() => {
+      if (spinCount < endCount) {
+        spinCount += 1
+        this.setData({ spinCount })
       } else {
         clearInterval(spit)
       }
@@ -1082,17 +1185,13 @@ Page({
 
     this.setData({
       fields,
-      rest_count
     })
 
     //分数结算
-    if (rest_count == 0) {
+    if (this._restStep <= 0) {
       setTimeout(() => {
         this.initResult()
-      }, 500)
-      setTimeout(() => {
-        this.setData({ btn_show: true })
-      }, 3000)
+      }, 100)
     }
   },
 
@@ -1253,8 +1352,7 @@ Page({
   goLink: function (e) {
     var currData = e.currentTarget.dataset
     var word = currData.word
-    var st_hint = this.data.st_hint
-    if (word == "" || st_hint != 0) return
+    if (word == "" || this._hasHint) return
     var bucket = this.data.bucket
     var fields = this.data.fields
     var row = currData.row
@@ -1276,15 +1374,16 @@ Page({
         if (old_step["word"] != "" && this_step["roma"] == old_step["roma"]) {
           this.linkDirect(old_row, old_col, row, col)
           // 清空提示
-          this.data.remind = 0
-          this.data.spend = 0
-          this.setData({ tipsClass: 'tips-hide' })
+          this._remind = 0
+          this._gap = 0
+          this.setData({ tip: '' })
         } else if (old_step["word"] != "" && this_step["word"] != "") {
           console.log("remind...")
-          this.data.remind += 1
-          if (this.data.remind > 5) {
+          this._gap = 0
+          this._remind += 1
+          if (this._remind > 5) {
             var tip = Math.random() > 0.5 ? '忘记罗马音时可以长按方块查看' : '觉得难的话可以自选假名和关闭片假名哦'
-            this.setData({ tipsClass: 'tips-show', tip })
+            this.setData({ tip })
           }
         }
       }
@@ -1295,27 +1394,43 @@ Page({
 
   },
 
-  showRoma: function (e) {
-    var currData = e.currentTarget.dataset
-    var word = currData.word
-    var st_hint = this.data.st_hint
-    if (word == "" || st_hint != 0) return
+  autoTips(){
+    if (this._tipsIt > -1) return
+    this._gap = 0
+    let tips = this.data.tips
+    this._tipsIt = setInterval(() => {
+      if (this._restStep < 80) this._tipsIt = clearInterval(this._tipsIt)
+      this._gap += 3
+      if (this._gap % 18 == 0) {
+        let ridx = parseInt(Math.random() * tips.length)
+        ridx = Math.min(ridx, tips.length - 1)
+        let tip = tips[ridx]
+        this.setData({ tip })
+      }
+    }, 3000)
+  },
+
+  showRoma(e) {
+    let currData = e.currentTarget.dataset
+    let word = currData.word
+    if (word == "" || this._hasHint) return
     wx.vibrateLong()
-    var fields = this.data.fields
-    var row = currData.row
-    var col = currData.col
-    var this_step = fields[row][col]
+    let fields = this.data.fields
+    let row = currData.row
+    let col = currData.col
+    let this_step = fields[row][col]
     this_step["hint"] = true
     let cur = this_step['roma']
     let curSrc = SrcYuku + cur + '.wav'
     audioContextOri.src = curSrc
     audioContextOri.play()
-    var st_hint = setTimeout(() => {
+    this._hasHint = setTimeout(() => {
       this_step["hint"] = false
-      this.setData({ fields, st_hint: 0 })
+      this.setData({ fields })
+      this._hasHint = false
     }, 1000)
 
-    this.setData({ fields, st_hint })
+    this.setData({ fields })
   },
 
   sakki() {

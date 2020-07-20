@@ -1,0 +1,107 @@
+@import "../detail/detail.wxss";
+
+.get-user{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 0.1;
+  color: #fff;
+  z-index: 999;
+}
+
+.box-pd{
+  padding: 20rpx;
+}
+
+.box-avatars{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 128rpx;
+  background: #fff;
+  z-index: 10;
+  perspective: 1200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 6rpx #ffffff;
+}
+
+.ava-container{
+  position: relative;
+  top: -40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92rpx;
+  transform-style: preserve-3d;
+  transition: transform .6s;
+}
+
+.out-avatar{
+  position: absolute;
+  top: 0;
+  width: 120rpx;
+  height: 82rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.out-avatar .avatar{
+  width: 82rpx;
+  height: 82rpx;
+  border-radius: 8rpx;
+  box-shadow: 0 0 6rpx #4a5fe2;
+}
+
+.an-spin {
+  animation: anSpin .3s ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes anSpin{
+  0% {
+    transform: rotate(0)
+  }
+  20% {
+    transform: rotate(5deg)
+  }
+  40% {
+    transform: rotate(-5deg)
+  }
+  60% {
+    transform: rotate(2deg)
+  }
+  80% {
+    transform: rotate(-2deg)
+  }
+  100% {
+    transform: rotate(0)
+  }
+}
+
+.share {
+  position: fixed;
+  right: 40rpx;
+  bottom: 60rpx;
+  z-index: 8;
+  height: 100rpx;
+  width: 100rpx;
+  background: transparent;
+  overflow: visible;
+  padding: 0;
+}
+
+.share image {
+  height: 60rpx;
+  width: 60rpx;
+  padding: 12rpx;
+  background: #fdfdfd;
+  border: 6rpx solid #eee;
+  box-shadow: 0 0 6rpx #4a5ee288;
+  border-radius: 50%;
+}

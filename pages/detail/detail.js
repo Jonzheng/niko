@@ -14,8 +14,6 @@ const options = {
 }
 const dura = options.duration / 1000
 
-const heartOff = "../../images/heart-off.png"
-const heartOn = "../../images/heart-on.png"
 const zanOff = "../../images/zan-off.png"
 const zanOn = "../../images/zan-on.png"
 
@@ -41,7 +39,6 @@ function _next() {
 Page({
   data: {
     isIpx: App.globalData.isIpx,
-    slider: 'bar-ori',
     cname: '* * *',
     skill: '* * *',
     oriPlaying: false,
@@ -71,6 +68,17 @@ Page({
 
   onLoad: function (options) {
     let { fileId } = options
+    if (!App.globalData.openid){
+      setTimeout(()=>{
+        App.initOpenid().then(openid =>{
+          console.log('App.initOpenid():', openid)
+          App.globalData.openid = openid
+          let url = `../detail/detail?fileId=${fileId}`
+          wx.redirectTo({ url })
+        })
+      }, 600)
+      return
+    }
     this.initPageData(fileId)
     this._title = '式神录'
     this.setData({
@@ -84,8 +92,10 @@ Page({
   },
 
   onShow() {
-    if (App.globalData.hasHeart){
+    if (App.globalData.hasUpdate){
       this.getRecords()
+      let pages = getCurrentPages()
+      App.globalData.hasUpdate = pages.length > 2
     }
   },
 
@@ -121,6 +131,7 @@ Page({
     // wx.setInnerAudioOption({ 'obeyMuteSwitch': false })
     // console.log('obeyMuteSwitch:',this._audioContextOri.obeyMuteSwitch)
     this._audioContextOri.onPlay(() => {
+      wx.hideNavigationBarLoading()
       console.log(this._audioContextOri.currentTime)
       let _len = this.data.shadow.length
       this._oriIter = setInterval(()=>{
@@ -133,7 +144,6 @@ Page({
       }, 30)
       console.log("audioContextOri...")
       this.setData({
-        slider: 'bar-end',
         oriPlaying: true,
       });
     });
@@ -146,10 +156,14 @@ Page({
       this.setOriStop();
     });
 
+    this._audioContextMaster.onPlay(() => {
+      wx.hideNavigationBarLoading()
+    })
+
     this._audioContextMaster.onEnded(() => {
       this.setMasterStop();
       let tipsRecord = wx.getStorageSync('tipsRecord101')
-      if (!tipsRecord) {
+      if (!tipsRecord && !this.data.tipsRecord) {
         wx.setStorageSync('tipsRecord101', true)
         setTimeout(() => {
           this.setData({ tipsRecord: '轮到你了' })
@@ -157,8 +171,8 @@ Page({
             this.setData({ tipsRecord: '轮到你了, 网友!' })
             setTimeout(() => {
               this.setData({ tipsRecord: '' })
-            }, 6000)
-          }, 2000)
+            }, 9500)
+          }, 3000)
         }, 500)
       }
     });
@@ -198,7 +212,7 @@ Page({
     let fileId = this.data.fileId
     let cname = this.data.cname
     return {
-      title: `${cname}·台词&模仿语音`,
+      title: `${cname}·台词&模仿录音`,
       path: `/pages/detail/detail?fileId=${fileId}`,
     }
   },
@@ -326,6 +340,7 @@ Page({
     }
   },
   pass(){
+    console.log('pass')
   },
 
   initSerifu(curList) {
@@ -377,17 +392,13 @@ Page({
   initRecords(recordList) {
     for (let record of recordList) {
       record["deAvatar"] = deAvatar(record.master_id)
-      record["listenStatus"] = "listen-off"
-      record["boxStyle"] = "btn-play-box"
       record["btnShow"] = false
       record["btnRt"] = ""
       record["dateStr"] = formatDate(record.c_date)
       record["isMine"] = record.master_id == App.globalData.openid
       if (record.heart_ud) {
-        record["heartShape"] = heartOn
         record["heartStatus"] = 1
       } else {
-        record["heartShape"] = heartOff
         record["heartStatus"] = 0
       }
       record["isListen"] = false
@@ -397,7 +408,7 @@ Page({
     })
   },
 
-  initPageData: function (fileId) {
+  initPageData(fileId) {
     let openid = App.globalData.openid
     console.log(fileId, ',', openid)
     wx.showNavigationBarLoading()
@@ -469,6 +480,7 @@ Page({
   },
 
   setOriStop() {
+    wx.hideNavigationBarLoading()
     this._audioContextOri.seek(0)
     console.log('end', this._audioContextOri.currentTime)
     if (this._oriIter > -1){
@@ -476,12 +488,11 @@ Page({
     }
     this.setData({
       oriIdx: 0,
-      slider: 'bar-ori',
       oriPlaying: false,
     });
 
     let tipsRecord = wx.getStorageSync('tipsRecord')
-    if (!tipsRecord){
+    if (!tipsRecord && !this.data.tipsRecord){
       wx.setStorageSync('tipsRecord', true)
       setTimeout(()=>{
         this.setData({ tipsRecord: '录音模仿一下吧' })
@@ -489,21 +500,21 @@ Page({
           this.setData({ tipsRecord: '录音模仿一下吧, 网友!' })
           setTimeout(() => {
             this.setData({ tipsRecord: '' })
-          }, 6000)
-        }, 2000)
+          }, 9500)
+        }, 3000)
       }, 500)
     }
   },
 
-  setMasterStop: function () {
+  setMasterStop() {
     let index = this._listenIndex
     let recordList = this.data.recordList
-    if (index != null && recordList[index]["isListen"]) {
+    console.log('_listenIndex', index)
+    if (index != undefined && recordList[index] && recordList[index]["isListen"]) {
+      wx.hideNavigationBarLoading()
       recordList[index]["isListen"] = false
-      recordList[index]["listenStatus"] = "listen-off"
-      recordList[index]["anListen"] = ""
       this._audioContextMaster.stop()
-      this._listenIndex = null
+      this._listenIndex = undefined
       this.setData({
         recordList,
       })
@@ -522,6 +533,7 @@ Page({
     let curAudio = this.data.curAudio
     this._audioContextOri.src = curAudio.src_audio
     if (!this.data.oriPlaying) {
+      wx.showNavigationBarLoading()
       this._audioContextOri.play()
     } else {
       this.stopOri()
@@ -529,6 +541,7 @@ Page({
   },
 
   stopOri() {
+    if (!this.data.oriPlaying) return
     this._audioContextOri.stop()
   },
 
@@ -541,13 +554,11 @@ Page({
     let isSelf = false
     if (master_id == App.globalData.openid) isSelf = true
     if (recordList[idx]["btnRt"] == "rt-90") {
-      recordList[idx]["boxStyle"] = "btn-play-box"
       recordList[idx]["btnRt"] = ""
       if (isSelf) {
         recordList[idx]["btnShow"] = false
       }
     } else {
-      recordList[idx]["boxStyle"] = "btn-play-box-sm"
       recordList[idx]["btnRt"] = "rt-90"
       if (isSelf) {
         recordList[idx]["btnShow"] = true
@@ -562,6 +573,8 @@ Page({
   //录音
   startRecord() {
     wx.vibrateShort()
+    this.setMasterStop()
+    wx.setStorageSync('tipsRecord', true)
     this.setData({ tipsRecord: '' })
     if (this.data.isPlaying) {
       this._audioContextMine.stop()
@@ -613,6 +626,7 @@ Page({
       method: 'post',
       data: { recordId, status: 0 },
       success: (res) => {
+        App.globalData.hasUpdate = true
         console.log(res)
       }
     })
@@ -676,15 +690,12 @@ Page({
     if (!srcRecord) return
     if (recordList[idx]["isListen"]) {
       recordList[idx]["isListen"] = false
-      recordList[idx]["listenStatus"] = "listen-off"
-      recordList[idx]["anListen"] = ""
       this._audioContextMaster.stop()
     } else {
       wx.vibrateShort()
+      wx.showNavigationBarLoading()
       this.setMasterStop()
       recordList[idx]["isListen"] = true
-      recordList[idx]["listenStatus"] = "listen-on"
-      recordList[idx]["anListen"] = "an-listen-on"
       this._audioContextMaster.src = srcRecord
       this._audioContextMaster.play()
       this._listenIndex = idx
@@ -708,12 +719,10 @@ Page({
       this.playHeartSrc()
       wx.vibrateShort()
       url = `${host}/updateHeart`
-      curMaster["heartShape"] = heartOn
       curMaster["heartStatus"] = 1
       curMaster["heart"] += 1
     } else {
       url = `${host}/cancelHeart`
-      curMaster["heartShape"] = heartOff
       curMaster["heartStatus"] = 0
       curMaster["heart"] -= 1
     }
@@ -725,7 +734,7 @@ Page({
       method: 'post',
       data: { recordId, fileId, userId, masterId },
       success: ()=>{
-        App.globalData.hasHeart = true
+        App.globalData.hasUpdate = true
         this.setData({
           recordList
         })
@@ -738,7 +747,13 @@ Page({
 
   // 上传录音-- record-1256378396.cos.ap-guangzhou.myqcloud.com/ssr_gq_0_31588943189222.mp3
   uploadRecord() {
+    if (this._uploading) return
+    this._uploading = true
     wx.vibrateShort()
+    wx.showNavigationBarLoading()
+    wx.showLoading({
+      title: '上传中...',
+    })
     let recordFile = this.data.recordFile
     console.log("recordFile:", recordFile)
     let masterId = App.globalData.openid
@@ -755,6 +770,9 @@ Page({
         console.log(JSON.stringify(info));
       }
     }, (err, data)=> {
+      this._uploading = false
+      wx.hideNavigationBarLoading()
+      wx.hideLoading()
       console.log(err || data);
       if (err){
         wx.showToast({
@@ -769,14 +787,20 @@ Page({
           method: 'post',
           data: { recordId, fileId, masterId, srcRecord },
           success: (res) => {
+            App.globalData.hasUpdate = true
             console.log('saveRecord success:', res)
             App.globalData.newRecord = true
+            this.onPullDownRefresh()
+            wx.showToast({
+              title: '上传成功',
+            })
+          },
+          complete: ()=>{
             this._tempFile = null
             this.setData({
               hasTmp: false,
               progress_record: 0
             })
-            this.onPullDownRefresh()
           }
         })
       }
@@ -836,6 +860,7 @@ Page({
       method: 'POST',
       data: { recordId, masterId, fileId, userId, content, reId, reName, reContent },
       success: (res)=> {
+        App.globalData.hasUpdate = true
         console.log(res.data)
         if (res && res.data && res.data.code == 87014) {
           let content = res.data.data
@@ -882,6 +907,7 @@ Page({
       method: 'POST',
       data: { recordId, userId, commId },
       success: (res) => {
+        App.globalData.hasUpdate = true
         this.clearInput()
         console.log(res.data)
         if (res) {

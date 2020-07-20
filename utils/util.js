@@ -26,10 +26,13 @@ const trim = (str) => {
  */
 function formatDate(time) {
   if (time.length < 8) return time
-  const now = new Date()
-  const date = new Date(time)
-  const today = now.getFullYear() + '-' + now.getDate()
-  const _today = date.getFullYear() + '-' + date.getDate()
+  let now = new Date()
+  let date = new Date(time)
+  let year = date.getFullYear()
+  let month = date.getMonth() + 1
+  let day = date.getDate()
+  let today = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`
+  let _today = `${year}-${month}-${day}`
   if (today == _today) { // 今天的评论，显示具体时间
     let hour = date.getHours()
     let minute = date.getMinutes()
@@ -42,10 +45,7 @@ function formatDate(time) {
     minute = minute < 10 ? '0' + minute : minute
     return `今天 ${hour}:${minute} ${dt}`
   } else { // 不是今天的评论，显示日期
-    let year = date.getFullYear()
-    let month = date.getMonth() + 1
     month = month < 10 ? '0' + month : month
-    let day = date.getDate()
     day = day < 10 ? '0' + day : day
     return `${year}-${month}-${day}`
   }

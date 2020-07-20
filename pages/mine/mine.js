@@ -24,9 +24,16 @@ Page({
   },
 
   onLoad: function (options) {
+    if (!App.globalData.openid) {
+      App.initOpenid().then(openid => {
+        console.log('App.initOpenid():', openid)
+        App.globalData.openid = openid
+        this.onLoad()
+      })
+      return
+    }
     let openid = App.globalData.openid
     this.init()
-    if (!openid) return this.login()
     this.getUser(openid)
     this.getRecords(openid)
     App.getHeartSrc()
@@ -53,11 +60,11 @@ Page({
           App.globalData.motto = false
           this.getUser(openid)
           this.getRecords(openid)
-        } else if (App.globalData.hasHeart){
+        } else if (App.globalData.hasUpdate){
           this.getRecords(openid)
         }
       }
-      App.globalData.hasHeart = false
+      App.globalData.hasUpdate = false
     }, 600)
   },
 
@@ -128,28 +135,7 @@ Page({
       hasLogin: App.globalData.hasLogin
     })
   },
-  login(){
-    // 登录-后台注册或更新登录时间
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        let userCode = res.code
-        wx.request({
-          method: 'post',
-          url: `${host}/regist`,
-          data: { userCode: userCode },
-          success: res => {
-            if (res && res.data) {
-              let userInfo = res.data[0]
-              App.globalData.userInfo = userInfo
-              App.globalData.openid = userInfo.openid
-              this.getUser(userInfo.openid)
-            }
-          }
-        })
-      }
-    })
-  },
+
   init() {
     this.setData({
       isIpx: App.globalData.isIpx,
@@ -276,6 +262,9 @@ Page({
     let userInfo = e.detail.userInfo
     if(!userInfo) return
     this.updateAvatar(userInfo)
+    wx.showToast({
+      title: '登录成功',
+    })
   },
 
   setMasterStop: function () {
@@ -456,7 +445,7 @@ Page({
       commentList,
     })
   },
-  showComment: function (e) {
+  showComment(e) {
     wx.hideTabBar({
       fail: ()=>{
         wx.showToast({

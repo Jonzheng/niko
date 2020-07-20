@@ -6,7 +6,8 @@
     "pages/detail/detail",
     "pages/person/person",
     "pages/news/news",
-    "pages/edit/edit"
+    "pages/edit/edit",
+    "pages/record/record"
   ],
   "tabBar": {
     "color": "#7A7E83",
