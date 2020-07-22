@@ -6,7 +6,7 @@
       <block wx:for="{{avatars}}" wx:key="index">
         <view class="out-avatar" catchtap="autoRot" data-uid="{{item.openid}}"
             style="transform: rotateY({{index *20}}deg) translateZ(320rpx)">
-          <image class="avatar {{isReady ? 'an-spin':''}}" src="{{isReady ? item.url: ''}}"></image>
+          <image class="avatar {{isReady ? 'an-spin':''}}" src="{{isReady ? item.url: preLoad && index%2==0 ? '../../images/loading-1.png':''}}"></image>
         </view>
       </block>
     </view>
@@ -27,6 +27,7 @@
       bind:refresh="refresh"
       bind:more="more">
       <view class="record-list box-pd">
+        <image wx:if="{{preLoad && recordList.length == 0}}" class="{{preLoad ? 'i-loading':'i-hide'}}" src="../../images/loading-0.png"></image>
         <block wx:for="{{recordList}}" wx:key="mkey">
           <template is="ele-master" data="{{...item,index,icon_more,icon_comm,icon_zan_em,icon_zan_fu}}"/>
         </block>

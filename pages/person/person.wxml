@@ -61,7 +61,8 @@
 
   <view class="box-records">
     <view class="record-label">cv模仿录音：</view>
-    <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
+    <view wx:if="{{isReady && recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
+    <image wx:if="{{showLoading}}" class="i-loading" src="../../images/loading-1.png"></image>
     <block wx:for="{{recordList}}" wx:key="mkey">
       <view class="item-record">
         <view class="box-col">

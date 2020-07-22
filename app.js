@@ -244,6 +244,7 @@ App({
     isIpx: false,
     admini: false,
     downCount: 0,
-    userInfo: null
+    userInfo: null,
+    needReload: true
   }
 })

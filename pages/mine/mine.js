@@ -197,6 +197,7 @@ Page({
     })
   },
   toPerson(e) {
+    wx.vibrateShort()
     let masterId = e.currentTarget.dataset.uid
     if (masterId == App.globalData.openid) return
     let url = `../person/person?masterId=${masterId}`
@@ -454,6 +455,7 @@ Page({
         })
       }
     })
+    wx.vibrateShort()
     let currData = e.currentTarget.dataset
     let { idx, fid } = currData
     let userId = App.globalData.openid

@@ -143,6 +143,8 @@ Page({
       requesting: true,
       empty: false,
       end: false,
+      isReady: false,
+      recordList: [],
     })
     this.getRecords(this._masterId)
   },
@@ -194,6 +196,7 @@ Page({
     if (this._loading) return
     this._loading = true
     let openid = App.globalData.openid
+    this.setData({ showLoading:true })
     wx.request({
       url: `${host}/queryRecord`,
       method: 'post',
@@ -207,7 +210,9 @@ Page({
       complete: (res) => {
         this._loading = false
         this.setData({
-          requesting: false
+          requesting: false,
+          showLoading: false,
+          isReady: true
         })
       }
     })

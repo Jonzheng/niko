@@ -122,17 +122,6 @@
   box-shadow:0px 0px 10rpx #fff;
 }
 
-.get-user{
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.1);
-  opacity: 0.1;
-  color: #fff;
-  z-index: 999;
-}
 .out-share{
   position: absolute;
   right: 80rpx;

@@ -50,6 +50,29 @@
   position: relative;
   flex: 1;
 }
+
+.cell__bd .circle{
+  position: absolute;
+  top: 3rpx;
+  left: 160rpx;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: rgba(255, 0, 0, 0.5);
+  transition: background,width,height,opacity,left ease-in .3s;
+  opacity: 1;
+}
+
+.circle-hide{
+  border-radius: 50%;
+  position: absolute;
+  top: 3rpx;
+  left: 150rpx;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
 .cell__bd .name {
   display: -webkit-box;
   -webkit-box-orient: vertical;

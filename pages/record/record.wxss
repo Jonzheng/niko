@@ -1,19 +1,19 @@
 @import "../detail/detail.wxss";
 
-.get-user{
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.1);
-  opacity: 0.1;
-  color: #fff;
-  z-index: 999;
-}
-
 .box-pd{
   padding: 20rpx;
+}
+
+.i-loading{
+  background: transparent;
+  width: 715rpx;
+  height: 715rpx;
+  opacity: 1;
+  transition: opacity .6s linear;
+}
+
+.i-hide{
+  opacity: 0;
 }
 
 .box-avatars{

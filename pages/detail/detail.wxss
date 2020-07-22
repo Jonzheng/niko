@@ -450,6 +450,22 @@
   justify-content: center;
 }
 
+.to-tips{
+  margin-top: 30rpx;
+  height: 120rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.to-tips .to-text{
+  opacity: .5;
+  color: #bbb;
+  padding: 6rpx 0;
+  border-bottom: 3rpx solid rgba(0, 0, 255, 0.3);
+}
+
 .end-pd{
   position: relative;
   left: -15rpx;

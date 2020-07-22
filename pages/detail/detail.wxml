@@ -90,7 +90,9 @@
           </block>
 
           <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
-          <view wx:if="{{end && recordList.length != 0}}" class="non-tips"> ※ 没有更多啦 ※</view>
+          <view wx:if="{{recordList.length != 0}}" class="to-tips">
+            <view class="to-text" bindtap="toRecord">※ 查看全部录音 ※</view>
+          </view>
         </view>
 
       </view>

@@ -34,6 +34,7 @@ Page({
   },
 
   onLoad: function (options) {
+    this._showIdxs = []
     if (!App.globalData.openid) {
       setTimeout(()=>{
         App.initOpenid().then(openid => {
@@ -46,11 +47,13 @@ Page({
       return
     }
     this.setData({
+      avatars: [],
+      preLoad: true,
+      rotY: this.data.rotY + 120,
       hasLogin: App.globalData.hasLogin,
     })
-    this.getRecords()
+    this.preLoadRecord()
     App.getHeartSrc()
-    this._showIdxs = []
   },
 
   onReady: function () {
@@ -64,10 +67,14 @@ Page({
   },
 
   onShow: function () {
+    App.globalData.hideCircle = true
     if (App.globalData.hasUpdate) {
       this.getRecords(true)
       let pages = getCurrentPages()
       App.globalData.hasUpdate = pages.length > 2
+      setTimeout(() => {
+        wx.hideNavigationBarLoading()
+      }, 300)
     }
   },
 
@@ -80,7 +87,7 @@ Page({
   },
 
   onPullDownRefresh: function () {
-
+    wx.stopPullDownRefresh()
   },
 
   onReachBottom: function () {
@@ -124,7 +131,7 @@ Page({
       recordList: [],
       rotY: this.data.rotY + 120,
     })
-    this.getRecords()
+    this.preLoadRecord()
   },
   // 加载更多
   more() {
@@ -140,11 +147,51 @@ Page({
     this.pickRecords(this._recordes)
   },
 
+  preLoadRecord(){
+    this._recordes = wx.getStorageSync('_recordes')
+    console.log(App.globalData.needReload, this._recordes.length)
+    if (this._recordes){
+      wx.setNavigationBarTitle({
+        title: '式神录※模仿录音',
+      })
+      this.initRecords(this._recordes)
+      if (App.globalData.needReload){
+        this.getRecords(true)
+      }else{
+        setTimeout(() => {
+          this.setData({ isReady: true, rotY: -20, preLoad: false })
+        }, 600)
+      }
+      setTimeout(()=>{
+        wx.hideNavigationBarLoading()
+      }, 300)
+    } else{
+      // loading
+      wx.setNavigationBarTitle({
+        title: '加载中※模仿录音',
+      })
+      this._avatars = []
+      let avatars = []
+      while (avatars.length < 18) {
+        avatars.push({ url: '', openid: '' })
+      }
+      this._loadSpin = setInterval(() => {
+        if (this.data.recordList.length == 0) {
+          this.avatarTap(true)
+        } else {
+          clearInterval(this._loadSpin)
+        }
+      }, 1000)
+      this.setData({ avatars })
+      this.getRecords()
+    }
+  },
+
   pickRecords(recordes){
     let _recordList = []
     let max = 2
+    console.log('this._showIdxs', this._showIdxs)
     while (recordes.length > this._showIdxs.length && _recordList.length < pageSize){
-      console.log('same max', max)
       this._step = Math.floor(pageSize / max)
       for (let [i, v] of recordes.entries()) {
         if (this._showIdxs.includes(i)) continue;
@@ -161,6 +208,8 @@ Page({
     this.setData({
       end: recordes.length == this._showIdxs.length,
       recordList,
+      requesting: false,
+      isReady: true
     })
   },
 
@@ -190,10 +239,16 @@ Page({
       requesting: false
     })
     this._recordes = recordList
+    wx.setStorageSync('_recordes', recordList)
     this.pickRecords(recordList)
+    wx.hideNavigationBarLoading()
+    wx.setNavigationBarTitle({
+      title: '式神录※模仿录音',
+    })
   },
 
   getRecords(silence = false) {
+    App.globalData.needReload = false
     wx.showNavigationBarLoading()
     let openid = App.globalData.openid
     wx.request({
@@ -217,10 +272,17 @@ Page({
           this.setData({ recordList })
         }else {
           this.initRecords(data)
-          setTimeout(()=>{
-            this.setData({ isReady: true, rotY: -20 })
-          }, 600)
         }
+      },
+      complete: (res) => {
+        if (!silence){
+          setTimeout(() => {
+            this.setData({ isReady: true, rotY: -20, preLoad: false })
+          }, 300)
+        }
+        setTimeout(()=>{
+          App.globalData.needReload = true
+        }, 10000)
       }
     })
   },
@@ -262,6 +324,7 @@ Page({
   },
 
   showComment(e) {
+    wx.vibrateShort()
     let currData = e.currentTarget.dataset
     let { idx, fid } = currData
     let userId = App.globalData.openid
@@ -555,6 +618,7 @@ Page({
   },
 
   toPerson(e) {
+    wx.vibrateShort()
     let masterId = e.currentTarget ? e.currentTarget.dataset.uid : e
     if (masterId == App.globalData.openid) {
       return wx.switchTab({
@@ -575,7 +639,7 @@ Page({
       let avatars = this.data.avatars
       let last = this._avatars.pop()
       let n = 0
-      while (avatars.filter(it => it.openid == last.openid).length != 0 && n < this._avatars.length) { // last已有
+      while (last && avatars.filter(it => it.openid == last.openid).length != 0 && n < this._avatars.length) { // last已有
         this._avatars.unshift(last)
         last = this._avatars.pop()
         n += 1

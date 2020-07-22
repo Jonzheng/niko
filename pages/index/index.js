@@ -53,6 +53,7 @@ Page({
     wx.setNavigationBarTitle({
       title: '式神录',
     })
+    this.setData({ hideCircle: App.globalData.hideCircle })
   },
 
   onHide: function () {
@@ -286,6 +287,7 @@ Page({
   },
 
   toDetail(e){
+    wx.vibrateShort()
     let fileId = e.currentTarget.dataset.id
     let url = `../detail/detail?fileId=${fileId}`
     App.toPage(url)
@@ -322,6 +324,8 @@ Page({
     }, 0)
   },
   toRecord(e) {
+    wx.vibrateShort()
+    this.setData({ hideCircle: true })
     let url = `../record/record`
     App.toPage(url)
   },

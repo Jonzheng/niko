@@ -671,6 +671,7 @@ Page({
   },
 
   toPerson(e) {
+    wx.vibrateShort()
     let masterId = e.currentTarget.dataset.uid
     if (masterId == App.globalData.openid){
       return wx.switchTab({
@@ -820,6 +821,7 @@ Page({
     })
   },
   showComment: function (e) {
+    wx.vibrateShort()
     let currData = e.currentTarget.dataset
     let { idx } = currData
     let userId = App.globalData.openid
@@ -989,6 +991,11 @@ Page({
     wx.redirectTo({
       url: _url
     })
+  },
+  toRecord(e) {
+    wx.vibrateShort()
+    let url = `../record/record`
+    App.toPage(url)
   },
 
 })

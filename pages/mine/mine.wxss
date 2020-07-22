@@ -528,8 +528,9 @@ page{
   align-items: center;
   justify-content: center;
   border: 1rpx solid #4a5fe2;
-  width: 100rpx;
-  height: 48rpx;
+  font-size: 26rpx;
+  width: 120rpx;
+  padding: 8rpx 0;
   color: #4a5fe2;
   background: rgba(bb,bb,bb,0.1);
   border-radius: 8rpx;
