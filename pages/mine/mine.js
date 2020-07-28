@@ -1,6 +1,10 @@
 const App = getApp()
 const { trim, host, formatDate, deAvatar } = require('../../utils/util')
 
+const cvColor = ['#dfdfdf', '#dfdfbf', '#95ddb2', '#92d1e5', '#ffb37c', '#ff6c00', '#ff0000', '#e52fec', '#841cf9', 'black', 'black']
+
+const Levels = [{ 'uv': 0, 'pv': -1 }, { 'uv': 1, 'pv': 1 }, { 'uv': 4, 'pv': 15 }, { 'uv': 9, 'pv': 53 }, { 'uv': 16, 'pv': 127 }, { 'uv': 25, 'pv': 249 }, { 'uv': 36, 'pv': 431 }, { 'uv': 49, 'pv': 685 }, { 'uv': 64, 'pv': 1023 }, { 'uv': 81, 'pv': 1457 }]
+
 Page({
 
   /**
@@ -15,41 +19,65 @@ Page({
     isMine: false,
     avatarUrl: 'https://avatar-1256378396.cos.ap-guangzhou.myqcloud.com/n_cm_0.png',
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    icon_more: "../../images/more.png",
     boxStyle: 'btn-play-box',
     anListen: '',
     isListen: false,
     listenStatus: 'listen-off',
     btnShow: false,
+    rePos: 0,
+    cvDescShow: 0,
+    cvColor,
+    levels:[0,1,2,3,4,5,6,7,8,9]
   },
 
   onLoad: function (options) {
     if (!App.globalData.openid) {
-      App.initOpenid().then(openid => {
-        console.log('App.initOpenid():', openid)
-        App.globalData.openid = openid
-        this.onLoad()
-      })
-      return
+      setTimeout(() => {
+        App.initOpenid().then(openid => {
+          console.log('App.initOpenid():', openid)
+          App.globalData.openid = openid
+          this.onLoad()
+        })
+      }, 600)
+    } else {
+      let openid = App.globalData.openid
+      this.init()
+      this.getUser(openid)
+      this.getRecords(openid)
+      App.getHeartSrc()
     }
-    let openid = App.globalData.openid
-    this.init()
-    this.getUser(openid)
-    this.getRecords(openid)
-    App.getHeartSrc()
   },
 
   onReady: function () {
     this._audioContextMaster = wx.createInnerAudioContext()
     this._audioContextMaster.onEnded(() => {
       this.setMasterStop();
-    });
+    })
+    this._ctx = []
+    for (let i = 0; i < 6; i++) {
+      this._ctx.push(wx.createInnerAudioContext())
+    }
+
+    this._audioContextMaster.onPlay(() => {
+      this._itMaster = setInterval(() => {
+        let curTime = this._audioContextMaster.currentTime || 0
+        let rePos = curTime / this._audioContextMaster.duration * 100
+        this.setData({
+          rePos
+        })
+      }, 30)
+    })
+
+    this._audioContextMaster.onStop(() => {
+      this.setMasterStop();
+    })
+
   },
 
   onShow() {
-    let hasLogin = App.globalData.hasLogin
-    let openid = App.globalData.openid
     setTimeout(() => {
+      let hasLogin = App.globalData.hasLogin || false
+      let openid = App.globalData.openid
       this.setData({ hasLogin })
       if (hasLogin) {
         let { newRecord, showName, motto } = App.globalData
@@ -119,7 +147,9 @@ Page({
             console.log('avatar_url empty!!!', userInfo)
             this.updateAvatar(userInfo)
           } else{
+            userInfo = this.computeCvLevel(userInfo)
             this.setData({
+              cv: userInfo.cv,
               userInfo
             })
           }
@@ -162,9 +192,10 @@ Page({
   },
   playHeartSrc() {
     App.getHeartSrc().then(heartSrc => {
-      this._ctx = wx.createInnerAudioContext()
-      this._ctx.src = heartSrc
-      this._ctx.play()
+      let ctx = this._ctx.pop()
+      this._ctx.unshift(ctx)
+      ctx.src = heartSrc
+      ctx.play()
     })
   },
   auth() {
@@ -178,8 +209,10 @@ Page({
   updateAvatar(userInfo) {
     App.initAvatar(userInfo).then(data => {
       console.log('updated!', data)
+      userInfo = this.computeCvLevel(data)
       this.setData({
-        userInfo: data,
+        cv: userInfo.cv,
+        userInfo,
         hasLogin: true
       })
     })
@@ -207,8 +240,8 @@ Page({
     if (!App.globalData.hasLogin) return
     wx.vibrateShort()
     let level = e.currentTarget.dataset.level
-    let { news, heartCount, followCount, fansCount } = this.data.userInfo
-    let url = `../news/news?level=${level}&news=${news}&heartCount=${heartCount}&followCount=${followCount}&fansCount=${fansCount}`
+    let { news, heartCount, followCount, fansCount, cv } = this.data.userInfo
+    let url = `../news/news?level=${level}&news=${news}&heartCount=${heartCount}&followCount=${followCount}&fansCount=${fansCount}&cv=${cv}`
     App.toPage(url)
     let openid = App.globalData.openid
     wx.request({
@@ -223,17 +256,25 @@ Page({
     })
   },
   getRecords(openid) {
+    if (this._loading) return
+    this._loading = true
     let masterId = openid
+    this.setData({ showLoading: true })
     wx.request({
       url: `${host}/queryRecord`,
       method: 'post',
       data: { masterId, openid },
       success: (res) => {
-        this.setData({
-          requesting: false
-        })
         let { data } = res
         this.initRecords(data)
+      },
+      complete: ()=>{
+        this._loading = false
+        this.setData({
+          showLoading: false,
+          requesting: false,
+          isReady: true,
+        })
       }
     })
   },
@@ -261,7 +302,7 @@ Page({
   // 按钮数据
   getUserInfo(e) {
     let userInfo = e.detail.userInfo
-    if(!userInfo) return
+    if (!userInfo) return
     this.updateAvatar(userInfo)
     wx.showToast({
       title: '登录成功',
@@ -281,6 +322,11 @@ Page({
         recordList,
       })
     }
+    this._audioContextMaster.seek(0)
+    if (this._itMaster > -1) clearInterval(this._itMaster)
+    this.setData({
+      rePos: 0
+    })
   },
 
   listen(e) {
@@ -363,7 +409,11 @@ Page({
       success: () => {
         let userInfo = this.data.userInfo
         userInfo['heartCount'] = status == 0 ? userInfo['heartCount'] + 1 : userInfo['heartCount'] - 1
-        this.setData({ userInfo })
+        userInfo = this.computeCvLevel(userInfo)
+        this.setData({
+          cv: userInfo.cv,
+          userInfo
+        })
         setTimeout(() => {
           this._updating = false
         }, 300)
@@ -620,5 +670,38 @@ Page({
     this.setData({
       aboutShow: false
     })
+  },
+  showTagDesc(e) {
+    wx.vibrateShort()
+    this.setData({
+      cvDescShow: 1
+    })
+  },
+  closeCvMask(){
+    this.setData({
+      cvDescShow: 0
+    })
+  },
+  computeCvLevel(userInfo){
+    let cv = userInfo.cv || 0
+    userInfo.heartCount = userInfo.heartCount || 0
+    userInfo.heartUv = userInfo.heartUv || 0
+    userInfo.uv = (cv + 1) ** 2
+    userInfo.pv = (cv + 1) ** 3 * 2 - 1
+    userInfo.uvWidth = userInfo.heartUv / userInfo.uv * 100
+    userInfo.uvWidth = userInfo.uvWidth < 100 ? userInfo.uvWidth : 100
+    userInfo.pvWidth = userInfo.heartCount / userInfo.pv * 100
+    userInfo.pvWidth = userInfo.pvWidth < 100 ? userInfo.pvWidth : 100
+    console.log(cv, userInfo.uv, userInfo.pv, userInfo.heartUv, userInfo.heartCount)
+    return userInfo
+  },
+
+  getCvLevel(uv, pv){
+    let cv = 0
+    for (let [idx, it] of Levels.entries()){
+      if (uv >= it.uv && pv >= it.pv) cv = idx
+    }
+    return cv
   }
+
 })

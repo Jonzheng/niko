@@ -1,5 +1,6 @@
-<image class="top-bg" src="{{bg}}" style="height:{{isIpx ? 260:200}}rpx;"></image>
-<view class="btn-back" bindtap="back" style="top:{{isIpx ? 110:60}}rpx;">
+<view class="top-bg" style="height:{{isIpx ? 260:200}}rpx;">
+  <view class="bg-cv" style="background: linear-gradient({{cvColor[cv]}}, {{cvColor[cv+1]}});"></view>
+</view><view class="btn-back" bindtap="back" style="top:{{isIpx ? 110:60}}rpx;">
   <image class="back" src="../../images/arrow-left.png"></image>
 </view>
 

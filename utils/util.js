@@ -1,4 +1,4 @@
-const host = 'https://nikoni.fun/api'
+const host = 'https://nikoni.fun/dev'
 
 const formatTime = date => {
   const year = date.getFullYear()
@@ -36,14 +36,14 @@ function formatDate(time) {
   if (today == _today) { // 今天的评论，显示具体时间
     let hour = date.getHours()
     let minute = date.getMinutes()
-    let dt = 'am'
-    if (hour > 12) {
-      dt = 'pm'
-      hour = hour - 12
-    }
+    // let dt = 'am'
+    // if (hour > 12) {
+    //   dt = 'pm'
+    //   hour = hour - 12
+    // }
     hour = hour < 10 ? '0' + hour : hour
     minute = minute < 10 ? '0' + minute : minute
-    return `今天 ${hour}:${minute} ${dt}`
+    return `今天 ${hour}:${minute}`
   } else { // 不是今天的评论，显示日期
     month = month < 10 ? '0' + month : month
     day = day < 10 ? '0' + day : day
@@ -55,6 +55,7 @@ function formatDate(time) {
  * 随机且固定的默认头像
  */
 function deAvatar(openid) {
+  openid = openid || 'foobar'
   let randInt = openid.codePointAt(openid.length - 1) % 9
   let avatar = `https://avatar-1256378396.cos.ap-guangzhou.myqcloud.com/de_avatar_${randInt}.png`
   return avatar

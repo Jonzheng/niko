@@ -79,6 +79,80 @@
   75%{transform: translate(-3rpx, 0)}
 }
 
+.tips-op{
+  color: #FF9966;
+  border-top: 1rpx solid #FF9966;
+  border-bottom: 1rpx solid #FF9966;
+  background: #F7F8FA;
+  border-radius: 8rpx;
+  padding: 6rpx 12rpx;
+  z-index: 6;
+  display: flex;
+  font-size: 24rpx;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.9;
+}
+
+.tips-tri-up {
+  width: 30rpx;
+  height: 30rpx;
+  position: absolute;
+  left: auto;
+  top: -15rpx;
+  transform: rotate(-315deg);
+  background: #F7F8FA;
+  border-left: 1rpx solid #FF9966;
+  border-top: 1rpx solid #FF9966;
+  z-index: -1;
+}
+
+.tips-tri-share {
+  width: 30rpx;
+  height: 30rpx;
+  position: absolute;
+  left: 74%;
+  top: -15rpx;
+  transform: rotate(-315deg);
+  background: #F7F8FA;
+  border-left: 1rpx solid #FF9966;
+  border-top: 1rpx solid #FF9966;
+  z-index: -1;
+}
+
+.tips-other{
+  position: absolute;
+  left: -56rpx;
+  top: 62rpx;
+}
+
+.tips-video{
+  position: absolute;
+  left: -20rpx;
+  top: 62rpx;
+  width: 103rpx;
+}
+
+.tips-cant-record{
+  position: absolute;
+  right: 26rpx;
+  top: 22rpx;
+}
+
+.tips-next{
+  position: absolute;
+  left: -20rpx;
+  top: 62rpx;
+  width: 102rpx;
+}
+
+.tips-share{
+  position: absolute;
+  left: -126rpx;
+  top: 62rpx;
+  width: 192rpx;
+}
+
 .box-tips{
   display: flex;
   align-items: center;
@@ -99,34 +173,49 @@
   align-items: center;
   justify-content: center;
 }
-.tips-record{
-  position: relative;
-  color: #337ab7;
-  border-bottom: 1rpx solid #337ab7;
-  background: #F7F8FA;
-  border-radius: 8rpx;
-  padding: 12rpx;
-  z-index: 6;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
 .tips-tri {
   width: 30rpx;
   height: 30rpx;
   position: absolute;
   bottom: -15rpx;
+  left: auto;
   transform: rotate(-315deg);
   background: #F7F8FA;
-  border-right: 1rpx solid #337ab7;
-  border-bottom: 1rpx solid #337ab7;
+  border-right: 1rpx solid #FF9966;
+  border-bottom: 1rpx solid #FF9966;
   z-index: -1;
 }
 
 .tips-word{
   line-height: 36rpx;
   z-index: 1;
+}
+
+.tips-btn-bottom{
+  font-size: 28rpx;
+  line-height: 36rpx;
+  z-index: 1;
+}
+
+.fade-out{
+  animation: fadeOut1 10s ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeOut1 {
+  0%, 5%{
+    opacity: 0.2;
+    transform: translateX(-320rpx) scale(0.2);
+  }
+  8%, 96%{
+    opacity: 9;
+    transform: translateX(0)  scale(1);
+  }
+  100% {
+    transform: translateX(-320rpx);
+    opacity: 0;
+  }
 }
 
 .an-out {
@@ -149,47 +238,44 @@
 }
 
 .box-line{
-  padding: 3rpx 0;
+  margin: 3rpx 0;
+  position: relative;
   min-height: 36rpx;
   display: flex;
   align-items: center;
+  overflow: hidden;
 }
 
 .out-share{
+  position: relative;
   display: flex;
   align-items: center;
   background: transparent;
   width: 50rpx;
   height: 50rpx;
+  overflow: visible;
 }
+
 .btn-share{
   width: 50rpx;
   height: 50rpx;
 }
 
 .out-btn{
+  position: relative;
   padding: 1rpx 25rpx;
   margin: 0 20rpx;
   border: 1rpx solid #337ab7;
   border-radius: 8rpx;
   width: 38rpx;
   height: 38rpx;
+  overflow: visible;
 }
 
 .btn-next, .btn-video{
   width: 36rpx;
   height: 36rpx;
   opacity: 0.8;
-}
-
-.btn-login{
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.1);
-  opacity: 0.1;
 }
 
 .sk-avatar{
@@ -592,16 +678,34 @@
 .ele-ori {
   display: flex;
   align-items: center;
+  justify-content: center;
   position: relative;
   width: 5rpx;
   box-shadow: 0px 0px 1rpx 1rpx #ffffff;
   transition: height 0.6s ease-in;
 }
 
+.ele-shape {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 6rpx;
+  box-shadow: 0px 0px 1rpx 1rpx #ffffff;
+  height: 0;
+  transition: height .3s ease-in-out;
+}
+
+.ele-shape-re {
+  width: 6rpx;
+  height: 0;
+  box-shadow: 0px 0px 1rpx 1rpx #ffffff;
+  transition: height .6s ease-in-out;
+}
+
 .cursor{
   position: absolute;
   width: 3rpx;
-  height: 110rpx;
+  height: 108rpx;
   background: #337ab7;
 }
 
@@ -684,17 +788,46 @@
 }
 
 .re-avatar, .comm-avatar{
-  margin: 8rpx 0;
-  margin-right: 8rpx;
-  width: 80rpx;
-  height: 80rpx;
+  position: relative;
+  width: 86rpx;
+  height: 86rpx;
   border-radius: 8rpx;
+  z-index: 9;
+}
+
+.frame-avatar {
+  position: relative;
+  width: 86rpx;
+  height: 86rpx;
+  border-radius: 3rpx;
+  z-index: 9;
+}
+
+.box-re-avatar{
+  position: relative;
+  border-radius: 8rpx;
+  margin-right: 8rpx;
+  width: 86rpx;
+  height: 86rpx;
+  overflow: hidden;
+}
+
+.avatar-frame{
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: rotate(-45deg) translate(-10rpx, -8rpx);
+  width: 60rpx;
+  height: 8rpx;
+  z-index: 11;
 }
 
 .re-width{
+  position: relative;
   width: 550rpx;
   display: flex;
   align-items: center;
+  margin-left: 20rpx;
 }
 
 .flex-right{
@@ -726,32 +859,29 @@
   transform: rotate(-45deg);
 }
 
-.btn-play-box{
+.re-tri{
+  position: absolute;
+  left: -8rpx;
+  top: auto;
+  width: 16rpx;
+  height: 16rpx;
+  transform: rotate(-45deg);
+  background: transparent;
+  border-left: 1rpx solid #ddd;
+  border-top: 1rpx solid #ddd;
+  z-index: 2;
+}
+
+.btn-listen{
   position: relative;
-  right:10rpx;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border: 1px #ddd solid; 
+  border: 3rpx #ddd solid; 
   border-radius: 4px;
   width:230rpx;
   height:60rpx;
-  z-index: 1px;
-  transition: width 0.2s ease-in;
-}
-
-.btn-play-box-sm{
-  position: relative;
-  right:10rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px #ddd solid; 
-  border-radius: 4px;
-  width:100rpx;
-  height:60rpx;
-  z-index: 1px;
-  transition: width 0.2s ease-out;
+  z-index: 1;
+  transition: width 0.3s ease-in;
 }
 
 .text-pub{
@@ -788,10 +918,6 @@
   transition: all 0.1s;
 }
 
-.an-breath{
-  animation: breath 2s infinite;
-}
-
 .listen-on{
   background-color: #ccc;
   width: 28rpx;
@@ -815,13 +941,22 @@
   flex-shrink: 0;
 }
 
-.box-record-right{
-  flex:1;
+.box-shape-re{
+  position: relative;
   height: 60rpx;
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 1;
+  width: 100%;
+}
+
+.re-idx{
+  position: absolute;
+  top: auto;
+  width: 5rpx;
+  height: 36rpx;
+  background: #337ab7;
+  box-shadow: 0 0 6rpx #fff;
+  transition: height .3s ease-in-out;
 }
 
 .btn-one {
@@ -971,108 +1106,18 @@
   animation: an-shad 3s linear infinite;
 }
 
-.an-playing{
-  animation: an-active 3s linear infinite;
-}
-
-@keyframes an-active{
-  50%{
-    box-shadow: 0 0 6rpx rgba(0, 0, 255, 0.9);
-    background: rgba(0, 0, 255, 0.5);
-  }
-}
-
 @keyframes an-shad{
-  50%{box-shadow: 0 0 10px rgba(0, 0, 255, 0.3) inset;}
-}
-
-@keyframes breath{
-  50%{opacity: 0.8}
-}
-
-@keyframes scay{
-  50%{transform: scaleY(0);}
-}
-
-@keyframes fadein{
-  25%{opacity: 0.25}
-  50%{opacity: 0.5}
-  100%{opacity: 1}
-}
-
-@keyframes toplay{
-  0%{opacity: 0.25;}
-  80%{opacity: 1;left:16%}
-  100%{opacity: 0}
-}
-
-@keyframes totop{
-  from{width:0%}
-  to{width:100%}
-}
-
-.mar-left{
-  margin-left: 10px;
-}
-
-.circle-foo{
-  position: relative;
-  width: 21px; 
-  height: 21px; 
-  border-radius: 50%;
-  background-color: #fff;
-  border: 1px #eee solid; 
-  box-shadow: 0px 0px 1px 1px #404040;
-}
-
-.btn-play-foo{
-  position: absolute;
-  left:7px;
-  top:3px;
-  color: #404040;
-  border-color: transparent transparent transparent #888;
-  border-width: 8px 0 8px 12px;
-  border-style: solid;
-}
-
-.record-bar{
-  border-radius: 3px;
-  border: 2px solid #999;
-  box-shadow: 0px 0px 2px 2px #ccc;
-
-  width: 0;
-}
-
-.record-bar-end{
-  border-radius: 3px;
-  border: 2px solid #999;
-  box-shadow: 0px 0px 2px 2px #ccc;
-
-  width: 100%;
-  transition: width 10s linear;
+  50%{box-shadow: 0 0 6px rgba(0, 0, 255, 0.2) inset;}
 }
 
 .my-progress-box{
   display: flex;
-  background: #ddd;
-  height: 8rpx;
-  width: 100%;
+  align-items: flex-end;
+  background: rgba(255, 240, 240, 0.95);
+  padding-bottom: 1rpx;
+  height: 0;
+  width: 748rpx;
+  border-bottom: 3rpx solid #337ab7;
+  transition: height .6s ease-in;
+  overflow: visible;
 }
-
-.an-totop{
-  animation: totop 10s linear;
-}
-
-.my-progress{
-  border: 1rpx solid #999;
-  box-shadow: 0px 0px 6rpx #666;
-  background: #bbb;
-}
-
-.my-progress-play{
-  position: relative;
-  bottom:4px;
-  border-radius: 1px;
-  border: 2px solid #ddd;
-}
-

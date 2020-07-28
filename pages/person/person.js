@@ -1,6 +1,8 @@
 const App = getApp()
 const { trim, host, formatDate, deAvatar } = require('../../utils/util')
 
+const cvColor = ['#dfdfdf', '#dfdfbf', '#95ddb2', '#92d1e5', '#ffb37c', '#ff6c00', '#ff0000', '#e52fec', '#841cf9', 'black', 'black']
+
 Page({
 
   /**
@@ -15,12 +17,14 @@ Page({
     isMine: false,
     avatarUrl: 'https://avatar-1256378396.cos.ap-guangzhou.myqcloud.com/n_cm_0.png',
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    icon_more: "../../images/more.png",
     boxStyle: 'btn-play-box',
     anListen: '',
     isListen: false,
     listenStatus: 'listen-off',
     btnShow: false,
+    rePos:0,
+    cvDescShow: 0,
+    cvColor
   },
 
   onLoad: function (options) {
@@ -34,22 +38,22 @@ Page({
           wx.redirectTo({ url })
         })
       }, 600)
-      return
+    } else {
+      this._masterId = masterId
+      if (App.globalData.openid == this._masterId) {
+        return wx.switchTab({
+          url: '/pages/mine/mine',
+        })
+      }
+      let pages = getCurrentPages()
+      this.setData({
+        home: pages.length == 1
+      })
+      this.getUser(masterId)
+      this.getRecords(masterId)
+      App.getHeartSrc()
     }
 
-    this._masterId = masterId
-    if (App.globalData.openid == this._masterId) {
-      return wx.switchTab({
-        url: '/pages/mine/mine',
-      })
-    }
-    let pages = getCurrentPages()
-    this.setData({
-      home: pages.length == 1
-    })
-    this.getUser(masterId)
-    this.getRecords(masterId)
-    App.getHeartSrc()
   },
 
   onReady: function () {
@@ -58,6 +62,25 @@ Page({
       this.setMasterStop();
     });
     this.setData({ isReady: true })
+    this._ctx = []
+    for (let i = 0; i < 6; i++) {
+      this._ctx.push(wx.createInnerAudioContext())
+    }
+
+    this._audioContextMaster.onPlay(() => {
+      this._itMaster = setInterval(() => {
+        let curTime = this._audioContextMaster.currentTime || 0
+        let rePos = curTime / this._audioContextMaster.duration * 100
+        this.setData({
+          rePos
+        })
+      }, 30)
+    })
+
+    this._audioContextMaster.onStop(() => {
+      this.setMasterStop();
+    })
+
   },
 
   onShow: function () {
@@ -120,7 +143,9 @@ Page({
         if (res && res.data) {
           let userInfo = res.data
           userInfo["deAvatar"] = deAvatar(openid)
+          userInfo = this.computeCvLevel(userInfo)
           this.setData({
+            cv: userInfo.cv,
             userInfo
           })
         }
@@ -157,9 +182,10 @@ Page({
   },
   playHeartSrc() {
     App.getHeartSrc().then(heartSrc => {
-      this._ctx = wx.createInnerAudioContext()
-      this._ctx.src = heartSrc
-      this._ctx.play()
+      let ctx = this._ctx.pop()
+      this._ctx.unshift(ctx)
+      ctx.src = heartSrc
+      ctx.play()
     })
   },
   toNews(e) {
@@ -264,6 +290,11 @@ Page({
         recordList,
       })
     }
+    this._audioContextMaster.seek(0)
+    if (this._itMaster > -1) clearInterval(this._itMaster)
+    this.setData({
+      rePos: 0
+    })
   },
 
   listen(e) {
@@ -613,5 +644,29 @@ Page({
         }
       }
     })
+  },
+  showTagDesc(e) {
+    wx.vibrateShort()
+    this.setData({
+      cvDescShow: 1
+    })
+  },
+  closeCvMask() {
+    this.setData({
+      cvDescShow: 0
+    })
+  },
+  computeCvLevel(userInfo) {
+    let cv = userInfo.cv || 0
+    userInfo.heartCount = userInfo.heartCount || 0
+    userInfo.heartUv = userInfo.heartUv || 0
+    userInfo.uv = (cv + 1) ** 2
+    userInfo.pv = (cv + 1) ** 3 * 2 - 1
+    userInfo.uvWidth = userInfo.heartUv / userInfo.uv * 100
+    userInfo.uvWidth = userInfo.uvWidth < 100 ? userInfo.uvWidth : 100
+    userInfo.pvWidth = userInfo.heartCount / userInfo.pv * 100
+    userInfo.pvWidth = userInfo.pvWidth < 100 ? userInfo.pvWidth : 100
+    console.log(cv, userInfo.heartUv, userInfo.heartCount, userInfo.uvWidth, userInfo.pvWidth)
+    return userInfo
   }
 })

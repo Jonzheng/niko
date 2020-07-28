@@ -7,8 +7,15 @@ page{
   width: 750rpx;
   height: 280rpx;
   overflow: hidden;
-  background: #ffffff;
+  background: rgba(245, 245, 240, 1);
   z-index: 9;
+  box-shadow: 0 0 10rpx #FFFFFF;
+}
+
+.bg-cv{
+  width: 100%;
+  height: 100%;
+  opacity: 0.1;
 }
 
 .box{
@@ -37,11 +44,17 @@ page{
   flex-direction: column;
 }
 
+.i-loading{
+  background: transparent;
+  width: 715rpx;
+  height: 715rpx;
+}
+
 .an-listen-on{
   animation: an-shad 3s linear infinite;
 }
 @keyframes an-shad{
-  50%{box-shadow: 0 0 10px rgba(0, 0, 255, 0.3) inset;}
+  50%{box-shadow: 0 0 6px rgba(0, 0, 255, 0.2) inset;}
 }
 
 .box-news{
@@ -66,6 +79,16 @@ page{
   height: 24rpx;
   width: 16rpx;
   right: 18rpx;
+}
+
+.mask-w{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 11;
+  background: rgba(255, 255, 255, .05);
 }
 
 .avatar-mask{
@@ -158,7 +181,7 @@ page{
   padding: 20rpx 20rpx;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   background: #ffffff;
 }
 
@@ -183,31 +206,56 @@ page{
 }
 
 .re-width{
+  position: relative;
   width: 620rpx;
   display: flex;
   align-items: center;
 }
 
-.btn-play-box{
-  border: 1px #ddd solid; 
-  border-radius: 4px;
-  width:230rpx;
-  height:60rpx;
-  z-index: 1px;
-  transition: width 0.2s ease-in;
+.re-idx{
+  position: absolute;
+  top: auto;
+  width: 5rpx;
+  height: 36rpx;
+  background: #337ab7;
+  transition: height .3s ease-in-out;
 }
 
-.btn-play-box-sm{
+.tag-tri{
+  position: absolute;
+  left: 28rpx;
+  top: -12rpx;
+  width: 20rpx;
+  height: 20rpx;
+  transform: rotate(45deg);
+  background: transparent;
+  border-left: 1rpx solid #ddd;
+  border-top: 1rpx solid #ddd;
+  z-index: 2;
+}
+.re-tri{
+  position: absolute;
+  left: -8rpx;
+  top: auto;
+  width: 16rpx;
+  height: 16rpx;
+  transform: rotate(-45deg);
+  background: transparent;
+  border-left: 1rpx solid #ddd;
+  border-top: 1rpx solid #ddd;
+  z-index: 2;
+}
+
+.btn-listen{
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border: 1px #ddd solid; 
+  border: 3rpx #ddd solid; 
   border-radius: 4px;
-  width:100rpx;
+  width:230rpx;
   height:60rpx;
-  z-index: 1px;
-  transition: width 0.2s ease-out;
+  z-index: 1;
+  transition: width 0.3s ease-in;
 }
 
 .box-paly-btn{
@@ -217,23 +265,6 @@ page{
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-.box-record-right{
-  flex:1;
-  height: 60rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 1;
-}
-.btn-play-foo{
-  position: absolute;
-  left:7px;
-  top:3px;
-  color: #404040;
-  border-color: transparent transparent transparent #888;
-  border-width: 8px 0 8px 12px;
-  border-style: solid;
 }
 
 .btn-one {
@@ -503,10 +534,102 @@ page{
 }
 
 .mine-coin {
-  margin: 3rpx 0;
-  height: 32rpx;
+  display: flex;
+  padding: 3rpx 0;
   font-size: 24rpx;
   color: #888888;
+}
+
+.box-tag {
+  position: relative;
+  display: flex;
+  margin: 6rpx 0;
+}
+
+.box-tag-desc{
+  position: absolute;
+  left: 0;
+  top: 56rpx;
+  background: rgba(255, 255, 255, 1);
+  border: 3rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  width: 420rpx;
+  height: 260rpx;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  z-index: 3;
+  transition: opacity .3s ease-in;
+}
+
+.cv-from-to{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tag-desc{
+  padding: 10rpx 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tag-desc .text{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20rpx;
+  margin-bottom: 10rpx;
+  font-size: 24rpx;
+  color: #bbb;
+}
+
+.tag-desc .text-sp{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-top: 20rpx;
+  font-size: 20rpx;
+  color: #ccc;
+}
+
+.tag-desc .bar{
+  height: 8rpx;
+  box-shadow: 0 0 8rpx #fff;
+}
+
+.tag-desc .bar-p{
+  height: 8rpx;
+  transition: width .6s ease-in;
+  border-left: 1rpx solid #ccc;
+}
+
+
+.tag-name{
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 18rpx;
+  width: 48rpx;
+  height: 40rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  letter-spacing: 3rpx;
+  color: #fff;
+}
+
+.tag-level{
+  position: absolute;
+  top: -1rpx;
+  right: 8rpx;
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: bold;
 }
 
 .mine-right{
@@ -548,14 +671,18 @@ page{
   display: flex;
   align-items: center;
   flex-direction: column;
+  font-size: 32rpx;
 }
 
 .menu-num{
-  color: rgba(91,92,110,0.8)
+  color: #666;
+  font-weight: bold;
+  text-shadow: 0 0 3rpx #fff;
 }
 
 .menu-label{
-  color: rgba(91,92,110,0.9)
+  color: #666;
+  text-shadow: 0 0 3rpx #fff;
 }
 
 .userinfo {

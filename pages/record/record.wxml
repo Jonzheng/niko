@@ -1,4 +1,4 @@
-  <button wx:if="{{!hasLogin && canIUse}}" class="get-user"
+  <button wx:if="{{!hasLogin}}" class="get-user"
     size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
   </button>
   <view class="box-avatars" bind:touchstart="moveStart" bind:touchend="moveEnd">
@@ -6,7 +6,16 @@
       <block wx:for="{{avatars}}" wx:key="index">
         <view class="out-avatar" catchtap="autoRot" data-uid="{{item.openid}}"
             style="transform: rotateY({{index *20}}deg) translateZ(320rpx)">
-          <image class="avatar {{isReady ? 'an-spin':''}}" src="{{isReady ? item.url: preLoad && index%2==0 ? '../../images/loading-1.png':''}}"></image>
+
+          <!-- <image class="avatar {{isReady ? 'an-spin':''}}" src="{{isReady ? item.url: preLoad && index%2==0 ? 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-1.png':''}}"></image> -->
+
+          <view class="box-re-avatar level-border-{{item.cv}}">
+            <view class="avatar-frame level-{{item.cv}}"></view>
+            <image src="{{isReady ? item.url: preLoad && index%2==0 ? 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-1.png':''}}"
+              class="{{isReady ? 'an-spin':''}} {{item.cv > 0 ?'frame-avatar':'avatar'}}">
+            </image>
+          </view>
+
         </view>
       </block>
     </view>
@@ -27,9 +36,9 @@
       bind:refresh="refresh"
       bind:more="more">
       <view class="record-list box-pd">
-        <image wx:if="{{preLoad && recordList.length == 0}}" class="{{preLoad ? 'i-loading':'i-hide'}}" src="../../images/loading-0.png"></image>
-        <block wx:for="{{recordList}}" wx:key="mkey">
-          <template is="ele-master" data="{{...item,index,icon_more,icon_comm,icon_zan_em,icon_zan_fu}}"/>
+        <image wx:if="{{preLoad && recordList.length == 0}}" class="{{preLoad ? 'i-loading':'i-hide'}}" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-0.png"></image>
+        <block wx:for="{{recordList}}" wx:key="index">
+          <template is="ele-master" data="{{...item,index,rePos,cvColor}}"/>
         </block>
       </view>
   </scroll>
@@ -75,27 +84,26 @@
       <view class="date">{{dateStr}}</view>
     </view>
     <view class="box-line">
-      <image src="{{avatar_url || deAvatar}}" class="re-avatar"
-      bindtap="toPerson" data-uid="{{openid}}"></image>
-      <view class="tri"></view>
+      <view class="box-re-avatar level-border-{{cv}}">
+        <view class="avatar-frame level-{{cv}}"></view>
+        <image src="{{avatar_url || deAvatar}}" class="{{cv > 0 ?'frame-avatar':'re-avatar'}}" bindtap="toPerson" data-uid="{{openid}}"></image>
+      </view>
       <view class="re-width">
-        <view class="{{boxStyle}} {{anListen}}"
+        <view class="re-tri"></view>
+        <view class="btn-listen {{isListen?'an-listen-on':''}}"
+          style="width: {{btnRt=='rt-90' ? 100 : 320}}rpx;border:3rpx solid {{cvColor[cv]}}"
           catchtap="listen" data-idx="{{index}}" data-rid="{{record_id}}">
           <view class='box-paly-btn'>
-            <view hidden="{{isListen}}" class="btn-one"></view>
-            <view class="btn-two {{listenStatus}}"></view>
-            <view hidden="{{isListen}}" class="btn-three"></view>
+            <view hidden="{{isListen}}" class="btn-one" style="background: {{cvColor[cv]}}"></view>
+            <view class="btn-two {{isListen?'listen-on':'listen-off'}}" style="background: {{cvColor[cv]}}"></view>
+            <view hidden="{{isListen}}" class="btn-three" style="background: {{cvColor[cv]}}"></view>
           </view>
-          <view class='box-record-right'>
-            <block wx:for="{{isLoading}}" wx:key="mkey">
-              <view class="play-foo" style="animation: scay 2s infinite {{item}}s;"></view>
-            </block>
-          </view>
+          <view wx:if="{{isListen}}" class="re-idx" style="height:{{rePos>0 ? 56:0}}rpx;left:{{rePos}}%;background: {{cvColor[cv]}}"></view>
         </view>
         <view wx:if="{{btnShow}}" class="text-pub {{btnShow ? 'btn-re':'btn-re-hide'}}" catchtap='delRecordConfirm'
           data-idx="{{index}}" data-rid="{{record_id}}">撤回</view>
       </view>
-      <image wx:if="{{isMine}}" src="{{icon_more}}" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
+      <image wx:if="{{isMine}}" src="../../images/more.png" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
     </view>
     <view class="box-line flex-right">
       <view class="menu-comm" bindtap='updateHeart' data-idx="{{index}}" data-fid="{{file_id}}" data-status="{{heart_ud}}">
@@ -104,7 +112,7 @@
       </view>
       <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-fid="{{file_id}}">
         <view class="text-heart">{{comm}}</view>
-        <image src="{{icon_comm}}" class="icon-comm"></image>
+        <image src="../../images/comm.png" class="icon-comm"></image>
       </view>
     </view>
   </view>

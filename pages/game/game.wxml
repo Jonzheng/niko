@@ -35,7 +35,7 @@
 
     <view class='box-link' hidden='{{!top_hide}}'>
 
-      <block wx:if="{{!showResult}}" wx:for="{{fields}}" wx:key="mkey" wx:for-index="idx">
+      <block wx:if="{{!showResult}}" wx:for="{{fields}}" wx:key="index" wx:for-index="idx">
         <template is="level-1" data="{{item,idx,cosmap,bgc}}"/>
       </block>
 
@@ -80,7 +80,7 @@
 
       <view class='box-kana' hidden='{{option != 1}}'>
         <view wx:if="{{tipsPuzon}}" class="tips-puzon" style="top:140rpx;">长按方块查看练度</view>
-        <block wx:for="{{ks_all}}" wx:key="mkey" wx:for-index="row">
+        <block wx:for="{{ks_all}}" wx:key="index" wx:for-index="row">
           <template is="all-kana" data="{{item,row,is_max,puzon,puz_map}}"/>
         </block>
         <view class="setting-meun">
@@ -126,7 +126,7 @@
               bind:refresh="refresh"
               bind:more="more">
             <view class="cells">
-              <block wx:for="{{ranks}}" wx:key="mkey" wx:for-index="idx">
+              <block wx:for="{{ranks}}" wx:key="index" wx:for-index="idx">
                 <template is="rank-0" data="{{...item,idx,bgc}}"/>
               </block>
             </view>
@@ -150,7 +150,7 @@
           </view>
 
           <view class="box-item">
-            <block wx:for="{{myclst}}" wx:key="mkey" wx:for-index="idx">
+            <block wx:for="{{myclst}}" wx:key="index" wx:for-index="idx">
               <template is="item-bgc" data="{{...item,bgc,stn}}"/>
             </block>
           </view>
@@ -200,7 +200,7 @@
         <view class="shop-title">※道具商店※</view>
         <view class="shop-line"></view>
         <view class="box-item">
-          <block wx:for="{{bgk}}" wx:key="mkey" wx:for-index="idx">
+          <block wx:for="{{bgk}}" wx:key="index" wx:for-index="idx">
             <template is="item-bgc" data="{{...item,bgc,stn}}"/>
           </block>
         </view>
@@ -234,7 +234,7 @@
 
 <template name="level-1">
   <view class="box-row">
-    <block wx:for="{{item}}" wx:key="mkey" wx:for-index="idx">
+    <block wx:for="{{item}}" wx:key="index" wx:for-index="idx">
       <view class='step-out' data-row="{{item.row}}" data-col="{{item.col}}" data-roma="{{item.roma}}"
         data-word="{{item.word}}" bindtap="goLink" bindlongpress="showRoma">
         <view class='step-box {{item.word == "" ? "rt-90":""}}' hover-class='step-hover'>
@@ -255,7 +255,7 @@
       <image class='user-avatar' src='{{avatar_url || deAvatar}}'></image>
       <view class='box-user-name'>
         <view class='user-myco'>
-          <block wx:for="{{colst}}" wx:key="mkey">
+          <block wx:for="{{colst}}" wx:key="index">
             <view class='step-box rt-45'>
               <view class='step-sm {{bgc[item]}}'></view>
             </view>
@@ -272,7 +272,7 @@
 <!-- 设定假名 -->
 <template name="all-kana">
   <view class="row-kana">
-    <block wx:for="{{item}}" wx:key="mkey" wx:for-index="col">
+    <block wx:for="{{item}}" wx:key="index" wx:for-index="col">
       <view class='col-kana {{item.selected ? "kana-active":""}} {{is_max && item.selected ? "kana-max":""}}'
       hover-class='kana-hover' data-row="{{row}}" data-col="{{col}}" bindtap="select" bindlongpress="showPuz">
         <view class='col-hira {{item.selected ? "kata-color":""}}'>{{item.hira}}</view>

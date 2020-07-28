@@ -1,6 +1,7 @@
-<image class="top-bg" src="{{bg}}" style="height:{{isIpx ? 300:''}}rpx;"></image>
-<!-- <view class="top-bg"  style="{{isIpx ? 'height: 340rpx;':''}}"></view> -->
-
+<view class="top-bg" style="height:{{isIpx ? 340:280}}rpx;">
+  <view class="bg-cv" style="background: linear-gradient({{cvColor[userInfo.cv]}}, {{cvColor[userInfo.cv+1]}});"></view>
+</view>
+<view wx:if="{{cvDescShow}}" class="mask-w" catchtap="closeCvMask"></view>
 <view class="box">
   <view class="top-mine">
     <image class="avatar {{admini ? 'admini':''}}" src="{{userInfo.avatar_url || detaultAvatar}}"
@@ -55,8 +56,41 @@
         <image class="arrow" src="../../images/arrow-left.png"></image>
       </view>
     </view>
-    <view class="mine-coin">硬币：1</view>
     <view class="mine-coin">{{userInfo.motto ? userInfo.motto : motto}}</view>
+    <view class="box-tag">
+        <view class="tag-name" catchtap="showTagDesc" style="background:{{cvColor[userInfo.cv]}}">
+          CV
+          <view class="tag-level">{{userInfo.cv}}</view>
+        </view>
+          <view class="box-tag-desc" style="opacity: {{cvDescShow}};visibility:{{cvDescShow == 1?'visible':'hidden'}}">
+            <view class="tag-tri"></view>
+              <view class="cv-from-to">
+                <view class="tag-name" style="background:{{cvColor[userInfo.cv]}}">
+                  CV
+                  <view class="tag-level">{{userInfo.cv}}</view>
+                </view>
+                <view class="tag-name" style="background:{{cvColor[userInfo.cv+1]}}">
+                  CV
+                  <view class="tag-level">{{userInfo.cv+1}}</view>
+                </view>
+              </view>
+              <view class="tag-desc">
+                <view class="bar" style="background: linear-gradient(to right, {{cvColor[userInfo.cv]}}, {{cvColor[userInfo.cv+1]}});"></view>
+                <view class="text">
+                  <view>点赞人数：{{userInfo.heartUv}}</view>
+                  <view>升级需要：{{userInfo.uv}}</view>
+                </view>
+                <view class="bar-p" style="width:{{userInfo.uvWidth}}%;background:{{userInfo.uvWidth >= 100 ? cvColor[userInfo.cv+1]:cvColor[userInfo.cv]}}"></view>
+                <view class="text">
+                  <view>点赞次数：{{userInfo.heartCount}}</view>
+                  <view>升级需要：{{userInfo.pv}}</view>
+                </view>
+                <view class="bar-p" style="width:{{userInfo.pvWidth}}%;background:{{userInfo.pvWidth >= 100 ? cvColor[userInfo.cv+1]:cvColor[userInfo.cv]}}"></view>
+                <view class="text-sp">※满足以上两个条件时cv等级up</view>
+
+              </view>
+          </view>
+    </view>  <!-- box-tag-end -->
   </view>
 
   <view class="box-records">
@@ -66,26 +100,25 @@
       <image class="icon-next" src="../../images/news-next.png"></image>
     </view>
     <view class="record-label">cv模仿录音：</view>
-    <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
-    <block wx:for="{{recordList}}" wx:key="mkey">
+    <view wx:if="{{isReady && recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
+    <image wx:if="{{showLoading}}" class="i-loading" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-1.png"></image>
+    <block wx:for="{{recordList}}" wx:key="index">
       <view class="item-record">
         <view class="box-col">
           <view class="serifu" bindtap="toDetail" data-id="{{item.file_id}}">{{item.ser}}</view>
 
           <view class="box-line">
             <view class="re-width">
-              <view class="{{item.boxStyle}} {{item.anListen}}"
+              <view class="re-tri"></view>
+              <view class="btn-listen {{item.isListen?'an-listen-on':''}}"
+                style="width: {{item.btnRt=='rt-90' ? 100 : 320}}rpx;border:3rpx solid {{cvColor[cv]}}"
                 catchtap="listen" data-idx="{{index}}" data-rid="{{item.record_id}}">
                 <view class='box-paly-btn'>
-                  <view hidden="{{item.isListen}}" class="btn-one"></view>
-                  <view class="btn-two {{item.listenStatus}}"></view>
-                  <view hidden="{{item.isListen}}" class="btn-three"></view>
+                  <view hidden="{{isListen}}" class="btn-one" style="background: {{cvColor[cv]}}"></view>
+                  <view class="btn-two {{isListen?'listen-on':'listen-off'}}" style="background: {{cvColor[cv]}}"></view>
+                  <view hidden="{{isListen}}" class="btn-three" style="background: {{cvColor[cv]}}"></view>
                 </view>
-                <view class='box-record-right'>
-                  <block wx:for="{{isLoading}}" wx:key="mkey">
-                    <view class="play-foo" style="animation: scay 2s infinite {{item}}s;"></view>
-                  </block>
-                </view>
+                <view wx:if="{{item.isListen}}" class="re-idx" style="height:{{rePos>0 ? 56:0}}rpx;left:{{rePos}}%;background: {{cvColor[cv]}}"></view>
               </view>
               <block wx:if="{{item.btnShow}}">
                 <view wx:if="{{item.status == 1}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
@@ -96,7 +129,7 @@
                   data-idx="{{index}}" data-rid="{{item.record_id}}">删除</view>
               </block>
             </view>
-            <image src="{{icon_more}}" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
+            <image src="../../images/more.png" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
           </view>
 
           <view class="box-line flex-space">

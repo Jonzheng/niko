@@ -2,39 +2,22 @@ const App = new getApp()
 const RecordBucket = 'record-1256378396'
 const Region = 'ap-guangzhou'
 const { trim, host, formatDate, deAvatar } = require('../../utils/util')
+const cvColor = ['#dfdfdf', '#dfdfbf', '#95ddb2', '#92d1e5', '#ffb37c', '#ff6c00', '#ff0000', '#e52fec', '#841cf9', 'black', 'black']
 
-const recorderManager = wx.getRecorderManager()
-const options = {
-  duration: 10000,
+const RecorderManager = wx.getRecorderManager()
+const Options = {
+  duration: 12000,
   sampleRate: 44100,
   numberOfChannels: 2,
   encodeBitRate: 320000,
   format: 'mp3',
   frameSize: 50
 }
-const dura = options.duration / 1000
-
-const zanOff = "../../images/zan-off.png"
-const zanOn = "../../images/zan-on.png"
 
 const userId = 'ocVQY4-dF2m4IiYTTJZFo6k-NZbE'
 
-function _next() {
-  let _progress = this.data.progress_record
-  if (!this.data.isRecording) {
-    return true;
-  }
-  if (_progress >= 100) {
-    _progress = 100;
-    return true
-  }
-  this.setData({
-    progress_record: _progress + 2
-  });
-  setTimeout( ()=> {
-    _next.call(this);
-  }, 200);
-}
+let Shape = [...Array(137)].map((v, idx) => v = { height: 0, idx })
+let Shadow = [...Array(166)].map((v, idx) => v = { height: 0, idx })
 
 Page({
   data: {
@@ -44,26 +27,24 @@ Page({
     oriPlaying: false,
     recordList: [],
     oriIdx: 0,
-    icon_omoz: 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/omoz_sm.png',
-    icon_trash: "../../images/trash.png",
-    icon_upload: "../../images/upload.png",
-    icon_record: "../../images/record.png",
-    icon_comm: "../../images/comm.png",
-    icon_more: "../../images/more.png",
+    mineIdx: 0,
+    rePos: 0,
+    logo: 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/omoz_sm.png',
     reId: '',
     reName: '',
     reContent: '',
-    icon_zan_em: zanOff,
-    icon_zan_fu: zanOn,
     progress_record: 0,
     hasTmp: false,
     isRecording: false,
-    isPlaying: false,
+    minePlaying: false,
     rt90: true,
     color: "#4a5fe2",
     requesting: false,
     bottomSize: 0,
     commentList: [],
+    shadow: Shadow,
+    shape: Shape,
+    cvColor
   },
 
   onLoad: function (options) {
@@ -77,18 +58,19 @@ Page({
           wx.redirectTo({ url })
         })
       }, 600)
-      return
+    } else {
+      this.initPageData(fileId)
+      this._title = '式神录'
+      this.setData({
+        fileId,
+        isIpx: App.globalData.isIpx,
+        userId: App.globalData.openid,
+        hasLogin: App.globalData.hasLogin,
+      })
+      setTimeout(() => { this.setData({ rt90: false }) }, 300)
+      App.getHeartSrc()
+      this._cantRecord = 0
     }
-    this.initPageData(fileId)
-    this._title = '式神录'
-    this.setData({
-      fileId,
-      isIpx: App.globalData.isIpx,
-      userId: App.globalData.openid,
-      hasLogin: App.globalData.hasLogin,
-    })
-    setTimeout(() => { this.setData({ rt90: false }) }, 300)
-    App.getHeartSrc()
   },
 
   onShow() {
@@ -128,13 +110,16 @@ Page({
     this._audioContextOri = wx.createInnerAudioContext()
     this._audioContextMaster = wx.createInnerAudioContext()
     this._audioContextMine = wx.createInnerAudioContext()
+    this._ctx = []
+    for (let i = 0; i < 6; i++) {
+      this._ctx.push(wx.createInnerAudioContext())
+    }
     // wx.setInnerAudioOption({ 'obeyMuteSwitch': false })
     // console.log('obeyMuteSwitch:',this._audioContextOri.obeyMuteSwitch)
     this._audioContextOri.onPlay(() => {
       wx.hideNavigationBarLoading()
-      console.log(this._audioContextOri.currentTime)
-      let _len = this.data.shadow.length
-      this._oriIter = setInterval(()=>{
+      let _len = this.data.shadow.filter(it=>it.height>0).length
+      this._itOri = setInterval(()=>{
         let curTime = this._audioContextOri.currentTime || 0
         let idx = curTime / this._audioContextOri.duration * _len
         let oriIdx = Math.round(idx)
@@ -142,23 +127,58 @@ Page({
           oriIdx
         })
       }, 30)
-      console.log("audioContextOri...")
       this.setData({
         oriPlaying: true,
-      });
-    });
+      })
+    })
 
     this._audioContextOri.onEnded(() => {
       this.setOriStop();
-    });
+      let tipsRecord = wx.getStorageSync('tipsRecord')
+      if (!tipsRecord && !this.data.tipsRecord) {
+        wx.setStorageSync('tipsRecord', true)
+        setTimeout(() => {
+          this.setData({ tipsRecord: '录音模仿一下吧' })
+          setTimeout(() => {
+            this.setData({ tipsRecord: '录音模仿一下吧, 网友!' })
+            setTimeout(() => {
+              this.setData({ tipsRecord: '' })
+            }, 9500)
+          }, 3000)
+        }, 500)
+      } else if (!this.data.tipsRecord) {
+        if (!this._btnTipsShow) {
+          this._btnTipsShow = true
+          let tipsDetailBtns = wx.getStorageSync('tipsDetailBtns') || 0
+          tipsDetailBtns += 1
+          console.log('tipsDetailBtns:', tipsDetailBtns)
+          wx.setStorageSync('tipsDetailBtns', tipsDetailBtns)
+          this.setData({ tipsDetailBtns })
+          setTimeout(() => {
+            this._btnTipsShow = false
+          }, 10000)
+        }
+      }
+    })
 
     this._audioContextOri.onStop(() => {
       this.setOriStop();
-    });
+    })
 
     this._audioContextMaster.onPlay(() => {
       wx.hideNavigationBarLoading()
+      this._itMaster = setInterval(() => {
+        let curTime = this._audioContextMaster.currentTime || 0
+        let rePos = curTime / this._audioContextMaster.duration * 100
+        this.setData({
+          rePos
+        })
+      }, 30)
     })
+
+    this._audioContextMaster.onStop(() => {
+      this.setMasterStop();
+    });
 
     this._audioContextMaster.onEnded(() => {
       this.setMasterStop();
@@ -185,26 +205,49 @@ Page({
       this.setMineStop();
     });
 
+    this._audioContextMine.onPlay(() => {
+      console.log(this._audioContextMine.currentTime)
+      let _len = this.data.shape.filter(it=>it.height>0).length
+      this._itMine = setInterval(() => {
+        let curTime = this._audioContextMine.currentTime || 0
+        let idx = curTime / this._audioContextMine.duration * _len
+        let mineIdx = Math.round(idx)
+        this.setData({
+          mineIdx
+        })
+      }, 30)
+      this.setData({
+        minePlaying: true,
+      });
+    });
+
     //----监听录音------------
-    recorderManager.onStart(() => {
-      console.log('start,dura:' + dura)
+    RecorderManager.onStart(() => {
       this.setData({
         isRecording: true,
-        dura: dura,
         isPlayed: false,
       })
-      _next.call(this);
+      let idx = 0
+      let shape = Shape
+      this._itRer = setInterval(()=>{
+        if (!shape[idx]) return
+        let height = idx > 5 ? Math.round(Math.random() * 30) + 5 : 10+idx*2
+        height = height < 2 ? 3 : height
+        shape[idx].height = height
+        this.setData({ shape })
+        idx += 1
+      }, 87)
     })
 
-    recorderManager.onStop((res) => {
+    RecorderManager.onStop((res) => {
       console.log(res)
-      let progress_record = res.duration / options.duration * 100
       this._tempFile = res
       this.setData({
-        progress_record,
         isRecording: false,
         hasTmp: true
       })
+      console.log('this._tempFile', this._tempFile.duration)
+      clearInterval(this._itRer)
     })
   },
 
@@ -250,9 +293,10 @@ Page({
   },
   playHeartSrc(){
     App.getHeartSrc().then(heartSrc => {
-      this._ctx = wx.createInnerAudioContext()
-      this._ctx.src = heartSrc
-      this._ctx.play()
+      let ctx = this._ctx.pop()
+      this._ctx.unshift(ctx)
+      ctx.src = heartSrc
+      ctx.play()
     })
   },
 
@@ -346,9 +390,10 @@ Page({
   initSerifu(curList) {
     let { title, serifu, koner, roma } = curList
     let fileId = curList.file_id
+    let ver = fileId.split('_')[3]
     let ts = title.split('_')
     let cname = ts[0]
-    let skill = ts[1]
+    let skill = `${ts[1]}_${ver}`
 
     let serifuList = []
     let words = []
@@ -441,7 +486,10 @@ Page({
           let recordList = record
           this.initSerifu(curList)
           this.initRecords(recordList)
-          list.map((item)=> item['ser'] = trim(item.serifu))
+          list.map((item)=> {
+            item['ser'] = trim(item.serifu)
+            item['title'] = item.title + '_' + item.file_id.split('_')[3]
+          })
           console.log(list)
           let shadow = curAudio.shadow.split(",").map((height, idx)=>{ return { idx, height } })
           let srcVideo = curList.src_video.trim()
@@ -451,7 +499,7 @@ Page({
             list,
             shadow
           })
-
+          
         }else{
           wx.showToast({
             icon: 'none',
@@ -482,28 +530,11 @@ Page({
   setOriStop() {
     wx.hideNavigationBarLoading()
     this._audioContextOri.seek(0)
-    console.log('end', this._audioContextOri.currentTime)
-    if (this._oriIter > -1){
-      clearInterval(this._oriIter)
-    }
+    if (this._itOri > -1) clearInterval(this._itOri)
     this.setData({
       oriIdx: 0,
       oriPlaying: false,
     });
-
-    let tipsRecord = wx.getStorageSync('tipsRecord')
-    if (!tipsRecord && !this.data.tipsRecord){
-      wx.setStorageSync('tipsRecord', true)
-      setTimeout(()=>{
-        this.setData({ tipsRecord: '录音模仿一下吧' })
-        setTimeout(()=>{
-          this.setData({ tipsRecord: '录音模仿一下吧, 网友!' })
-          setTimeout(() => {
-            this.setData({ tipsRecord: '' })
-          }, 9500)
-        }, 3000)
-      }, 500)
-    }
   },
 
   setMasterStop() {
@@ -519,11 +550,19 @@ Page({
         recordList,
       })
     }
+    this._audioContextMaster.seek(0)
+    if (this._itMaster > -1) clearInterval(this._itMaster)
+    this.setData({
+      rePos: 0
+    })
   },
 
   setMineStop() {
+    if (this._itMine > -1) clearInterval(this._itMine)
+    this._audioContextMine.seek(0)
     this.setData({
-      isPlaying: false,
+      mineIdx: 0,
+      minePlaying: false,
       isPlayed: true
     })
   },
@@ -532,7 +571,7 @@ Page({
     wx.vibrateShort()
     let curAudio = this.data.curAudio
     this._audioContextOri.src = curAudio.src_audio
-    if (!this.data.oriPlaying) {
+    if (!this.data.oriPlaying && !this.data.isRecording) {
       wx.showNavigationBarLoading()
       this._audioContextOri.play()
     } else {
@@ -572,18 +611,19 @@ Page({
 
   //录音
   startRecord() {
+    this.canIRecord()
     wx.vibrateShort()
     this.setMasterStop()
     wx.setStorageSync('tipsRecord', true)
     this.setData({ tipsRecord: '' })
-    if (this.data.isPlaying) {
+    if (this.data.minePlaying) {
       this._audioContextMine.stop()
     }
     this.stopOri()
     if (!this.data.isRecording) {
-      recorderManager.start(options)
+      RecorderManager.start(Options)
     } else {
-      recorderManager.stop()
+      RecorderManager.stop()
       this.setData({
         isRecording: false,
         hasTmp: true,
@@ -593,27 +633,26 @@ Page({
 
   clearTemp() {
     wx.vibrateShort()
+    if (this.data.minePlaying) {
+      this._audioContextMine.stop()
+    }
     this._tempFile = null
+    Shape.map(it=>it.height = 0)
     this.setData({
+      mineIdx: 0,
       hasTmp: false,
-      progress_record: 0
+      shape: Shape
     })
-    return
   },
 
   playMyVoice() {
     wx.vibrateShort()
     if (this.data.isRecording) return
     if (this._tempFile) {
-      let recordFile = this._tempFile.tempFilePath
-      console.log('recordFile:', recordFile)
-      this._audioContextMine.src = recordFile
-      if (!this.data.isPlaying) {
+      console.log('this._tempFile.tempFilePath:', this._tempFile.tempFilePath)
+      this._audioContextMine.src = this._tempFile.tempFilePath
+      if (!this.data.minePlaying) {
         this._audioContextMine.play()
-        this.setData({
-          isPlaying: true,
-          recordFile
-        })
       } else {
         this._audioContextMine.stop()
       }
@@ -755,8 +794,7 @@ Page({
     wx.showLoading({
       title: '上传中...',
     })
-    let recordFile = this.data.recordFile
-    console.log("recordFile:", recordFile)
+    let recordFile = this._tempFile.tempFilePath
     let masterId = App.globalData.openid
     let fileId = this.data.fileId
     let recordId = fileId + new Date().getTime()
@@ -797,11 +835,7 @@ Page({
             })
           },
           complete: ()=>{
-            this._tempFile = null
-            this.setData({
-              hasTmp: false,
-              progress_record: 0
-            })
+            this.clearTemp()
           }
         })
       }
@@ -997,5 +1031,22 @@ Page({
     let url = `../record/record`
     App.toPage(url)
   },
+
+  canIRecord(){
+    wx.getSetting({
+      success: res => {
+        if (!res.authSetting['scope.record'] && !this.data.tipsCantRecord) {
+          this._cantRecord += 1
+          if (this._cantRecord > 1){
+            wx.vibrateLong()
+            this.setData({ tipsCantRecord: true })
+            setTimeout(()=>{
+              this.setData({ tipsCantRecord: false })
+            }, 10000)
+          }
+        }
+      }
+    })
+  }
 
 })

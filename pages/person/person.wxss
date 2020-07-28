@@ -32,9 +32,3 @@
   background: rgba(bb,bb,bb,0.1);
   border-radius: 8rpx;
 }
-
-.i-loading{
-  background: transparent;
-  width: 715rpx;
-  height: 715rpx;
-}

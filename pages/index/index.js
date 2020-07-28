@@ -33,6 +33,7 @@ Page({
     refreshSize: 0,
     topSize: 90,
     bottomSize: 0,
+    hideCircle: true
   },
 
   onLoad: function (options) {
@@ -54,11 +55,15 @@ Page({
       title: '式神录',
     })
     this.setData({ hideCircle: App.globalData.hideCircle })
+    if (this._stHide > -1) clearTimeout(this._stHide)
   },
 
   onHide: function () {
     this._indexTab = false
-    wx.hideNavigationBarLoading()
+    this._stHide = setTimeout(()=>{
+      wx.hideNavigationBarLoading()
+      this.setData({ hideCircle: true })
+    }, 900)
   },
 
   /**

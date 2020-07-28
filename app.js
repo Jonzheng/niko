@@ -120,6 +120,7 @@ App({
       userInfo['nick_name'] = userInfo.nickName
       userInfo['showName'] = userInfo.show_name
       let openid = userInfo.openid || this.globalData.openid
+      openid = openid || new Date().getTime()
       wx.downloadFile({
         url: avatarUrl,
         success: res => {
@@ -245,6 +246,7 @@ App({
     admini: false,
     downCount: 0,
     userInfo: null,
+    hideCircle: false,
     needReload: true
   }
 })

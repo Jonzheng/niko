@@ -21,7 +21,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 128rpx;
+  height: 150rpx;
   background: #fff;
   z-index: 10;
   perspective: 1200rpx;
@@ -46,14 +46,14 @@
   position: absolute;
   top: 0;
   width: 120rpx;
-  height: 82rpx;
+  height: 96rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .out-avatar .avatar{
-  width: 82rpx;
-  height: 82rpx;
+  width: 86rpx;
+  height: 86rpx;
   border-radius: 8rpx;
   box-shadow: 0 0 6rpx #4a5fe2;
 }

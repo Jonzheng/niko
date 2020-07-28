@@ -1,5 +1,7 @@
 const App = getApp()
 const { host, formatDate, deAvatar } = require('../../utils/util')
+const cvColor = ['#dfdfdf', '#dfdfbf', '#95ddb2', '#92d1e5', '#ffb37c', '#ff6c00', '#ff0000', '#e52fec', '#841cf9', 'black', 'black']
+
 const tops = {
   "news": { api: "queryNews", idx: 0, total: 30 },
   "heart": { api: "queryHeart", idx: 1, total: 30 },
@@ -12,7 +14,6 @@ Page({
 
   data: {
     isIpx: App.globalData.isIpx,
-    bg: '../../images/bg-0.png',
     tabData: [],
     tabCur: 0,
     size: 90,
@@ -28,11 +29,13 @@ Page({
     refreshSize: 0,
     topSize: 0,
     bottomSize: 220,
+    cv: 0,
+    cvColor,
   },
 
   onLoad: function (options) {
     console.log('onLoad:', options)
-    let { level, news, heartCount, followCount, fansCount, masterId} = options
+    let { level, news, heartCount, followCount, fansCount, masterId, cv} = options
     news = parseInt(news)
     let tabData = [
       { value: "news", name: "通知", count: '+'+news},
@@ -58,6 +61,7 @@ Page({
       heartCount,
       followCount: parseInt(followCount),
       fansCount,
+      cv: parseInt(cv),
       tabData
     })
     this.getList('reflash', pageStart, level)

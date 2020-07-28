@@ -1,5 +1,7 @@
 const App = new getApp()
 const { trim, host, formatDate, deAvatar } = require('../../utils/util')
+const cvColor = ['#dfdfdf', '#dfdfbf', '#95ddb2', '#92d1e5', '#ffb37c', '#ff6c00', '#ff0000', '#e52fec', '#841cf9', 'black', 'black']
+
 const pageStart = 1
 const pageSize = 20
 
@@ -14,8 +16,6 @@ Page({
     avatars: [],
     rotY: 180,
     isReady: false,
-    icon_comm: "../../images/comm.png",
-    icon_more: "../../images/more.png",
     reId: '',
     reName: '',
     reContent: '',
@@ -28,12 +28,14 @@ Page({
     scrollTop: null,
     enableBackToTop: true,
     refreshSize: 0,
-    topSize: 130,
+    topSize: 150,
     bottomSize: 0,
-    cursor: 0
+    cursor: 0,
+    cvColor
   },
 
   onLoad: function (options) {
+    this._pageNo = 1
     this._showIdxs = []
     if (!App.globalData.openid) {
       setTimeout(()=>{
@@ -44,16 +46,16 @@ Page({
           wx.redirectTo({ url })
         })
       }, 600)
-      return
+    } else {
+      this.setData({
+        avatars: [],
+        preLoad: true,
+        rotY: this.data.rotY + 120,
+        hasLogin: App.globalData.hasLogin,
+      })
+      this.preLoadRecord()
+      App.getHeartSrc()
     }
-    this.setData({
-      avatars: [],
-      preLoad: true,
-      rotY: this.data.rotY + 120,
-      hasLogin: App.globalData.hasLogin,
-    })
-    this.preLoadRecord()
-    App.getHeartSrc()
   },
 
   onReady: function () {
@@ -64,6 +66,24 @@ Page({
     this._audioContextMaster.onEnded(() => {
       this.setMasterStop();
     });
+    this._ctx = []
+    for (let i = 0; i < 6; i++) {
+      this._ctx.push(wx.createInnerAudioContext())
+    }
+    
+    this._audioContextMaster.onPlay(() => {
+      this._itMaster = setInterval(() => {
+        let curTime = this._audioContextMaster.currentTime || 0
+        let rePos = curTime / this._audioContextMaster.duration * 100
+        this.setData({
+          rePos
+        })
+      }, 30)
+    })
+
+    this._audioContextMaster.onStop(() => {
+      this.setMasterStop();
+    })
   },
 
   onShow: function () {
@@ -123,6 +143,7 @@ Page({
   // 刷新数据
   refresh() {
     this._showIdxs = []
+    this._pageNo = 1
     this.setData({
       requesting: true,
       empty: false,
@@ -213,7 +234,7 @@ Page({
     })
   },
 
-  initRecords(recordList) {
+  initRecords(recordList, silence=false) {
     let avatars = []
     for (let record of recordList) {
       record["deAvatar"] = deAvatar(record.master_id)
@@ -225,7 +246,7 @@ Page({
       record["ser"] = trim(record.serifu)
       record["isMine"] = record.master_id == App.globalData.openid
       let avatar = record.avatar_url || record.deAvatar
-      if (avatars.filter(it=> it.url == avatar).length == 0) avatars.push({ url:avatar, openid: record.openid })
+      if (avatars.filter(it => it.url == avatar).length == 0) avatars.push({ url: avatar, openid: record.openid, cv: record.cv })
       record["isListen"] = false
     }
     this._avatars = [].concat(avatars)
@@ -240,21 +261,25 @@ Page({
     })
     this._recordes = recordList
     wx.setStorageSync('_recordes', recordList)
-    this.pickRecords(recordList)
-    wx.hideNavigationBarLoading()
-    wx.setNavigationBarTitle({
-      title: '式神录※模仿录音',
-    })
+    if (!silence){
+      this.pickRecords(recordList)
+      wx.hideNavigationBarLoading()
+      wx.setNavigationBarTitle({
+        title: '式神录※模仿录音',
+      })
+    }
   },
 
   getRecords(silence = false) {
     App.globalData.needReload = false
     wx.showNavigationBarLoading()
     let openid = App.globalData.openid
+    let pageNo = this._pageNo
+    let masterIds = ''
     wx.request({
       url: `${host}/queryRecord`,
       method: 'post',
-      data: { openid },
+      data: { openid, pageNo,  },
       success: (res) => {
         wx.hideNavigationBarLoading()
         let { data } = res
@@ -270,6 +295,7 @@ Page({
             } // for end
           } // for end
           this.setData({ recordList })
+          this.initRecords(data, true)
         }else {
           this.initRecords(data)
         }
@@ -289,9 +315,10 @@ Page({
 
   playHeartSrc() {
     App.getHeartSrc().then(heartSrc => {
-      this._ctx = wx.createInnerAudioContext()
-      this._ctx.src = heartSrc
-      this._ctx.play()
+      let ctx = this._ctx.pop()
+      this._ctx.unshift(ctx)
+      ctx.src = heartSrc
+      ctx.play()
     })
   },
 
@@ -540,6 +567,11 @@ Page({
         recordList,
       })
     }
+    this._audioContextMaster.seek(0)
+    if (this._itMaster > -1) clearInterval(this._itMaster)
+    this.setData({
+      rePos: 0
+    })
   },
 
   delRecord(recordId) {

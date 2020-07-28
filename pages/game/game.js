@@ -1,5 +1,4 @@
 const App = new getApp()
-const audioContextOri = wx.createInnerAudioContext()
 
 const { host, deAvatar } = require('../../utils/util')
 const pageStart = 1
@@ -188,6 +187,10 @@ Page({
 
   onReady: function () {
     this._echartsComponnet = this.selectComponent('#mychart')
+    this._ctx = []
+    for (let i = 0;i<6;i++){
+      this._ctx.push(wx.createInnerAudioContext())
+    }
   },
 
   onShow: function () {
@@ -576,8 +579,10 @@ Page({
       ks_all[row][col]["selected"] = true
       let cur = ks_all[row][col]['roma']
       let curSrc = SrcYuku + cur + '.wav'
-      audioContextOri.src = curSrc
-      audioContextOri.play()
+      let ctx = this._ctx.pop()
+      this._ctx.unshift(ctx)
+      ctx.src = curSrc
+      ctx.play()
     }
     if (ks_sed.length > max_sed) { //如果点击已选或者大于可选--取消最先选择的
       var ned = ks_sed.shift()
@@ -644,8 +649,10 @@ Page({
     var kon = !this.data.kon
     this.setData({ kon })
     if (kon) {
-      audioContextOri.src = SrcHshs
-      audioContextOri.play()
+      let ctx = this._ctx.pop()
+      this._ctx.unshift(ctx)
+      ctx.src = SrcHshs
+      ctx.play()
     }
   },
 
@@ -1127,9 +1134,10 @@ Page({
 
     let cur = thisStep["roma"]
     let curSrc = SrcYuku + cur + '.wav'
-    console.log(curSrc)
-    audioContextOri.src = curSrc
-    audioContextOri.play()
+    let ctx = this._ctx.pop()
+    this._ctx.unshift(ctx)
+    ctx.src = curSrc
+    ctx.play()
 
     var sakki_roma = thisStep["roma"]
     var sakki_hira = thisStep["hira"]
@@ -1422,8 +1430,10 @@ Page({
     this_step["hint"] = true
     let cur = this_step['roma']
     let curSrc = SrcYuku + cur + '.wav'
-    audioContextOri.src = curSrc
-    audioContextOri.play()
+    let ctx = this._ctx.pop()
+    this._ctx.unshift(ctx)
+    ctx.src = curSrc
+    ctx.play()
     this._hasHint = setTimeout(() => {
       this_step["hint"] = false
       this.setData({ fields })
@@ -1438,8 +1448,10 @@ Page({
     var skon = !this.data.skon
     this.setData({ skon })
     let curSrc = SrcYuku + this.data.sakki_roma + '.wav'
-    audioContextOri.src = curSrc
-    audioContextOri.play()
+    let ctx = this._ctx.pop()
+    this._ctx.unshift(ctx)
+    ctx.src = curSrc
+    ctx.play()
   },
 
 })
