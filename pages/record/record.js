@@ -30,11 +30,13 @@ Page({
     refreshSize: 0,
     topSize: 150,
     bottomSize: 0,
+    curData: 0,
     cursor: 0,
     cvColor
   },
 
   onLoad: function (options) {
+    this._lockHearts = []
     this._pageNo = 1
     this._showIdxs = []
     if (!App.globalData.openid) {
@@ -47,13 +49,26 @@ Page({
         })
       }, 600)
     } else {
+      this._step = 10
+      this._avatars = []
+      let avatars = []
+      while (avatars.length < 18) {
+        avatars.push({ url: '', openid: '' })
+      }
+      this._loadSpin = setInterval(() => {
+        if (this.data.recordList.length == 0) {
+          this.avatarTap(true)
+        } else {
+          clearInterval(this._loadSpin)
+        }
+      }, 1000)
+      
       this.setData({
-        avatars: [],
-        preLoad: true,
+        avatars,
         rotY: this.data.rotY + 120,
         hasLogin: App.globalData.hasLogin,
       })
-      this.preLoadRecord()
+      this.getRecords()
       App.getHeartSrc()
     }
   },
@@ -89,7 +104,7 @@ Page({
   onShow: function () {
     App.globalData.hideCircle = true
     if (App.globalData.hasUpdate) {
-      this.getRecords(true)
+      this.getRecords('', true)
       let pages = getCurrentPages()
       App.globalData.hasUpdate = pages.length > 2
       setTimeout(() => {
@@ -145,6 +160,7 @@ Page({
     this._showIdxs = []
     this._pageNo = 1
     this.setData({
+      curData: 0,
       requesting: true,
       empty: false,
       end: false,
@@ -152,12 +168,12 @@ Page({
       recordList: [],
       rotY: this.data.rotY + 120,
     })
-    this.preLoadRecord()
+    this.getRecords()
   },
   // 加载更多
   more() {
     if (!this.data.isReady) return
-    console.log('-load more-')
+    console.log('-load more-', this._step)
     for(let i = 0; i < this._step; i++){
       this.avatarTap()
     }
@@ -165,77 +181,13 @@ Page({
     setTimeout(()=>{
       this.setData({ isReady: true })
     }, 600)
-    this.pickRecords(this._recordes)
+    this._pageNo += 1
+    this.getRecords('more')
   },
 
-  preLoadRecord(){
-    this._recordes = wx.getStorageSync('_recordes')
-    console.log(App.globalData.needReload, this._recordes.length)
-    if (this._recordes){
-      wx.setNavigationBarTitle({
-        title: '式神录※模仿录音',
-      })
-      this.initRecords(this._recordes)
-      if (App.globalData.needReload){
-        this.getRecords(true)
-      }else{
-        setTimeout(() => {
-          this.setData({ isReady: true, rotY: -20, preLoad: false })
-        }, 600)
-      }
-      setTimeout(()=>{
-        wx.hideNavigationBarLoading()
-      }, 300)
-    } else{
-      // loading
-      wx.setNavigationBarTitle({
-        title: '加载中※模仿录音',
-      })
-      this._avatars = []
-      let avatars = []
-      while (avatars.length < 18) {
-        avatars.push({ url: '', openid: '' })
-      }
-      this._loadSpin = setInterval(() => {
-        if (this.data.recordList.length == 0) {
-          this.avatarTap(true)
-        } else {
-          clearInterval(this._loadSpin)
-        }
-      }, 1000)
-      this.setData({ avatars })
-      this.getRecords()
-    }
-  },
-
-  pickRecords(recordes){
-    let _recordList = []
-    let max = 2
-    console.log('this._showIdxs', this._showIdxs)
-    while (recordes.length > this._showIdxs.length && _recordList.length < pageSize){
-      this._step = Math.floor(pageSize / max)
-      for (let [i, v] of recordes.entries()) {
-        if (this._showIdxs.includes(i)) continue;
-        if (_recordList.filter(it => it.master_id == v.master_id).length < max && _recordList.length < pageSize){
-          _recordList.push(v)
-          // recordes.splice(i, 1) // 顺序被打乱
-          this._showIdxs.push(i)
-        }
-      }
-      max += 1
-    } // while end
-    console.log(_recordList.length, '/', recordes.length - this._showIdxs.length)
-    let recordList = this.data.recordList.concat(_recordList)
-    this.setData({
-      end: recordes.length == this._showIdxs.length,
-      recordList,
-      requesting: false,
-      isReady: true
-    })
-  },
-
-  initRecords(recordList, silence=false) {
-    let avatars = []
+  initRecords(recordList, type = 'refresh') {
+    this._step = 0
+    let unq = new Set()
     for (let record of recordList) {
       record["deAvatar"] = deAvatar(record.master_id)
       record["listenStatus"] = "listen-off"
@@ -245,70 +197,92 @@ Page({
       record["dateStr"] = formatDate(record.c_date)
       record["ser"] = trim(record.serifu)
       record["isMine"] = record.master_id == App.globalData.openid
-      let avatar = record.avatar_url || record.deAvatar
-      if (avatars.filter(it => it.url == avatar).length == 0) avatars.push({ url: avatar, openid: record.openid, cv: record.cv })
       record["isListen"] = false
+      unq.add(record.openid)
     }
-    this._avatars = [].concat(avatars)
-    console.log(this._avatars)
-    avatars = avatars.slice(0, 18)
-    while (avatars.length < 18){
-      avatars.push({ url: '', openid:'' })
-    }
-    this.setData({
-      avatars,
-      requesting: false
-    })
-    this._recordes = recordList
-    wx.setStorageSync('_recordes', recordList)
-    if (!silence){
-      this.pickRecords(recordList)
-      wx.hideNavigationBarLoading()
-      wx.setNavigationBarTitle({
-        title: '式神录※模仿录音',
-      })
+    this._step = unq.size
+    if (type == 'more') {
+      let oldList = this.data.recordList
+      if (oldList.length > 40){
+        oldList = []
+        this.toTop()
+      }
+      recordList = oldList.concat(recordList)
+      this.setData({ recordList })
+    }else{
+      this.setData({ recordList })
     }
   },
 
-  getRecords(silence = false) {
+  getRecords(type='refresh', silence = false) {
     App.globalData.needReload = false
     wx.showNavigationBarLoading()
     let openid = App.globalData.openid
     let pageNo = this._pageNo
-    let masterIds = ''
+    let recordIds = App.globalData.recordIds.join()
+    recordIds = ''
+    wx.setNavigationBarTitle({
+      title: '加载中※模仿录音',
+    })
     wx.request({
       url: `${host}/queryRecord`,
       method: 'post',
-      data: { openid, pageNo,  },
+      data: { openid, pageNo, pageSize, recordIds },
       success: (res) => {
-        wx.hideNavigationBarLoading()
-        let { data } = res
+        console.log(res)
+        let { records, avatars, total } = res.data
+        total = total || 800
         if (silence){
           let recordList = this.data.recordList
           for (let record of recordList){
-            for (let d of data) {
-              if (record.record_id == d.record_id){
-                record['heart'] = d.heart
-                record['comm'] = d.comm
-                record['heart_ud'] = d.heart_ud
+            for (let dd of records) {
+              if (record.record_id == dd.record_id){
+                record['heart'] = dd.heart
+                record['comm'] = dd.comm
+                record['heart_ud'] = dd.heart_ud
               }
             } // for end
           } // for end
           this.setData({ recordList })
-          this.initRecords(data, true)
         }else {
-          this.initRecords(data)
+          this.initRecords(records, type)
+          if (type == 'refresh') {
+            this._avatars = [].concat(avatars)
+            console.log('_avatars', this._avatars)
+            avatars = avatars.slice(0, 18)
+            while (avatars.length < 18) {
+              avatars.push({ url: '', openid: '' })
+            }
+            avatars.map(it=>it.url = it.url || deAvatar(it.openid))
+            this.setData({ avatars, total })
+          }
         }
       },
       complete: (res) => {
-        if (!silence){
+        wx.hideNavigationBarLoading()
+        wx.setNavigationBarTitle({
+          title: '式神录※模仿录音',
+        })
+        if (!silence && type == 'refresh'){
           setTimeout(() => {
-            this.setData({ isReady: true, rotY: -20, preLoad: false })
+            this.setData({ rotY: -20, isReady: true })
           }, 300)
         }
-        setTimeout(()=>{
-          App.globalData.needReload = true
-        }, 10000)
+        this.setData({
+          requesting: false
+        })
+        
+        let curData = this.data.curData
+        this._itPage = setInterval(() => {
+          if (curData < pageNo * pageSize && curData < this.data.total) {
+            curData += 1
+            this.setData({ curData })
+          } else {
+            clearInterval(this._itPage)
+          }
+        }, 50)
+        
+        this._needReload = false
       }
     })
   },
@@ -487,13 +461,15 @@ Page({
   },
 
   updateHeart(e) {
-    if (this._lockHeart) return
-    this._lockHeart = true
     let currData = e.currentTarget.dataset
     let { idx, status, fid } = currData
     let userId = App.globalData.openid
     let recordList = this.data.recordList
     let curMaster = recordList[idx]
+    let recordId = curMaster["record_id"]
+    let masterId = curMaster['master_id']
+    if (this._lockHearts.indexOf(recordId) > -1) return
+    this._lockHearts.push(recordId)
     let url = ''
     if (!status) {
       this.playHeartSrc()
@@ -506,20 +482,18 @@ Page({
       curMaster["heart_ud"] = false
       curMaster["heart"] -= 1
     }
-    let recordId = curMaster["record_id"]
-    let masterId = curMaster['master_id']
     wx.request({
       url: url,
       method: 'post',
       data: { recordId, fileId: fid, userId, masterId },
       success: () => {
         App.globalData.hasUpdate = true
+      },
+      complete: () => {
         this.setData({
           recordList
         })
-        setTimeout(() => {
-          this._lockHeart = false
-        }, 300)
+        this._lockHearts.splice(this._lockHearts.indexOf(recordId), 1)
       }
     })
   },
@@ -699,6 +673,16 @@ Page({
       let up = e.detail.x < 90
       this.avatarTap(up)
     }
-  }
+  },
+  toTop() {
+    this.setData({
+      scrollAnimation: true
+    })
+    setTimeout(() => {
+      this.setData({
+        scrollTop: 0,
+      })
+    }, 0)
+  },
 
 })

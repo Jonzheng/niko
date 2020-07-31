@@ -105,3 +105,24 @@
   box-shadow: 0 0 6rpx #4a5ee288;
   border-radius: 50%;
 }
+
+.page-no{
+  display: flex;
+  align-items: center;
+  position: fixed;
+  border-radius: 12rpx;
+  bottom: 20rpx;
+  left: -8rpx;
+  height: 60rpx;
+  padding-left: 20rpx;
+  background: rgba(255, 255, 255, .9);
+  color: #bbb;
+  font-size: 32rpx;
+  z-index: 10;
+}
+
+.page-no .icon{
+  width: 46rpx;
+  height: 46rpx;
+  opacity: .6;
+}

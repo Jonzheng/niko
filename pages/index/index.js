@@ -224,6 +224,7 @@ Page({
   initList(data){
     let { total, list, names, type, pageNo, level } = data
     let items = this.initItem(list, names)
+    console.log(items)
     if ('sp' == level){
       let spList = type === 'more' ? this.data.spList.concat(items) : items
       this.setData({

@@ -31,32 +31,32 @@
         <image class="arrow {{spin ? 'tr-spin':'tr-end'}}" src="../../images/right.png" mode="heightFix"></image>
       </view>
     </view>
-    <block wx:for="{{spList}}" wx:key="index">
+    <block wx:for="{{spList}}" wx:key="file_id">
       <view hidden="{{level != 'sp'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
         <template is="an-list" data="{{item}}"/>
       </view>
     </block>
-    <block wx:for="{{ssrList}}" wx:key="index">
+    <block wx:for="{{ssrList}}" wx:key="file_id">
       <view hidden="{{level != 'ssr'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
         <template is="an-list" data="{{item}}"/>
       </view>
     </block>
-    <block wx:for="{{srList}}" wx:key="index">
+    <block wx:for="{{srList}}" wx:key="file_id">
       <view hidden="{{level != 'sr'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
         <template is="an-list" data="{{item}}"/>
       </view>
     </block>
-    <block wx:for="{{rList}}" wx:key="index">
+    <block wx:for="{{rList}}" wx:key="file_id">
       <view hidden="{{level != 'r'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
         <template is="an-list" data="{{item}}"/>
       </view>
     </block>
-    <block wx:for="{{nList}}" wx:key="index">
+    <block wx:for="{{nList}}" wx:key="file_id">
       <view hidden="{{level != 'n'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
         <template is="an-list" data="{{item}}"/>
       </view>
     </block>
-    <block wx:for="{{mList}}" wx:key="index">
+    <block wx:for="{{mList}}" wx:key="file_id">
       <view hidden="{{level != 'm'}}" class="cell" bindtap="toDetail" data-id="{{item.file_id}}">
         <template is="an-list" data="{{item}}"/>
       </view>

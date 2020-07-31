@@ -247,6 +247,7 @@ App({
     downCount: 0,
     userInfo: null,
     hideCircle: false,
+    recordIds: [],
     needReload: true
   }
 })

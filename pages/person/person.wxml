@@ -98,7 +98,7 @@
     <view class="record-label">cv模仿录音：</view>
     <view wx:if="{{isReady && recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
     <image wx:if="{{showLoading}}" class="i-loading" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-1.png"></image>
-    <block wx:for="{{recordList}}" wx:key="mkey">
+    <block wx:for="{{recordList}}" wx:key="record_id">
       <view class="item-record">
         <view class="box-col">
           <view class="serifu" bindtap="toDetail" data-id="{{item.file_id}}">{{item.ser}}</view>
@@ -160,9 +160,9 @@
 </view>
 
 <action-sheet formShow="{{commShow}}" bind:clickMask="closeMask" bind:confirmInput="confirmInput" bind:blur="clearInput"
-  hasInput="{{true}}" boxHeight="{{isIpx ? 900 : 720}}" inputValue="{{inputValue}}"
+  hasInput="{{true}}" boxHeight="{{isIpx ? 920 : 720}}" inputValue="{{inputValue}}"
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
-  <view class="comm-item" wx:for="{{commentList}}" wx:key="index">
+  <view class="comm-item" wx:for="{{commentList}}" wx:key="id">
     <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url || item.deAvatar}}"/>
     <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
       data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">

@@ -419,6 +419,7 @@ Page({
       }
     }
     this.setData({
+      videoSize: curList.video_size,
       fileId,
       cname,
       skill,
@@ -778,9 +779,9 @@ Page({
         this.setData({
           recordList
         })
-        setTimeout(() => {
-          this._lockHeart = false
-        }, 300)
+      },
+      complete: () => {
+        this._lockHeart = false
       }
     })
   },

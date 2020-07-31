@@ -33,23 +33,23 @@
       bind:more="more">
     <view class="cells">
 
-      <block wx:for="{{newsList}}" wx:key="index">
-        <view hidden="{{level != 'news'}}" class="cell">
+      <block wx:if="{{level == 'news'}}" wx:for="{{newsList}}" wx:key="c_date">
+        <view class="cell">
           <template is="an-list" data="{{item, news, index}}"/>
         </view>
       </block>
-      <block wx:for="{{heartList}}" wx:key="index">
-        <view hidden="{{level != 'heart'}}" class="cell">
+      <block wx:if="{{level == 'heart'}}" wx:for="{{heartList}}" wx:key="c_date">
+        <view class="cell">
           <template is="an-list" data="{{item, news, index}}"/>
         </view>
       </block>
-      <block wx:for="{{followList}}" wx:key="index">
-        <view hidden="{{level != 'follow'}}" class="cell">
+      <block wx:if="{{level == 'follow'}}" wx:for="{{followList}}" wx:key="c_date">
+        <view class="cell">
           <template is="an-list" data="{{item, news, index}}"/>
         </view>
       </block>
-      <block wx:for="{{fansList}}" wx:key="index">
-        <view hidden="{{level != 'fans'}}" class="cell">
+      <block wx:if="{{level == 'fans'}}" wx:for="{{fansList}}" wx:key="c_date">
+        <view class="cell">
           <template is="an-list" data="{{item, news, index}}"/>
         </view>
       </block>
