@@ -4,6 +4,7 @@ const { trim, host, formatDate, deAvatar } = require('../../utils/util')
 const cvColor = ['#dfdfdf', '#dfdfbf', '#95ddb2', '#92d1e5', '#ffb37c', '#ff6c00', '#ff0000', '#e52fec', '#841cf9', 'black', 'black']
 
 const Levels = [{ 'uv': 0, 'pv': -1 }, { 'uv': 1, 'pv': 1 }, { 'uv': 4, 'pv': 15 }, { 'uv': 9, 'pv': 53 }, { 'uv': 16, 'pv': 127 }, { 'uv': 25, 'pv': 249 }, { 'uv': 36, 'pv': 431 }, { 'uv': 49, 'pv': 685 }, { 'uv': 64, 'pv': 1023 }, { 'uv': 81, 'pv': 1457 }]
+const pageSize = 20
 
 Page({
 
@@ -13,7 +14,6 @@ Page({
   data: {
     hasLogin: false,
     userInfo: {},
-    bg: '../../images/bg-0.png',
     detaultAvatar: '../../images/de-avatar.png',
     motto: '',
     isMine: false,
@@ -27,10 +27,16 @@ Page({
     rePos: 0,
     cvDescShow: 0,
     cvColor,
-    levels:[0,1,2,3,4,5,6,7,8,9]
+    bottomSize: App.globalData.isIpx?336:266,
+    emptyShow: true,
+    hasTop: true,
+    curData: 0,
+    total: 0,
   },
 
   onLoad: function (options) {
+    this._pageNo = 1
+    this._lockHearts = []
     if (!App.globalData.openid) {
       setTimeout(() => {
         App.initOpenid().then(openid => {
@@ -174,7 +180,9 @@ Page({
   },
   // 刷新数据
   refresh() {
+    this._pageNo = 1
     this.setData({
+      curData: 0,
       requesting: true,
       empty: false,
       end: false,
@@ -185,10 +193,8 @@ Page({
   },
   // 加载更多
   more() {
-    this.setData({
-      loadEnd: true
-    })
-    // this.getList();
+    this._pageNo += 1
+    this.getRecords(App.globalData.openid, 'more')
   },
   playHeartSrc() {
     App.getHeartSrc().then(heartSrc => {
@@ -255,18 +261,22 @@ Page({
       }
     })
   },
-  getRecords(openid) {
+  getRecords(openid, type = 'refresh') {
     if (this._loading) return
     this._loading = true
     let masterId = openid
+    let pageNo = this._pageNo
     this.setData({ showLoading: true })
     wx.request({
       url: `${host}/queryRecord`,
       method: 'post',
-      data: { masterId, openid },
+      data: { masterId, openid, pageNo, pageSize, mine:1 },
       success: (res) => {
-        let { data } = res
-        this.initRecords(data)
+        let { records, total } = res.data        
+        records = records || []
+        let end = records.length == 0
+        this.setData({ total, end })
+        this.initRecords(records, type)
       },
       complete: ()=>{
         this._loading = false
@@ -275,11 +285,23 @@ Page({
           requesting: false,
           isReady: true,
         })
-      }
+        let curData = this.data.curData
+        let total = this.data.total
+        if (this._itPage > -1) clearInterval(this._itPage)
+        this._itPage = setInterval(() => {
+          if (curData < pageNo * pageSize && curData < total) {
+            curData += 1
+            this.setData({ curData })
+          } else {
+            clearInterval(this._itPage)
+          }
+        }, 30)
+
+      } // end complete
     })
   },
 
-  initRecords(recordList) {
+  initRecords(recordList, type) {
     for (let record of recordList) {
       record["listenStatus"] = "listen-off"
       record["boxStyle"] = "btn-play-box"
@@ -294,9 +316,19 @@ Page({
       }
       record["isListen"] = false
     }
-    this.setData({
-      recordList: recordList,
-    })
+    if (type == 'more') {
+      let oldList = this.data.recordList
+      if (oldList.length > 40 && recordList.length > 0) {
+        oldList = []
+        this.toTop()
+      }
+      recordList = oldList.concat(recordList)
+      setTimeout(() => {
+        this.setData({ recordList })
+      }, 30)
+    } else {
+      this.setData({ recordList })
+    }
   },
 
   // 按钮数据
@@ -312,7 +344,7 @@ Page({
   setMasterStop: function () {
     let index = this._listenIndex
     let recordList = this.data.recordList
-    if (index != null && recordList[index]["isListen"]) {
+    if (index != null && index < recordList.length && recordList[index]["isListen"]) {
       recordList[index]["isListen"] = false
       recordList[index]["listenStatus"] = "listen-off"
       recordList[index]["anListen"] = ""
@@ -378,13 +410,15 @@ Page({
   },
 
   updateHeart(e) {
-    if (this._updating) return
-    this._updating = true
     let currData = e.currentTarget.dataset
     let { idx, status, fid } = currData
     let userId = App.globalData.openid
     let recordList = this.data.recordList
     let curMaster = recordList[idx]
+    let recordId = curMaster["record_id"]
+    let masterId = curMaster['master_id']
+    if (this._lockHearts.indexOf(recordId) > -1) return
+    this._lockHearts.push(recordId)
     let url = ''
     if (status == 0) {
       this.playHeartSrc()
@@ -397,8 +431,6 @@ Page({
       curMaster["heartStatus"] = 0
       curMaster["heart"] -= 1
     }
-    let recordId = curMaster["record_id"]
-    let masterId = curMaster['master_id']
     this.setData({
       recordList
     })
@@ -414,9 +446,9 @@ Page({
           cv: userInfo.cv,
           userInfo
         })
-        setTimeout(() => {
-          this._updating = false
-        }, 300)
+      },
+      complete: () => {
+        this._lockHearts.splice(this._lockHearts.indexOf(recordId), 1)
       }
     })
   },
@@ -436,7 +468,7 @@ Page({
       success: (res) => {
         setTimeout(()=>{
           this._updating = false
-        }, 300)
+        }, 100)
         let recordList = this.data.recordList
         recordList[idx]['status'] = status
         this.setData({ recordList })
@@ -683,7 +715,8 @@ Page({
     })
   },
   computeCvLevel(userInfo){
-    let cv = userInfo.cv || 0
+    userInfo.cv = this.getCvLevel(userInfo)
+    let cv = userInfo.cv
     userInfo.heartCount = userInfo.heartCount || 0
     userInfo.heartUv = userInfo.heartUv || 0
     userInfo.uv = (cv + 1) ** 2
@@ -695,13 +728,24 @@ Page({
     console.log(cv, userInfo.uv, userInfo.pv, userInfo.heartUv, userInfo.heartCount)
     return userInfo
   },
-
-  getCvLevel(uv, pv){
+  getCvLevel(userInfo){
+    let uv = userInfo.heartUv
+    let pv = userInfo.heartCount
     let cv = 0
     for (let [idx, it] of Levels.entries()){
       if (uv >= it.uv && pv >= it.pv) cv = idx
     }
     return cv
-  }
+  },
+  toTop() {
+    this.setData({
+      scrollAnimation: true
+    })
+    setTimeout(() => {
+      this.setData({
+        scrollTop: 0,
+      })
+    }, 0)
+  },
 
 })

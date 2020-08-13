@@ -1,6 +1,7 @@
 page{
   position: fixed;
   overflow: hidden;
+  background: transparent;
 }
 .top-bg{
   position: relative;
@@ -38,6 +39,7 @@ page{
 }
 
 .box-records{
+  position: relative;
   padding: 20rpx 20rpx;
   background: #fff;
   display: flex;
@@ -183,6 +185,8 @@ page{
   flex-direction: column;
   overflow: visible;
   background: #ffffff;
+  box-shadow: 0 6rpx 6rpx #ffffff;
+  z-index: 11;
 }
 
 .box-line{
@@ -704,4 +708,47 @@ page{
 
 .usermotto {
   margin-top: 20px;
+}
+
+.page-no{
+  display: flex;
+  align-items: center;
+  position: fixed;
+  border-radius: 12rpx;
+  bottom: 0;
+  left: -8rpx;
+  height: 60rpx;
+  padding-left: 20rpx;
+  background: rgba(255, 255, 255, .9);
+  color: #bbb;
+  font-size: 32rpx;
+  z-index: 10;
+}
+
+.page-no .icon{
+  width: 46rpx;
+  height: 46rpx;
+  opacity: .6;
+}
+
+.share {
+  position: fixed;
+  right: 40rpx;
+  bottom: 60rpx;
+  z-index: 11;
+  height: 100rpx;
+  width: 100rpx;
+  background: transparent;
+  overflow: visible;
+  padding: 0;
+}
+
+.share image {
+  height: 60rpx;
+  width: 60rpx;
+  padding: 12rpx;
+  background: #fdfdfd;
+  border: 6rpx solid #eee;
+  box-shadow: 0 0 6rpx #4a5ee288;
+  border-radius: 50%;
 }

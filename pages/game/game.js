@@ -137,7 +137,7 @@ Page({
     enableBackToTop: true,
     refreshSize: 0,
     topSize: 0,
-    bottomSize: 220,
+    bottomSize: 200,
     showChart: false,
     ec: {
       lazyLoad: true

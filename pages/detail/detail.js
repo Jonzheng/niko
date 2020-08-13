@@ -71,6 +71,7 @@ Page({
       App.getHeartSrc()
       this._cantRecord = 0
     }
+    this.playBGM()
   },
 
   onShow() {
@@ -86,6 +87,7 @@ Page({
     this.setData({
       showCode: false
     })
+    if (this._audioContextBgm) this._audioContextBgm.stop()
   },
 
   onPullDownRefresh: function () {
@@ -103,9 +105,12 @@ Page({
     this._audioContextOri.destroy()
     this._audioContextMine.destroy()
     this._audioContextMaster.destroy()
+    if (this._audioContextBgm) this._audioContextBgm.destroy()
   },
 
   onReady: function () {
+    // 文学少女BGM
+    this.playBGM()
     this.videoContext = wx.createVideoContext('myVideo')
     this._audioContextOri = wx.createInnerAudioContext()
     this._audioContextMaster = wx.createInnerAudioContext()
@@ -113,6 +118,17 @@ Page({
     this._ctx = []
     for (let i = 0; i < 6; i++) {
       this._ctx.push(wx.createInnerAudioContext())
+    }
+    if (this._audioContextBgm){
+      this._audioContextBgm.onPlay(() => {
+        this._bgmOnPlay = true
+      })
+      this._audioContextBgm.onStop(() => {
+        this._bgmOnPlay = false
+      })
+      this._audioContextBgm.onPause(() => {
+        this._bgmOnPlay = false
+      })
     }
     // wx.setInnerAudioOption({ 'obeyMuteSwitch': false })
     // console.log('obeyMuteSwitch:',this._audioContextOri.obeyMuteSwitch)
@@ -248,10 +264,19 @@ Page({
       })
       console.log('this._tempFile', this._tempFile.duration)
       clearInterval(this._itRer)
+      this.playBGM()
     })
   },
 
   onShareAppMessage() {
+    this._itBgm = setInterval(()=>{
+      console.log('it_bgmOnPlay', this._bgmOnPlay)
+      if (!this._bgmOnPlay){
+        this.playBGM()
+      } else {
+        clearInterval(this._itBgm)
+      }
+    }, 1000)
     let fileId = this.data.fileId
     let cname = this.data.cname
     return {
@@ -622,6 +647,7 @@ Page({
     }
     this.stopOri()
     if (!this.data.isRecording) {
+      this.pauseBGM()
       RecorderManager.start(Options)
     } else {
       RecorderManager.stop()
@@ -1048,6 +1074,21 @@ Page({
         }
       }
     })
+  },
+  playBGM(){
+    console.log('this._bgmOnPlay', this._bgmOnPlay)
+    if (!this.data.fileId || this.data.fileId.indexOf('sp_wxsn') == -1 || this._bgmOnPlay) return
+    if (!this._audioContextBgm) this._audioContextBgm = wx.createInnerAudioContext()
+    App.getBgmSrc().then(bgmSrc => {
+      this._audioContextBgm.src = bgmSrc
+      this._audioContextBgm.loop = true
+      this._audioContextBgm.volume = 0.3
+      this._audioContextBgm.play()
+    })
+  },
+  pauseBGM(){
+    if (!this._audioContextBgm) return
+    this._audioContextBgm.pause()
   }
 
 })

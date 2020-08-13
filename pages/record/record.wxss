@@ -111,7 +111,7 @@
   align-items: center;
   position: fixed;
   border-radius: 12rpx;
-  bottom: 20rpx;
+  bottom: 50rpx;
   left: -8rpx;
   height: 60rpx;
   padding-left: 20rpx;

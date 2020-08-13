@@ -273,8 +273,10 @@ Page({
         })
         
         let curData = this.data.curData
+        let total = this.data.total
+        if (this._itPage > -1) clearInterval(this._itPage)
         this._itPage = setInterval(() => {
-          if (curData < pageNo * pageSize && curData < this.data.total) {
+          if (curData < pageNo * pageSize && curData < total) {
             curData += 1
             this.setData({ curData })
           } else {
@@ -282,7 +284,6 @@ Page({
           }
         }, 50)
         
-        this._needReload = false
       }
     })
   },
@@ -530,7 +531,7 @@ Page({
   setMasterStop() {
     let index = this._listenIndex
     let recordList = this.data.recordList
-    if (index != undefined && recordList[index] && recordList[index]["isListen"]) {
+    if (index != undefined && index < recordList.length && recordList[index]["isListen"]) {
       wx.hideNavigationBarLoading()
       recordList[index]["isListen"] = false
       recordList[index]["listenStatus"] = "listen-off"

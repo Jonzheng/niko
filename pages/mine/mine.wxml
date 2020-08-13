@@ -2,6 +2,10 @@
   <view class="bg-cv" style="background: linear-gradient({{cvColor[userInfo.cv]}}, {{cvColor[userInfo.cv+1]}});"></view>
 </view>
 <view wx:if="{{cvDescShow}}" class="mask-w" catchtap="closeCvMask"></view>
+<view wx:if="{{total>20}}" class="page-no" catchtap="toTop">{{curData}}/{{total}} <image class="icon" src="../../images/top.png"></image></view>
+<button wx:if="{{total>0}}" class="share" open-type="share" size="mini" style="bottom:12rpx">
+  <image src="../../images/share.png"></image>
+</button>
 <view class="box">
   <view class="top-mine">
     <image class="avatar {{admini ? 'admini':''}}" src="{{userInfo.avatar_url || detaultAvatar}}"
@@ -40,16 +44,23 @@
     <button wx:if="{{!hasLogin && canIUse}}" class="btn-user" open-type="getUserInfo" bindgetuserinfo="getUserInfo">二次元入口</button>
   </view>
 
-  <pull-down id="scroll" wx:if="{{hasLogin}}"
-      requesting="{{requesting}}"
-      bottomSize="280"
-      end="{{end}}"
-      has-top="{{hasTop}}"
-      color="{{color}}"
-      bind:refresh="refresh"
-      bind:more="more">
-
-  <view class="profile">
+<scroll id="scroll"
+    requesting="{{requesting}}"
+    empty-show="{{emptyShow}}"
+    end="{{end}}"
+    listCount="{{total}}"
+    scrollTop="{{scrollTop}}"
+    scrollAnimation="{{scrollAnimation}}"
+    has-top="{{true}}"
+    enable-back-to-top="{{true}}"
+    refresh-size="{{refreshSize}}"
+    top-size="{{topSize}}"
+    bottom-size="{{bottomSize}}"
+    color="{{color}}"
+    bind:refresh="refresh"
+    bind:more="more">
+    
+  <view class="profile" style="border-bottom: 3rpx solid {{cvColor[userInfo.cv]}};">
     <view class="box-line">
       <view class="mine-name" bindlongpress="auth">{{userInfo.show_name || userInfo.nick_name}}</view>
       <view class="icon-right" bindtap="toEdit" data-name="{{userInfo.show_name || userInfo.nick_name}}" data-motto="{{userInfo.motto}}">
@@ -99,6 +110,7 @@
       {{userInfo.news}}条未读信息
       <image class="icon-next" src="../../images/news-next.png"></image>
     </view>
+  <view class="cells">
     <view class="record-label">cv模仿录音：</view>
     <view wx:if="{{isReady && recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
     <image wx:if="{{showLoading}}" class="i-loading" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-1.png"></image>
@@ -153,10 +165,9 @@
         </view>
       </view>
     </block>
-    <view wx:if="{{loadEnd}}" class="non-tips">※ 没有更多了 ※</view>
   </view>
-
-  </pull-down>
+  </view>
+  </scroll>
 </view>
 <view wx:if="{{avatarShow}}" class="avatar-mask" catchtap="hideAvatar">
   <image class="avatar-detail" src="{{userInfo.avatar_url}}" mode="widthFix"></image>

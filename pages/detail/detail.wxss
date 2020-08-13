@@ -285,7 +285,7 @@
 }
 
 .curr-title{
-  width: 180rpx;
+  width: 220rpx;
   display: flex;
   align-items: center;
   color: #888888;

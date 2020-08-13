@@ -1,6 +1,7 @@
 <view class="top-bg" style="height:{{isIpx ? 300:280}}rpx;">
   <view class="bg-cv" style="background: linear-gradient({{cvColor[userInfo.cv]}}, {{cvColor[userInfo.cv+1]}});"></view>
 </view>
+<view wx:if="{{total>20}}" class="page-no" catchtap="toTop" style="bottom:50rpx;">{{curData}}/{{total}} <image class="icon" src="../../images/top.png"></image></view>
 <view wx:if="{{cvDescShow}}" class="mask-w" catchtap="closeCvMask"></view>
 <view class="btn-back" bindtap="back" style="top:{{isIpx ? 110:60}}rpx;">
   <image wx:if="{{!home}}" class="back" src="../../images/arrow-left.png"></image>
@@ -43,16 +44,24 @@
     size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
   </button>
 
-  <pull-down id="scroll"
-      requesting="{{requesting}}"
-      bottomSize="280"
-      end="{{end}}"
-      has-top="{{hasTop}}"
-      color="{{color}}"
-      bind:refresh="refresh"
-      bind:more="more">
+<scroll id="scroll"
+    requesting="{{requesting}}"
+    empty-show="{{emptyShow}}"
+    end="{{end}}"
+    listCount="{{total}}"
+    scrollTop="{{scrollTop}}"
+    scrollAnimation="{{scrollAnimation}}"
+    has-top="{{true}}"
+    enable-back-to-top="{{true}}"
+    refresh-size="{{refreshSize}}"
+    top-size="{{topSize}}"
+    bottom-size="{{bottomSize}}"
+    color="{{color}}"
+    bind:refresh="refresh"
+    bind:more="more">
+  <view class="cells">
 
-  <view class="profile">
+  <view class="profile" style="border-bottom: 3rpx solid {{cvColor[userInfo.cv]}};">
     <view class="box-line" wx:if="{{isReady}}">
       <view class="mine-name">{{userInfo.show_name || userInfo.nick_name}}</view>
       <view wx:if="{{!userInfo.isFollow}}" class="btn-follow" bindtap="follow">+ 关注</view>
@@ -110,9 +119,9 @@
                 style="width: {{item.btnRt=='rt-90' ? 100 : 320}}rpx;border:3rpx solid {{cvColor[cv]}}"
                 catchtap="listen" data-idx="{{index}}" data-rid="{{item.record_id}}">
                 <view class='box-paly-btn'>
-                  <view hidden="{{isListen}}" class="btn-one" style="background: {{cvColor[cv]}}"></view>
-                  <view class="btn-two {{isListen?'listen-on':'listen-off'}}" style="background: {{cvColor[cv]}}"></view>
-                  <view hidden="{{isListen}}" class="btn-three" style="background: {{cvColor[cv]}}"></view>
+                  <view hidden="{{item.isListen}}" class="btn-one" style="background: {{cvColor[cv]}}"></view>
+                  <view class="btn-two {{item.isListen?'listen-on':'listen-off'}}" style="background: {{cvColor[cv]}}"></view>
+                  <view hidden="{{item.isListen}}" class="btn-three" style="background: {{cvColor[cv]}}"></view>
                 </view>
                 <view wx:if="{{item.isListen}}" class="re-idx" style="height:{{rePos>0 ? 56:0}}rpx;left:{{rePos}}%;background: {{cvColor[cv]}}"></view>
               </view>
@@ -149,10 +158,12 @@
         </view>
       </view>
     </block>
-    <view wx:if="{{loadEnd}}" class="non-tips"> ※ 没有更多了 ※</view>
   </view>
 
-  </pull-down>
+</view>
+</scroll>
+
+
 </view>
 
 <view wx:if="{{avatarShow}}" class="avatar-mask" catchtap="hideAvatar">

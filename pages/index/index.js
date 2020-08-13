@@ -295,6 +295,7 @@ Page({
   toDetail(e){
     wx.vibrateShort()
     let fileId = e.currentTarget.dataset.id
+    fileId = fileId.indexOf('sp_wxsn') > -1 ? 'sp_wxsn_0_0' : fileId
     let url = `../detail/detail?fileId=${fileId}`
     App.toPage(url)
   },

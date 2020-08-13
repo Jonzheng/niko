@@ -31,11 +31,6 @@ Component({
 			type: Number,
 			value: 0,
 		},
-		// 空状态的图片
-		emptyUrl: {
-			type: String,
-			value: "/assets/image/empty/empty.png"
-		},
 		// 空状态的文字提示
 		emptyText: {
 			type: String,
@@ -103,7 +98,7 @@ Component({
 					this.setData({
 						scrollTop: e.detail.scrollTop
 					})
-				}, 100)
+				}, 200)
 			});
 		},
 		/**
@@ -180,7 +175,7 @@ Component({
 								successTran: false,
 								move: this.data.scrollHeight1
 							});
-						}, 250)
+						}, 400)
 					}, 900)
 				}, 450)
 			} else {

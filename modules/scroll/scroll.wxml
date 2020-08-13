@@ -49,7 +49,6 @@
 				</view>
 				<slot></slot>
 				<view wx:if="{{listCount === 0 && emptyShow}}" class="empty">
-					<image class="empty__image" src="{{emptyUrl}}"></image>
 					<view class="empty__text">{{emptyText}}</view>
 				</view>
 				<view wx:if="{{listCount !== 0}}" class="scroll__bottom">

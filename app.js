@@ -240,11 +240,51 @@ App({
       } // end 判断缓存文件是否可用
     })
   },
+  getBgmSrc() {
+    return new Promise((resolve, reject) => {
+      let url = 'https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/AudioHighs01.mp3'
+      if (this.globalData.bgmCount > 3){
+        resolve(url)
+        return
+      }
+      let bgmSrc = wx.getStorageSync('bgmSrc')
+      if (!bgmSrc) {
+        wx.downloadFile({
+          url: url,
+          success: (res) => {
+            if (res && res.tempFilePath) {
+              let fs = wx.getFileSystemManager()
+              bgmSrc = res.tempFilePath
+              wx.setStorageSync('bgmSrc', bgmSrc)
+              resolve(bgmSrc)
+            }
+          },
+          fail: (err)=>{
+            console.log(err)
+          }
+        })
+      } else { // 判断缓存文件是否可用
+        wx.getFileInfo({
+          filePath: bgmSrc,
+          complete: (info) => {
+            if (info && info.size > 0){
+              resolve(bgmSrc)
+            }else{
+              wx.setStorageSync('bgmSrc', false)
+              this.globalData.bgmCount += 1
+              this.getBgmSrc()
+            }
+          }
+        })
+      } // end 判断缓存文件是否可用
+    })
+  },
   globalData: {
     Cos,
     isIpx: false,
     admini: false,
     downCount: 0,
+    bgmCount: 0,
     userInfo: null,
     hideCircle: false,
     recordIds: [],
