@@ -96,8 +96,11 @@
                 <view class="tips-tri-up"></view>
               </view>
             </view>
-            <view class="out-btn" bindtap="nextSerifu">
-              <image class="btn-next" src="../../images/next.png"></image>
+            <view class="out-btn" bindtap="nextSerifu" data-rev="1">
+              <image class="btn-next rt-180" src="../../images/next.png"></image>
+            </view>
+            <view class="out-btn" bindtap="nextSerifu" data-rev="0">
+              <image class="btn-next an-spin-360" src="../../images/next.png"></image>
               <view wx:if="{{tipsDetailBtns == 1}}" class="tips-op tips-next fade-out">
                 <view class="tips-word">下一句</view>
                 <view class="tips-tri-up"></view>
@@ -107,9 +110,9 @@
 
         </view>
 
-      <view class="re-title">cv模仿录音：</view>
+      <view wx:if="{{!fakeHide}}" class="re-title">cv模仿录音：</view>
 
-        <view class="record-list">
+        <view wx:if="{{!fakeHide}}" class="record-list">
           <block wx:for="{{recordList}}" wx:key="record_id">
             <template is="ele-master" data="{{...item,index,rePos,cvColor}}"/>
           </block>
@@ -125,7 +128,7 @@
 
   </pull-down>
 </view>
-  <view class="fixed-bottom">
+  <view wx:if="{{!fakeHide}}" class="fixed-bottom">
     <view class="box-tips an-scale">
       <view class="item-tips"></view>
       <view class="item-tips-m">
@@ -249,5 +252,15 @@
         <image src="../../images/comm.png" class="icon-comm"></image>
       </view>
     </view>
+    <view wx:if="{{comments}}" class="box-comment-2" bindtap='showComment' data-idx="{{index}}">
+      <view class="item-comm-tri" />
+      <block wx:for="{{comments}}" wx:key="id">
+        <view class="item-comm">
+          <view class="item-comm-name">{{item.show_name || item.nick_name}}</view>
+          <view class="item-comm-content">{{item.content}}</view>
+        </view>
+      </block>
+    </view>
+    
   </view>
 </template>

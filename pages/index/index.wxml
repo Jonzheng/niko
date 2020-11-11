@@ -24,7 +24,7 @@
 		bind:refresh="refresh"
 		bind:more="more">
 	<view class="cells">
-    <view class="to-record" bindtap="toRecord">
+    <view wx:if="{{!fakeHide}}" class="to-record" bindtap="toRecord">
       <view class="cell__bd">
         cv模仿录音
         <view class="{{hideCircle ? 'circle-hide':'circle'}}"></view>

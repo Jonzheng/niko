@@ -343,14 +343,16 @@ Page({
     this._audioContextMine.stop()
   },
 
-  nextSerifu() {
+  nextSerifu(e) {
+    let rev = e.currentTarget.dataset.rev == '1' ? -1 : 1
     if (this._loading) return
     wx.vibrateShort()
     this.stopAllMedia()
     let fileId = this.data.fileId
     let list = this.data.list
     let idx = list.findIndex( item=> item.file_id == fileId)
-    let nidx = (idx+1) % list.length
+    let nidx = (idx+rev) % list.length
+    nidx = nidx == -1 ? list.length - 1 : nidx
     console.log(nidx, fileId, list)
     let curList = list[nidx]
     this.initPageData(curList.file_id)
@@ -507,6 +509,8 @@ Page({
           let data = res.data
           let { list, audio, record } = data
           list = list || []
+          let fakeHide = (list.length > 0 && list[0].clicks == 110)
+          this.setData({ fakeHide })
           let curList = list.filter(i=>i.file_id == fileId)[0]
           let curAudio = audio[0]
           let recordList = record
@@ -596,6 +600,7 @@ Page({
   playOri() {
     wx.vibrateShort()
     let curAudio = this.data.curAudio
+    if (!curAudio) return
     this._audioContextOri.src = curAudio.src_audio
     if (!this.data.oriPlaying && !this.data.isRecording) {
       wx.showNavigationBarLoading()
@@ -802,6 +807,7 @@ Page({
       data: { recordId, fileId, userId, masterId },
       success: ()=>{
         App.globalData.hasUpdate = true
+        App.globalData.recordIds.push(recordId)
         this.setData({
           recordList
         })
@@ -894,6 +900,7 @@ Page({
     this._curRecordIdx = idx
     this.setData({
       inputPh: `评论 ${nickname}：`,
+      curIdx: idx,
       curMaster,
       commShow: true
     })
@@ -911,7 +918,7 @@ Page({
     })
   },
   saveComment: function (content) {
-    let { fileId, curMaster } = this.data
+    let { fileId, curMaster, curIdx } = this.data
     let recordId = curMaster.record_id
     let masterId = curMaster.master_id
     let userId = App.globalData.openid
@@ -924,6 +931,7 @@ Page({
       data: { recordId, masterId, fileId, userId, content, reId, reName, reContent },
       success: (res)=> {
         App.globalData.hasUpdate = true
+        App.globalData.recordIds.push(recordId)
         console.log(res.data)
         if (res && res.data && res.data.code == 87014) {
           let content = res.data.data
@@ -933,6 +941,9 @@ Page({
           })
         } else {
           let commentList = res.data
+          let recordList = this.data.recordList
+          recordList[curIdx].comments = commentList.slice(0, 2)
+          this.setData({ recordList })
           this.initCommentList(commentList)
         }
       }
@@ -971,6 +982,7 @@ Page({
       data: { recordId, userId, commId },
       success: (res) => {
         App.globalData.hasUpdate = true
+        App.globalData.recordIds.push(recordId)
         this.clearInput()
         console.log(res.data)
         if (res) {

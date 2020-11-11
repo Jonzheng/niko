@@ -70,6 +70,28 @@
   }
 }
 
+.an-spin-360{
+  animation: spin-360 20s linear infinite;
+}
+
+@keyframes spin-360{
+  0%, 48%{
+    transform: rotate(0deg);
+  }
+  49%{
+    transform: rotate(-15deg);
+  }
+  50%{
+    transform: rotate(0deg);
+  }
+  51%{
+    transform: rotate(15deg);
+  }
+  52%, 100%{
+    transform: rotate(0deg);
+  }
+}
+
 .an-scale {
   animation: anScale 3s linear infinite;
 }
@@ -243,7 +265,7 @@
   min-height: 36rpx;
   display: flex;
   align-items: center;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .out-share{
@@ -526,6 +548,7 @@
   flex-direction: column;
   min-height: 400rpx;
   margin-bottom: 100px;
+  background: #fff;
 }
 .non-tips{
   height: 120rpx;
@@ -584,34 +607,6 @@
   color: #bbb;
 }
 
-.box-comment{
-  margin-left:80rpx;
-  margin-bottom: 6rpx;
-  padding-left: 12rpx;
-  padding-top: 10rpx;
-  width:632rpx;
-  height:240rpx;
-
-  border: 1rpx #eee solid; 
-}
-
-.box-comment-ele{
-  padding-left: 6rpx;
-  padding-top: 2rpx;
-  height: 28px;
-  width:610rpx;
-  border-left: 1rpx #eee solid;
-  border-bottom: 1rpx #eee solid;
-}
-.font-comment{
-  display: inline-block;
-  font-size: 36rpx;
-  color: #bbb;
-}
-.record-footer{
-  text-align: center;
-  margin-bottom: 0;
-}
 .fixed-bottom{
   position:fixed;
   left: 0;
@@ -743,7 +738,9 @@
   height: 105rpx;
   overflow: hidden;
 }
-
+.box-line .serifu .page-re{
+  color: #bbb;
+}
 .box-line .serifu{
   color: #337ab7;
   line-height: 60rpx;
@@ -902,6 +899,7 @@
   z-index: 1px;
   opacity: 1;
   transition: all 0.5s;
+  margin-left: 8rpx;
 }
 
 .btn-re-hide{

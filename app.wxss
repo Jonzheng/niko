@@ -79,9 +79,73 @@ page{
   transition: transform 0.3s ease-in;
 }
 
+.rt-180{
+  transform: rotate(180deg);
+  transition: transform 0.3s ease-in;
+}
+
 .blue-hover{
   transform:scale(1.01, 1.01);
   box-shadow: 0 0 20rpx rgba(0, 0, 255, 0.3);
+}
+
+.box-comment-2{
+  position: relative;
+  border: 3px solid #F7F8FA;
+  border-radius: 8rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 20rpx 6rpx;
+  padding: 10rpx 0;
+  max-width: 690rpx;
+}
+
+.item-comm-tri {
+  width: 35rpx;
+  height: 35rpx;
+  position: absolute;
+  right: 16rpx;
+  top: -24rpx;
+  transform: rotate(45deg);
+  border-left: 3px solid #F7F8FA;
+  border-top: 3px solid #F7F8FA;
+  z-index: 2;
+}
+
+.box-comment-2 .item-comm{
+  display: flex;
+  align-items: center;
+  line-height: 50rpx;
+  z-index: 1;
+}
+
+.item-comm-name {
+  flex-shrink: 0;
+  max-width: 168rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #4B6482;
+  letter-spacing: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-comm-name::after{
+  content: ":";
+  color: #4B6482;
+}
+
+.item-comm-content {
+  flex-shrink: 1;
+  font-size: 28rpx;
+  color: #999;
+  letter-spacing: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 3;
 }
 
 .level-0{

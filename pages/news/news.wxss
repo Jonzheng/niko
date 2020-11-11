@@ -96,6 +96,10 @@ page{
   width: 320rpx;
 }
 
+.comm-pre{
+  color: #4B6482;
+}
+
 .content-label{
   color: #bbb;
 }

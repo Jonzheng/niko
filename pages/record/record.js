@@ -11,7 +11,7 @@ Page({
     isIpx: App.globalData.isIpx,
     hasLogin: App.globalData.hasLogin,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
-    recordList: [],
+    pageList: [],
     commentList: [],
     avatars: [],
     rotY: 180,
@@ -36,6 +36,16 @@ Page({
   },
 
   onLoad: function (options) {
+    this._globalIndex = 0
+    this._globalList = []
+    this.pageHeightArr = []
+    wx.getSystemInfo({
+      success: (res) => {
+        let { windowHeight } = res;
+        this._windowHeight = windowHeight;
+      }
+    })
+
     this._lockHearts = []
     this._pageNo = 1
     this._showIdxs = []
@@ -56,7 +66,7 @@ Page({
         avatars.push({ url: '', openid: '' })
       }
       this._loadSpin = setInterval(() => {
-        if (this.data.recordList.length == 0) {
+        if (this.data.pageList.length == 0) {
           this.avatarTap(true)
         } else {
           clearInterval(this._loadSpin)
@@ -157,6 +167,9 @@ Page({
 
   // 刷新数据
   refresh() {
+    this._globalIndex = 0
+    this._globalList = []
+    this.pageHeightArr = []
     this._showIdxs = []
     this._pageNo = 1
     this.setData({
@@ -165,7 +178,7 @@ Page({
       empty: false,
       end: false,
       isReady: false,
-      recordList: [],
+      pageList: [],
       rotY: this.data.rotY + 120,
     })
     this.getRecords()
@@ -182,7 +195,34 @@ Page({
       this.setData({ isReady: true })
     }, 600)
     this._pageNo += 1
+    this._globalIndex += 1
     this.getRecords('more')
+  },
+
+  setHeight() {
+    let globalIdx = this._globalIndex
+    this.query = wx.createSelectorQuery();
+    this.query.select(`#wrp_${globalIdx}`).boundingClientRect()
+    this.query.exec( (res) => {
+      this.pageHeightArr[globalIdx] = res[0] && res[0].height;
+    });
+    this.observePage(globalIdx);
+  },
+
+  observePage(pageIndex) {
+    const observerObj = wx.createIntersectionObserver(this).relativeToViewport({ top: 2 * this._windowHeight, bottom: 2 * this._windowHeight });
+    observerObj.observe(`#wrp_${pageIndex}`, (res) => {
+      if (res.intersectionRatio <= 0) {
+        this.setData({
+          ['pageList[' + pageIndex + ']']: { height: this.pageHeightArr[pageIndex] },
+        })
+
+      } else {
+        this.setData({
+          ['pageList[' + pageIndex + ']']: this._globalList[pageIndex],
+        })
+      }
+    });
   },
 
   initRecords(recordList, type = 'refresh') {
@@ -202,15 +242,18 @@ Page({
     }
     this._step = unq.size
     if (type == 'more') {
-      let oldList = this.data.recordList
-      if (oldList.length > 40){
-        oldList = []
-        this.toTop()
-      }
-      recordList = oldList.concat(recordList)
-      this.setData({ recordList })
+      this._globalList[this._globalIndex] = recordList
+      let globalIdx = this._globalIndex
+      let datas = {}
+      datas['pageList[' + globalIdx + ']'] = recordList
+      this.setData(datas, () => {
+        this.setHeight();
+      })
     }else{
-      this.setData({ recordList })
+      this._globalList[this._globalIndex] = recordList
+      this.setData({ ['pageList[' + this._globalIndex + ']']: recordList }, () => {
+        this.setHeight();
+      })
     }
   },
 
@@ -220,7 +263,6 @@ Page({
     let openid = App.globalData.openid
     let pageNo = this._pageNo
     let recordIds = App.globalData.recordIds.join()
-    recordIds = ''
     wx.setNavigationBarTitle({
       title: '加载中※模仿录音',
     })
@@ -229,21 +271,26 @@ Page({
       method: 'post',
       data: { openid, pageNo, pageSize, recordIds },
       success: (res) => {
-        console.log(res)
         let { records, avatars, total } = res.data
         total = total || 800
         if (silence){
-          let recordList = this.data.recordList
-          for (let record of recordList){
-            for (let dd of records) {
-              if (record.record_id == dd.record_id){
-                record['heart'] = dd.heart
-                record['comm'] = dd.comm
-                record['heart_ud'] = dd.heart_ud
-              }
-            } // for end
+          let pageList = this.data.pageList
+          records = records || res.data
+          for (let lst of pageList){
+            if (!lst.length) continue;
+            for (let record of lst) {
+              for (let dd of records) {
+                if (record.record_id == dd.record_id){
+                  console.log('set--', dd.record_id)
+                  record['heart'] = dd.heart
+                  record['comm'] = dd.comm
+                  record['heart_ud'] = dd.heart_ud
+                }
+              } // for end
+            }
           } // for end
-          this.setData({ recordList })
+          App.globalData.recordIds = []
+          this.setData({ pageList })
         }else {
           this.initRecords(records, type)
           if (type == 'refresh') {
@@ -282,7 +329,7 @@ Page({
           } else {
             clearInterval(this._itPage)
           }
-        }, 50)
+        }, 30)
         
       }
     })
@@ -312,30 +359,28 @@ Page({
   },
 
   closeMask() {
-    let idx = this._curRecordIdx
-    console.log('idx;', idx)
+    let pdx = this.__pdx
+    let idx = this.__idx
     if (idx != undefined) {
-      let recordList = this.data.recordList
-      recordList[idx]['comm'] = this.data.commentList.length
-      this.setData({ recordList })
+      let pageList = this.data.pageList
+      pageList[pdx][idx]['comm'] = this.data.commentList.length
+      pageList[pdx][idx]['comments'] = this.data.commentList.slice(0, 2)
+      this.setData({ pageList })
     }
-    this.setData({
-      rt90: false,
-    })
-    this._curRecordIdx = undefined
+    this.__idx = undefined
   },
 
   showComment(e) {
     wx.vibrateShort()
-    let currData = e.currentTarget.dataset
-    let { idx, fid } = currData
+    let { idx, pdx, fid } = e.currentTarget.dataset
     let userId = App.globalData.openid
-    let recordList = this.data.recordList
-    let curMaster = recordList[idx]
+    let pageList = this.data.pageList
+    let curMaster = pageList[pdx][idx]
     let recordId = curMaster.record_id
     let nickname = curMaster.nick_name
     this._inputPh = `评论 ${nickname}：`
-    this._curRecordIdx = idx
+    this.__idx = idx
+    this.__pdx = pdx
     this.setData({
       fileId: fid,
       inputPh: `评论 ${nickname}：`,
@@ -356,14 +401,12 @@ Page({
     })
   },
 
-  saveComment: function (content) {
-    let { fileId, curMaster } = this.data
+  saveComment(content) {
+    let { fileId, curMaster, reId, reName, reContent  } = this.data
     let recordId = curMaster.record_id
     let masterId = curMaster.master_id
     let userId = App.globalData.openid
-    let reId = this.data.reId
-    let reName = this.data.reName
-    let reContent = this.data.reContent
+
     wx.request({
       url: `${host}/saveComment`,
       method: 'POST',
@@ -379,6 +422,11 @@ Page({
           })
         } else {
           let commentList = res.data
+          let pdx = this.__pdx
+          let idx = this.__idx
+          let pageList = this.data.pageList
+          pageList[pdx][idx].comments = commentList.slice(0, 2)
+          this.setData({ pageList })
           this.initCommentList(commentList)
         }
       }
@@ -387,13 +435,11 @@ Page({
 
   replyUser(e) {
     let { cid, nickname, content } = e.currentTarget.dataset
-    let recordList = this.data.recordList
     let pre = content.substr(0, 5)
     pre = (content.length > 5) ? pre + '...' : pre
     this.setData({
       inputPh: `回复 ${nickname} '${pre}'：`,
       inputValue: '',
-      recordList,
       reId: cid,
       reName: nickname,
       reContent: content
@@ -431,27 +477,26 @@ Page({
 
   showMore(e) {
     wx.vibrateShort()
-    let currData = e.currentTarget.dataset
-    let idx = currData.idx
-    let recordList = this.data.recordList
-    let master_id = recordList[idx]["master_id"]
+    let { pdx, idx } = e.currentTarget.dataset
+    let pageList = this.data.pageList
+    let master_id = pageList[pdx][idx]["master_id"]
     let isSelf = false
     if (master_id == App.globalData.openid) isSelf = true
-    if (recordList[idx]["btnRt"] == "rt-90") {
-      recordList[idx]["boxStyle"] = "btn-play-box"
-      recordList[idx]["btnRt"] = ""
+    if (pageList[pdx][idx]["btnRt"] == "rt-90") {
+      pageList[pdx][idx]["boxStyle"] = "btn-play-box"
+      pageList[pdx][idx]["btnRt"] = ""
       if (isSelf) {
-        recordList[idx]["btnShow"] = false
+        pageList[pdx][idx]["btnShow"] = false
       }
     } else {
-      recordList[idx]["boxStyle"] = "btn-play-box-sm"
-      recordList[idx]["btnRt"] = "rt-90"
+      pageList[pdx][idx]["boxStyle"] = "btn-play-box-sm"
+      pageList[pdx][idx]["btnRt"] = "rt-90"
       if (isSelf) {
-        recordList[idx]["btnShow"] = true
+        pageList[pdx][idx]["btnShow"] = true
       }
     }
     this.setData({
-      recordList
+      pageList
     })
   },
 
@@ -462,13 +507,11 @@ Page({
   },
 
   updateHeart(e) {
-    let currData = e.currentTarget.dataset
-    let { idx, status, fid } = currData
+    let { idx, pdx, status, fid } = e.currentTarget.dataset
     let userId = App.globalData.openid
-    let recordList = this.data.recordList
-    let curMaster = recordList[idx]
-    let recordId = curMaster["record_id"]
-    let masterId = curMaster['master_id']
+    let pageList = this.data.pageList
+    let recordId = pageList[pdx][idx]["record_id"]
+    let masterId = pageList[pdx][idx]['master_id']
     if (this._lockHearts.indexOf(recordId) > -1) return
     this._lockHearts.push(recordId)
     let url = ''
@@ -476,13 +519,14 @@ Page({
       this.playHeartSrc()
       wx.vibrateShort()
       url = `${host}/updateHeart`
-      curMaster["heart_ud"] = true
-      curMaster["heart"] += 1
+      pageList[pdx][idx]["heart_ud"] = true
+      pageList[pdx][idx]["heart"] += 1
     } else {
       url = `${host}/cancelHeart`
-      curMaster["heart_ud"] = false
-      curMaster["heart"] -= 1
+      pageList[pdx][idx]["heart_ud"] = false
+      pageList[pdx][idx]["heart"] -= 1
     }
+    this.setData({ pageList })
     wx.request({
       url: url,
       method: 'post',
@@ -491,55 +535,52 @@ Page({
         App.globalData.hasUpdate = true
       },
       complete: () => {
-        this.setData({
-          recordList
-        })
         this._lockHearts.splice(this._lockHearts.indexOf(recordId), 1)
       }
     })
   },
 
   listen(e) {
-    let currData = e.currentTarget.dataset
-    let recordId = currData.rid
-    let idx = currData.idx
-    let recordList = this.data.recordList
-    let srcRecord = recordList[idx]["src_record"]
-    console.log(srcRecord)
+    let { idx, pdx } = e.currentTarget.dataset
+    let pageList = this.data.pageList
+    let srcRecord = pageList[pdx][idx]["src_record"]
     if (!srcRecord) return
-    if (recordList[idx]["isListen"]) {
-      recordList[idx]["isListen"] = false
-      recordList[idx]["listenStatus"] = "listen-off"
-      recordList[idx]["anListen"] = ""
+    if (pageList[pdx][idx]["isListen"]) {
+      pageList[pdx][idx]["isListen"] = false
+      pageList[pdx][idx]["listenStatus"] = "listen-off"
+      pageList[pdx][idx]["anListen"] = ""
       this._audioContextMaster.stop()
     } else {
       wx.vibrateShort()
       wx.showNavigationBarLoading()
       this.setMasterStop()
-      recordList[idx]["isListen"] = true
-      recordList[idx]["listenStatus"] = "listen-on"
-      recordList[idx]["anListen"] = "an-listen-on"
+      pageList[pdx][idx]["isListen"] = true
+      pageList[pdx][idx]["listenStatus"] = "listen-on"
+      pageList[pdx][idx]["anListen"] = "an-listen-on"
       this._audioContextMaster.src = srcRecord
       this._audioContextMaster.play()
       this._listenIndex = idx
+      this._pdx = pdx
     }
     this.setData({
-      recordList
+      pageList
     })
   },
 
   setMasterStop() {
-    let index = this._listenIndex
-    let recordList = this.data.recordList
-    if (index != undefined && index < recordList.length && recordList[index]["isListen"]) {
+    let idx = this._listenIndex
+    let pdx = this._pdx
+    let pageList = this.data.pageList
+    if (idx != undefined && idx < pageList[pdx].length && pageList[pdx][idx]["isListen"]) {
       wx.hideNavigationBarLoading()
-      recordList[index]["isListen"] = false
-      recordList[index]["listenStatus"] = "listen-off"
-      recordList[index]["anListen"] = ""
+      pageList[pdx][idx]["isListen"] = false
+      pageList[pdx][idx]["listenStatus"] = "listen-off"
+      pageList[pdx][idx]["anListen"] = ""
       this._audioContextMaster.stop()
       this._listenIndex = undefined
+      this._pdx = undefined
       this.setData({
-        recordList,
+        pageList,
       })
     }
     this._audioContextMaster.seek(0)
@@ -561,10 +602,8 @@ Page({
     })
   },
 
-  delRecordConfirm: function (e) {
-    let currData = e.currentTarget.dataset
-    let recordId = currData.rid
-    let index = currData.idx
+  delRecordConfirm(e) {
+    let { idx, pdx, rid } = e.currentTarget.dataset
     wx.showModal({
       title: '撤回录音?',
       content: '撤回后可在「我的」再次发布',
@@ -572,10 +611,10 @@ Page({
       cancelText: "取消",
       success: (res) => {
         if (res.confirm) {
-          let recordList = this.data.recordList
-          recordList.splice(index, 1)
-          this.setData({ recordList })
-          this.delRecord(recordId)
+          let pageList = this.data.pageList
+          pageList[pdx].splice(idx, 1)
+          this.setData({ pageList })
+          this.delRecord(rid)
         }
       }
     });

@@ -123,9 +123,10 @@ page{
 
 .item-record{
   color: #666;
-  padding: 20rpx 20rpx;
+  padding: 20rpx 10rpx;
   display: flex;
-  border-bottom: 1rpx solid #ccc;
+  flex-direction: column;
+  border-bottom: 1rpx solid #ccc;  
 }
 
 .menu-comm{
@@ -199,6 +200,9 @@ page{
 .box-col{
   display: flex;
   flex-direction: column;
+}
+.box-col .serifu .page-re{
+  color: #bbb;
 }
 .box-col .serifu{
   color: #337ab7;

@@ -75,7 +75,7 @@
     <view wx:if="{{item.type == 'comment'}}" class="content">
       <view class="content-label">评论了{{news == -1 ? 'ta':'你'}}</view>
       <view class="content-line">
-        <text>{{item.pre}}</text>
+        <text class="comm-pre">{{item.pre}}</text>
         <text class="content-label">@{{item.dateStr}}</text></view>
     </view>
   </view>

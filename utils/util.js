@@ -1,4 +1,4 @@
-const host = 'https://nikoni.fun/api'
+const host = 'https://nikoni.fun/dev'
 
 const formatTime = date => {
   const year = date.getFullYear()

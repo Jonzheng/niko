@@ -138,8 +138,12 @@ App({
             })
           })
         },
-        fail: err=>{
+        fail: err =>{
           console.log('download avatar fail!!!', err)
+          this.globalData.hasLogin = true
+          this.updateUser(userInfo).then((res) => {
+            resolve(res)
+          })
         }
       })
     })

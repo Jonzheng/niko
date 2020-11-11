@@ -2,7 +2,7 @@
   <view class="bg-cv" style="background: linear-gradient({{cvColor[userInfo.cv]}}, {{cvColor[userInfo.cv+1]}});"></view>
 </view>
 <view wx:if="{{cvDescShow}}" class="mask-w" catchtap="closeCvMask"></view>
-<view wx:if="{{total>20}}" class="page-no" catchtap="toTop">{{curData}}/{{total}} <image class="icon" src="../../images/top.png"></image></view>
+<view wx:if="{{total>0}}" class="page-no" catchtap="toTop">{{curData}}/{{total}} <image class="icon" src="../../images/top.png"></image></view>
 <button wx:if="{{total>0}}" class="share" open-type="share" size="mini" style="bottom:12rpx">
   <image src="../../images/share.png"></image>
 </button>
@@ -44,7 +44,7 @@
     <button wx:if="{{!hasLogin && canIUse}}" class="btn-user" open-type="getUserInfo" bindgetuserinfo="getUserInfo">二次元入口</button>
   </view>
 
-<scroll id="scroll"
+<scroll wx:if="{{hasLogin}}" id="scroll"
     requesting="{{requesting}}"
     empty-show="{{emptyShow}}"
     end="{{end}}"
@@ -112,59 +112,74 @@
     </view>
   <view class="cells">
     <view class="record-label">cv模仿录音：</view>
-    <view wx:if="{{isReady && recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
+    <view wx:if="{{isReady && total == 0}}" class="non-tips"> ※ 没有录音 ※</view>
     <image wx:if="{{showLoading}}" class="i-loading" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-1.png"></image>
-    <block wx:for="{{recordList}}" wx:key="record_id">
-      <view class="item-record">
-        <view class="box-col">
-          <view class="serifu" bindtap="toDetail" data-id="{{item.file_id}}">{{item.ser}}</view>
+    <view wx:for="{{ pageList }}" id="wrp_{{pageIndex}}" wx:for-index="pageIndex" wx:for-item="listSingleItem" wx:key="index">
+      <block wx:if="{{listSingleItem.length > 0}}">
+        <block wx:for="{{listSingleItem}}" wx:key="record_id">
+          <view class="item-record">
+            <view class="box-col">
+              <view class="serifu" bindtap="toDetail" data-id="{{item.file_id}}"><text class="page-re">p{{pageIndex+1}}.</text>{{item.ser || '* * *'}}</view>
 
-          <view class="box-line">
-            <view class="re-width">
-              <view class="re-tri"></view>
-              <view class="btn-listen {{item.isListen?'an-listen-on':''}}"
-                style="width: {{item.btnRt=='rt-90' ? 100 : 320}}rpx;border:3rpx solid {{cvColor[cv]}}"
-                catchtap="listen" data-idx="{{index}}" data-rid="{{item.record_id}}">
-                <view class='box-paly-btn'>
-                  <view hidden="{{isListen}}" class="btn-one" style="background: {{cvColor[cv]}}"></view>
-                  <view class="btn-two {{isListen?'listen-on':'listen-off'}}" style="background: {{cvColor[cv]}}"></view>
-                  <view hidden="{{isListen}}" class="btn-three" style="background: {{cvColor[cv]}}"></view>
+              <view class="box-line">
+                <view class="re-width">
+                  <view class="re-tri"></view>
+                  <view class="btn-listen {{item.isListen?'an-listen-on':''}}"
+                    style="width: {{item.btnRt=='rt-90' ? 100 : 320}}rpx;border:3rpx solid {{cvColor[cv]}}"
+                    catchtap="listen" data-idx="{{index}}" data-pdx="{{pageIndex}}" data-rid="{{item.record_id}}">
+                    <view class='box-paly-btn'>
+                      <view hidden="{{isListen}}" class="btn-one" style="background: {{cvColor[cv]}}"></view>
+                      <view class="btn-two {{isListen?'listen-on':'listen-off'}}" style="background: {{cvColor[cv]}}"></view>
+                      <view hidden="{{isListen}}" class="btn-three" style="background: {{cvColor[cv]}}"></view>
+                    </view>
+                    <view wx:if="{{item.isListen}}" class="re-idx" style="height:{{rePos>0 ? 56:0}}rpx;left:{{rePos}}%;background: {{cvColor[cv]}}"></view>
+                  </view>
+                  <block wx:if="{{item.btnShow}}">
+                    <view wx:if="{{item.status == 1}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
+                      catchtap='updateRecord' data-idx="{{index}}" data-pdx="{{pageIndex}}" data-rid="{{item.record_id}}" data-status="0">撤回</view>
+                    <view wx:if="{{item.status == 0}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
+                      catchtap='updateRecord' data-idx="{{index}}" data-pdx="{{pageIndex}}" data-rid="{{item.record_id}}" data-status="1">发布</view>
+                    <view class="text-del {{item.btnShow ? 'btn-red':'btn-red-hidden'}}" catchtap='delRecordConfirm'
+                      data-idx="{{index}}" data-pdx="{{pageIndex}}" data-rid="{{item.record_id}}">删除</view>
+                  </block>
                 </view>
-                <view wx:if="{{item.isListen}}" class="re-idx" style="height:{{rePos>0 ? 56:0}}rpx;left:{{rePos}}%;background: {{cvColor[cv]}}"></view>
+                <image src="../../images/more.png" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}" data-pdx="{{pageIndex}}"></image>
               </view>
-              <block wx:if="{{item.btnShow}}">
-                <view wx:if="{{item.status == 1}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
-                  catchtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="0">撤回</view>
-                <view wx:if="{{item.status == 0}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
-                  catchtap='updateRecord' data-idx="{{index}}" data-rid="{{item.record_id}}" data-status="1">发布</view>
-                <view class="text-del {{item.btnShow ? 'btn-red':'btn-red-hidden'}}" catchtap='delRecordConfirm'
-                  data-idx="{{index}}" data-rid="{{item.record_id}}">删除</view>
-              </block>
-            </view>
-            <image src="../../images/more.png" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
-          </view>
 
-          <view class="box-line flex-space">
-            <view class="date">{{item.dateStr}}
-              <view hidden="{{item.status == 0}}" class="bg-pub comm-author">公开</view>
-              <view hidden="{{item.status == 1}}" class="bg-pri comm-author">私密</view>
-            </view>
-            <view class="box-line">
-              <view class="menu-comm" bindtap='updateHeart'
-                data-idx="{{index}}" data-fid="{{item.file_id}}" data-status="{{item.heartStatus}}">
-                <view class="text-heart">{{item.heart}}</view>
-                <image src="../../images/heart-{{item.heartStatus == 1 ? 'on' : 'off'}}.png" class="sm-icon"></image>
+              <view class="box-line flex-space">
+                <view class="date">{{item.dateStr}}
+                  <view hidden="{{item.status == 0}}" class="bg-pub comm-author">公开</view>
+                  <view hidden="{{item.status == 1}}" class="bg-pri comm-author">私密</view>
+                </view>
+                <view class="box-line">
+                  <view class="menu-comm" bindtap='updateHeart'
+                    data-idx="{{index}}" data-pdx="{{pageIndex}}" data-fid="{{item.file_id}}" data-status="{{item.heartStatus}}">
+                    <view class="text-heart">{{item.heart}}</view>
+                    <image src="../../images/heart-{{item.heartStatus == 1 ? 'on' : 'off'}}.png" class="sm-icon"></image>
+                  </view>
+                  <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-pdx="{{pageIndex}}" data-fid="{{item.file_id}}">
+                    <view class="text-heart">{{item.comm}}</view>
+                    <image src="../../images/comm.png" class="icon-comm"></image>
+                  </view>
+                </view>
               </view>
-              <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-fid="{{item.file_id}}">
-                <view class="text-heart">{{item.comm}}</view>
-                <image src="../../images/comm.png" class="icon-comm"></image>
+
+              <view wx:if="{{item.comments && item.comments.length >0}}" class="box-comment-2" bindtap='showComment' data-idx="{{index}}" data-pdx="{{pageIndex}}" data-fid="{{item.file_id}}">
+                <view class="item-comm-tri" />
+                <block wx:for="{{item.comments}}" wx:key="id" wx:for-item="comm">
+                  <view class="item-comm">
+                    <view class="item-comm-name">{{comm.show_name || comm.nick_name}}</view>
+                    <view class="item-comm-content">{{comm.content}}</view>
+                  </view>
+                </block>
               </view>
+
             </view>
           </view>
-
-        </view>
-      </view>
-    </block>
+        </block>
+      </block>
+      <view wx:else style="height:{{listSingleItem.height}}px" ></view>
+    </view>
   </view>
   </view>
   </scroll>
@@ -205,7 +220,7 @@
 <action-sheet formShow="{{aboutShow}}" bind:clickMask="closeAbout" boxHeight="{{isIpx ? 800 : 720}}"
   formTitle="关于『式神录』" scroll="{{false}}">
   <view class="about-label">简介</view>
-  <view class="about-desc">式神录是我业余时间开发的一个小程序，一来是出于兴趣，再者是为了技术实践，如果你遇到一些bug可以点击下面的反馈按钮，截图反馈给我，24小时在线陪聊。如果你觉得小程序还ok，那你可以多发几条录音、分享给你的朋友或寮群，让更多的人发现式神录。记得常回来看崽崽啦。</view>
+  <view class="about-desc">式神录是我业余时间开发的一个小程序，纯粹是兴趣和技术实践，发现Bug可以点下面的反馈按钮，截图反馈给我。玩得开心。</view>
   <view class="about-label">传火</view>
   <view class="about-desc" style="text-indent:0">
     <button class="out-share" open-type="share" size="mini" bindtap="closeAbout">
@@ -218,5 +233,5 @@
       <image class="btn-contact" src="../../images/talk.png"></image>
     </button>
   </view>
-  <view class="non-tips end-pd">※ 2020-07-14 郑三刀 ※</view>
+  <view class="non-tips end-pd">※ 2020-10-30 狂気の三刀 ※</view>
 </action-sheet>

@@ -25,7 +25,7 @@
       requesting="{{requesting}}"
       empty-show="{{emptyShow}}"
       end="{{end}}"
-      listCount="{{recordList.length}}"
+      listCount="{{total}}"
       scrollTop="{{scrollTop}}"
       scrollAnimation="{{scrollAnimation}}"
       has-top="{{hasTop}}"
@@ -37,10 +37,18 @@
       bind:refresh="refresh"
       bind:more="more">
       <view class="record-list box-pd">
-        <image wx:if="{{preLoad && recordList.length == 0}}" class="{{preLoad ? 'i-loading':'i-hide'}}" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-0.png"></image>
-        <block wx:for="{{recordList}}" wx:key="record_id">
-          <template is="ele-master" data="{{...item,index,rePos,cvColor,pageIdx}}"/>
-        </block>
+        <image wx:if="{{preLoad && pageList.length == 0}}" class="{{preLoad ? 'i-loading':'i-hide'}}" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-0.png"></image>
+
+        <view wx:for="{{ pageList }}" id="wrp_{{pageIndex}}" wx:for-index="pageIndex" wx:for-item="listSingleItem" wx:key="index">
+          <block wx:if="{{listSingleItem.length > 0}}">
+            <block wx:for="{{listSingleItem}}" wx:key="record_id">
+              <template is="ele-master" data="{{...item,index,rePos,cvColor,pageIndex}}"/>
+            </block>
+          </block>
+          <view wx:else style="height:{{listSingleItem.height}}px" ></view>
+
+        </view>
+
       </view>
   </scroll>
 
@@ -78,10 +86,10 @@
 <template name="ele-master">
   <view class="box-record">
     <view class="box-line">
-      <view class="serifu" bindtap="toDetail" data-id="{{file_id}}">{{ser || '* * *'}}</view>
+      <view class="serifu" bindtap="toDetail" data-id="{{file_id}}"><text class="page-re">p{{pageIndex+1}}.</text>{{ser || '* * *'}}</view>
     </view>
     <view class="box-line">
-      <view class="nickname">{{show_name || nick_name}}</view>
+      <view class="nickname" style="color: {{cvColor[cv]}};font-weight: 500;">{{show_name || nick_name}}</view>
       <view class="date">{{dateStr}}</view>
     </view>
     <view class="box-line">
@@ -93,7 +101,7 @@
         <view class="re-tri"></view>
         <view class="btn-listen {{isListen?'an-listen-on':''}}"
           style="width: {{btnRt=='rt-90' ? 100 : 320}}rpx;border:3rpx solid {{cvColor[cv]}}"
-          catchtap="listen" data-idx="{{index}}" data-rid="{{record_id}}">
+          catchtap="listen" data-idx="{{index}}" data-pdx="{{pageIndex}}" data-rid="{{record_id}}">
           <view class='box-paly-btn'>
             <view hidden="{{isListen}}" class="btn-one" style="background: {{cvColor[cv]}}"></view>
             <view class="btn-two {{isListen?'listen-on':'listen-off'}}" style="background: {{cvColor[cv]}}"></view>
@@ -102,19 +110,30 @@
           <view wx:if="{{isListen}}" class="re-idx" style="height:{{rePos>0 ? 56:0}}rpx;left:{{rePos}}%;background: {{cvColor[cv]}}"></view>
         </view>
         <view wx:if="{{btnShow}}" class="text-pub {{btnShow ? 'btn-re':'btn-re-hide'}}" catchtap='delRecordConfirm'
-          data-idx="{{index}}" data-rid="{{record_id}}">撤回</view>
+          data-idx="{{index}}" data-pdx="{{pageIndex}}" data-rid="{{record_id}}">撤回</view>
       </view>
-      <image wx:if="{{isMine}}" src="../../images/more.png" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
+      <image wx:if="{{isMine}}" src="../../images/more.png" class="sm-icon {{btnRt}}"
+        bindtap='showMore' data-idx="{{index}}" data-pdx="{{pageIndex}}"></image>
     </view>
     <view class="box-line flex-right">
-      <view class="menu-comm" bindtap='updateHeart' data-idx="{{index}}" data-fid="{{file_id}}" data-status="{{heart_ud}}">
+      <view class="menu-comm" bindtap='updateHeart' data-idx="{{index}}" data-pdx="{{pageIndex}}" data-fid="{{file_id}}" data-status="{{heart_ud}}">
         <view class="text-heart">{{heart}}</view>
         <image src="../../images/heart-{{heart_ud ? 'on' : 'off'}}.png" class="sm-icon"></image>
       </view>
-      <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-fid="{{file_id}}">
+      <view class="menu-comm" bindtap='showComment' data-idx="{{index}}" data-pdx="{{pageIndex}}" data-fid="{{file_id}}">
         <view class="text-heart">{{comm}}</view>
         <image src="../../images/comm.png" class="icon-comm"></image>
       </view>
     </view>
+    <view wx:if="{{comments && comments.length >0}}" class="box-comment-2" bindtap='showComment' data-idx="{{index}}" data-pdx="{{pageIndex}}" data-fid="{{file_id}}">
+      <view class="item-comm-tri" />
+      <block wx:for="{{comments}}" wx:key="id">
+        <view class="item-comm">
+          <view class="item-comm-name">{{item.show_name || item.nick_name}}</view>
+          <view class="item-comm-content">{{item.content}}</view>
+        </view>
+      </block>
+    </view>
+
   </view>
 </template>

@@ -3,7 +3,7 @@ const { trim, host } = require('../../utils/util')
 
 const pageStart = 1
 const tabData = [
-  { value: "sp", name:"SP"},
+  { value: "sp", name:"SP+"},
   { value: "ssr",name: "SSR"},
   { value: "sr",name: "SR"},
   { value: "r",name: "R"},
@@ -33,7 +33,8 @@ Page({
     refreshSize: 0,
     topSize: 90,
     bottomSize: 0,
-    hideCircle: true
+    hideCircle: true,
+    fakeHide: true
   },
 
   onLoad: function (options) {
@@ -206,7 +207,7 @@ Page({
       let first = {}
       for (let v of list) {
         if (v.s_name == name) {
-          let pure = trim(v.serifu)
+          let pure = trim(v.serifu).replace(/[　]+/g, "")
           if (!first.serifu || pure.length > trim(first.serifu).length) first = v
           sers.push(pure)
         }
@@ -225,6 +226,8 @@ Page({
     let { total, list, names, type, pageNo, level } = data
     let items = this.initItem(list, names)
     console.log(items)
+    let fakeHide = (list.length > 0 && list[0].clicks == 110)
+    this.setData({ fakeHide })
     if ('sp' == level){
       let spList = type === 'more' ? this.data.spList.concat(items) : items
       this.setData({
