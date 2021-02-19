@@ -31,7 +31,7 @@
   position: fixed;
   bottom: 0;
   width: 750rpx;
-  background: #ffffff;
+  background: #FDFDFD;
   z-index: 11;
   border-radius: 30rpx 30rpx 0 0;
 }

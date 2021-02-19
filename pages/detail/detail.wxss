@@ -307,7 +307,7 @@
 }
 
 .curr-title{
-  width: 220rpx;
+  width: 360rpx;
   display: flex;
   align-items: center;
   color: #888888;
@@ -501,6 +501,7 @@
 }
 
 .box-serifu{
+  position: relative;
   border-top: 1rpx solid #cccccc;
   border-bottom: 3rpx solid #337ab7;
   display: flex;
@@ -569,10 +570,9 @@
 }
 
 .to-tips .to-text{
-  opacity: .5;
-  color: #bbb;
+  color: #CCCCCC;
   padding: 6rpx 0;
-  border-bottom: 3rpx solid rgba(0, 0, 255, 0.3);
+  border-bottom: 3rpx solid rgba(0, 0, 255, 0.6);
 }
 
 .end-pd{
@@ -996,10 +996,14 @@
 
 .menu-comm{
   width: 120rpx;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: flex-end;
   color: #ccc;
+  margin: 0;
+  font-weight: normal;
+  background: transparent;
+  background-color: transparent;
 }
 
 .box-comm-zan{

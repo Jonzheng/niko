@@ -18,7 +18,6 @@ Page({
     motto: '',
     isMine: false,
     avatarUrl: 'https://avatar-1256378396.cos.ap-guangzhou.myqcloud.com/n_cm_0.png',
-    canIUse: wx.canIUse('button.open-type.getUserInfo'),
     boxStyle: 'btn-play-box',
     anListen: '',
     isListen: false,
@@ -246,13 +245,10 @@ Page({
     App.toPage(url)
   },
   showAvatar() {
-    this.setData({
-      avatarShow: true
-    })
-  },
-  hideAvatar() {
-    this.setData({
-      avatarShow: false
+    let url = this.data.userInfo.avatar_url
+    url = url.split('&imageView2')[0]
+    wx.previewImage({
+      urls: [url],
     })
   },
   back(){
@@ -509,9 +505,10 @@ Page({
     let { idx, pdx, fid } = e.currentTarget.dataset
     let userId = App.globalData.openid
     let pageList = this.data.pageList
+    let userInfo = this.data.userInfo
     let curMaster = pageList[pdx][idx]
     let recordId = curMaster.record_id
-    let nickname = curMaster.nick_name
+    let nickname = curMaster.nick_name || userInfo.show_name || userInfo.nick_name
     this._inputPh = `评论 ${nickname}：`
     this.__idx = idx
     this.__pdx = pdx

@@ -3,12 +3,12 @@ const { trim, host } = require('../../utils/util')
 
 const pageStart = 1
 const tabData = [
-  { value: "sp", name:"SP+"},
+  { value: "m",name: "罗德岛"},
+  { value: "sp", name:"SP"},
   { value: "ssr",name: "SSR"},
   { value: "sr",name: "SR"},
   { value: "r",name: "R"},
-  { value: "n",name: "N"},
-  { value: "m",name: "阴阳师"}
+  { value: "n",name: "N"}
 ]
 Page({
 
@@ -18,7 +18,7 @@ Page({
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     tabData: tabData,
-    tabCur: 1,
+    tabCur: 2,
     size: 90,
     color: "#4a5fe2",
     loadingImg: "../../images/loading1.gif",
@@ -227,6 +227,7 @@ Page({
     let items = this.initItem(list, names)
     console.log(items)
     let fakeHide = (list.length > 0 && list[0].clicks == 110)
+    App.globalData.fakeHide = fakeHide
     this.setData({ fakeHide })
     if ('sp' == level){
       let spList = type === 'more' ? this.data.spList.concat(items) : items

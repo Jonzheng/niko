@@ -517,7 +517,7 @@ Page({
           this.initSerifu(curList)
           this.initRecords(recordList)
           list.map((item)=> {
-            item['ser'] = trim(item.serifu)
+            item['ser'] = trim(item.serifu).replace(/[　]+/g, "")
             item['title'] = item.title + '_' + item.file_id.split('_')[3]
           })
           console.log(list)
@@ -743,6 +743,7 @@ Page({
 
   toPerson(e) {
     wx.vibrateShort()
+    if (this.data.fakeHide) return;
     let masterId = e.currentTarget.dataset.uid
     if (masterId == App.globalData.openid){
       return wx.switchTab({

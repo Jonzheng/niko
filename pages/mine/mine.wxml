@@ -2,14 +2,17 @@
   <view class="bg-cv" style="background: linear-gradient({{cvColor[userInfo.cv]}}, {{cvColor[userInfo.cv+1]}});"></view>
 </view>
 <view wx:if="{{cvDescShow}}" class="mask-w" catchtap="closeCvMask"></view>
-<view wx:if="{{total>0}}" class="page-no" catchtap="toTop">{{curData}}/{{total}} <image class="icon" src="../../images/top.png"></image></view>
-<button wx:if="{{total>0}}" class="share" open-type="share" size="mini" style="bottom:12rpx">
+<view wx:if="{{total>0 && !tmpAvatar}}" class="page-no" catchtap="toTop">{{curData}}/{{total}} <image class="icon" src="../../images/top.png"></image></view>
+<button wx:if="{{total>0 && !tmpAvatar}}" class="share" open-type="share" size="mini" style="bottom:12rpx">
   <image src="../../images/share.png"></image>
 </button>
 <view class="box">
   <view class="top-mine">
-    <image class="avatar {{admini ? 'admini':''}}" src="{{userInfo.avatar_url || detaultAvatar}}"
-    bindtap="showAvatar"></image>
+    <view class="box-avatar">
+      <image class="avatar {{admini ? 'admini':''}}" src="{{userInfo.avatar_url || detaultAvatar}}"
+      bindtap="showAvatar"></image>
+      <image wx:if="{{!fakeHide}}" class="icon-cam" src="../../images/cam.png" bindtap="chooseAvatar"></image>
+    </view>
 
     <view class="relation">
       <view class="mine-menu">
@@ -40,6 +43,17 @@
 </view>
 
 <view class="mine-body">
+  <view class="box-image-cropper {{tmpAvatar ? 'ic-show':'ic-hide'}}">
+    <image-cropper
+      id="image-cropper" limit_move="{{true}}" disable_rotate="{{true}}" disable_width="{{true}}" disable_height="{{true}}"
+      width="{{300}}" height="{{300}}"
+      imgSrc="{{tmpAvatar}}"
+      bindload="cropperload" bindimageload="loadimage" bindtapcut="clickcut">
+    </image-cropper>
+    <view class="btn btn-save" bindtap="saveAvatar">保存</view>
+    <view class="btn btn-cancel" bindtap="cancelAvatar">取消</view>
+  </view>
+
   <view class="userinfo">
     <button wx:if="{{!hasLogin && canIUse}}" class="btn-user" open-type="getUserInfo" bindgetuserinfo="getUserInfo">二次元入口</button>
   </view>
@@ -63,7 +77,7 @@
   <view class="profile" style="border-bottom: 3rpx solid {{cvColor[userInfo.cv]}};">
     <view class="box-line">
       <view class="mine-name" bindlongpress="auth">{{userInfo.show_name || userInfo.nick_name}}</view>
-      <view class="icon-right" bindtap="toEdit" data-name="{{userInfo.show_name || userInfo.nick_name}}" data-motto="{{userInfo.motto}}">
+      <view wx:if="{{!fakeHide}}" class="icon-right" bindtap="toEdit" data-name="{{userInfo.show_name || userInfo.nick_name}}" data-motto="{{userInfo.motto}}">
         <image class="arrow" src="../../images/arrow-left.png"></image>
       </view>
     </view>
@@ -184,15 +198,12 @@
   </view>
   </scroll>
 </view>
-<view wx:if="{{avatarShow}}" class="avatar-mask" catchtap="hideAvatar">
-  <image class="avatar-detail" src="{{userInfo.avatar_url}}" mode="widthFix"></image>
-</view>
 
 <action-sheet formShow="{{commShow}}" bind:clickMask="closeMask" bind:confirmInput="confirmInput" bind:blur="clearInput"
   hasInput="{{true}}" boxHeight="{{isIpx ? 920 : 720}}" inputValue="{{inputValue}}"
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="id">
-    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
+    <image class="re-avatar" mode="aspectFit" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
     <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
       data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">
       <view class="comm-top">
@@ -220,7 +231,11 @@
 <action-sheet formShow="{{aboutShow}}" bind:clickMask="closeAbout" boxHeight="{{isIpx ? 800 : 720}}"
   formTitle="关于『式神录』" scroll="{{false}}">
   <view class="about-label">简介</view>
-  <view class="about-desc">式神录是我业余时间开发的一个小程序，纯粹是兴趣和技术实践，发现Bug可以点下面的反馈按钮，截图反馈给我。玩得开心。</view>
+  <view class="about-desc">式神录是我业余时间开发的一个小程序，纯粹是兴趣和技术实践，发现Bug或者台词纠错，可以点下面的按钮反馈给我。玩得开心。</view>
+  <view class="about-uv">式神录今日访问量：{{userInfo.nikoUv}}</view>
+  <view class="about-uv" wx:if="{{userInfo.nikoUv < 20}}">冷清 (๑°⌓°๑)</view>
+  <view class="about-uv" wx:else>热闹? ٩(•̤̀ᵕ•̤́๑)ᵒᵏᵎᵎᵎᵎ</view>
+  <view class="about-uv" wx:if="{{userInfo.prepare}}">版本审核中...(ó﹏ò｡)</view>
   <view class="about-label">传火</view>
   <view class="about-desc" style="text-indent:0">
     <button class="out-share" open-type="share" size="mini" bindtap="closeAbout">
@@ -233,5 +248,6 @@
       <image class="btn-contact" src="../../images/talk.png"></image>
     </button>
   </view>
-  <view class="non-tips end-pd">※ 2020-10-30 狂気の三刀 ※</view>
+  <view class="non-tips end-pd">※ 2020-12-11 update by 狂気の三刀 ※</view>
+  <image class="mini-ex" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/ajln-w-idel.gif"></image>
 </action-sheet>

@@ -1,0 +1,18 @@
+<view class="box">
+  <view class="box-image">
+    <image bindload="imageLoad" bindtouchstart="_start" bindtouchmove="_move" bindtouchend="_end" style="width:{{imgWidth ? imgWidth + 'px' : 'auto'}};height:{{imgHeight ? imgHeight + 'px' : 'auto'}};transform:translate3d({{imgLeft-imgWidth/2}}px,{{imgTop-imgHeight/2}}px,0) scale({{scale}}) rotate({{angle}}deg);" src='{{imgSrc}}' class="img"></image>
+  </view>
+</view>
+  <view class="box-cav">
+    <canvas canvas-id="canvas2d" class="i-cav" style="width:{{_canvas_width * export_scale}}px;height:{{_canvas_height * export_scale}}px;left:{{canvas_left}}px;top:{{canvas_top}}px"></canvas>
+  </view>
+<view class="btns">
+  <view class="btn">
+    <button bindtap="initAvatar">获取微信头像</button>
+  </view>
+  <view class="btn" bindtap="chooseImage">上传头像</view>
+  <view class="btn" bindtap="saveImg">保存图片</view>
+  <view class="btn" bindtap="toMine">返回主页</view>
+  <view class="btn" bindtap="reload">reload</view>
+
+</view>

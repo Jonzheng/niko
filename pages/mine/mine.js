@@ -32,7 +32,7 @@ Page({
     hasTop: true,
     curData: 0,
     total: 0,
-    pageList: [],
+    pageList: []
   },
 
   onLoad: function (options) {
@@ -186,7 +186,8 @@ Page({
   init() {
     this.setData({
       isIpx: App.globalData.isIpx,
-      hasLogin: App.globalData.hasLogin
+      hasLogin: App.globalData.hasLogin,
+      fakeHide: App.globalData.fakeHide,
     })
   },
   // 刷新数据
@@ -265,15 +266,10 @@ Page({
     })
   },
   showAvatar(){
-    wx.hideTabBar()
-    this.setData({
-      avatarShow: true
-    })
-  },
-  hideAvatar(){
-    wx.showTabBar()
-    this.setData({
-      avatarShow: false
+    let url = this.data.userInfo.avatar_url
+    url = url.split('&imageView2')[0]
+    wx.previewImage({
+      urls: [url],
     })
   },
   toPerson(e) {
@@ -780,5 +776,67 @@ Page({
       })
     }, 0)
   },
+  cropperload(e) {
+    console.log("cropper初始化完成");
+  },
+  loadimage(e) {
+    console.log("图片加载完成", e.detail);
+    wx.hideLoading();
+    //重置图片角度、缩放、位置
+    // this._cropper.imgReset();
+  },
+
+  chooseAvatar() {
+    console.log('chooseAvatar')
+    this._cropper = this.selectComponent("#image-cropper");
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album'],
+      success: (res)=> {
+        console.log(res)
+        let tmpAvatar = res.tempFilePaths[0]
+        this.setData({ tmpAvatar })
+        wx.hideTabBar()
+      },
+    })
+  },
+  saveAvatar() {
+    this._cropper.getImg((obj) => {
+      let userInfo = this.data.userInfo
+      this.setData({ tmpAvatar: '' })
+      let openid = App.globalData.openid
+      wx.showLoading({
+        title: '正在上传...',
+      })
+      wx.uploadFile({
+        url: `${host}/uploadAvatar`,
+        filePath: obj.url,
+        name: 'avatar',
+        formData: { openid },
+        success: (res) =>{
+          console.log(res)
+          if(res && res.statusCode == 200) {
+            let miniImage = '&imageView2/1/w/80/h/80'
+            userInfo.avatar_url = res.data + miniImage
+            this.setData({ userInfo })
+          }
+        },
+        complete: (ret, err) =>{
+          wx.hideLoading()
+        }
+      })
+    });
+    wx.showTabBar()
+  },
+  cancelAvatar() {
+    this.setData({ tmpAvatar: false })
+    wx.showTabBar()
+  },
+  toHat() {
+    wx.navigateTo({
+      url: '/pages/hat/hat',
+    })
+  }
 
 })

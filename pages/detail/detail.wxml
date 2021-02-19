@@ -1,5 +1,4 @@
-<button wx:if="{{!hasLogin}}" class="get-user"
-  size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
+<button wx:if="{{!hasLogin}}" class="get-user" size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
 </button>
 <view class="box-list">
   <view wx:if="{{tipsCantRecord}}" class="tips-op tips-cant-record fade-out">
@@ -110,15 +109,15 @@
 
         </view>
 
-      <view wx:if="{{!fakeHide}}" class="re-title">cv模仿录音：</view>
+      <view class="re-title">cv模仿录音</view>
 
-        <view wx:if="{{!fakeHide}}" class="record-list">
+        <view class="record-list">
           <block wx:for="{{recordList}}" wx:key="record_id">
-            <template is="ele-master" data="{{...item,index,rePos,cvColor}}"/>
+            <template is="ele-master" data="{{...item,index,rePos,cvColor,hasLogin,fakeHide}}"/>
           </block>
 
           <view wx:if="{{recordList.length == 0}}" class="non-tips"> ※ 没有录音 ※</view>
-          <view wx:if="{{recordList.length != 0}}" class="to-tips">
+          <view wx:if="{{recordList.length != 0 && !fakeHide}}" class="to-tips">
             <view class="to-text" bindtap="toRecord">※ 查看全部录音 ※</view>
           </view>
         </view>
@@ -222,7 +221,7 @@
     <view class="box-line">
       <view class="box-re-avatar level-border-{{cv}}">
         <view class="avatar-frame level-{{cv}}"></view>
-        <image src="{{avatar_url || deAvatar}}" class="{{cv > 0 ?'frame-avatar':'re-avatar'}}" bindtap="toPerson" data-uid="{{openid}}"></image>
+        <image src="{{!fakeHide&& avatar_url ? avatar_url : deAvatar}}" class="{{cv > 0 ?'frame-avatar':'re-avatar'}}" bindtap="toPerson" data-uid="{{openid}}"></image>
       </view>
 
       <view class="re-width">
@@ -242,8 +241,12 @@
       </view>
       <image wx:if="{{isMine}}" src="../../images/more.png" class="sm-icon {{btnRt}}" bindtap='showMore' data-idx="{{index}}"></image>
     </view>
-    <view class="box-line flex-right">
-      <view class="menu-comm" bindtap='updateHeart' data-idx="{{index}}" data-status="{{heartStatus}}">
+    <view wx:if="{{!fakeHide}}" class="box-line flex-right">
+      <button wx:if="{{!hasLogin}}" class="menu-comm" size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
+        <view class="text-heart">{{heart}}</view>
+        <image src="../../images/heart-{{heartStatus == 1 ? 'on' : 'off'}}.png" class="sm-icon"></image>
+      </button>
+      <view wx:else class="menu-comm" bindtap='updateHeart' data-idx="{{index}}" data-status="{{heartStatus}}">
         <view class="text-heart">{{heart}}</view>
         <image src="../../images/heart-{{heartStatus == 1 ? 'on' : 'off'}}.png" class="sm-icon"></image>
       </view>
@@ -252,7 +255,7 @@
         <image src="../../images/comm.png" class="icon-comm"></image>
       </view>
     </view>
-    <view wx:if="{{comments}}" class="box-comment-2" bindtap='showComment' data-idx="{{index}}">
+    <view wx:if="{{comments && !fakeHide}}" class="box-comment-2" bindtap='showComment' data-idx="{{index}}">
       <view class="item-comm-tri" />
       <block wx:for="{{comments}}" wx:key="id">
         <view class="item-comm">

@@ -33,6 +33,49 @@ page{
   z-index: 8;
 }
 
+.mine-body .box-image-cropper{
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 8;
+}
+.mine-body .ic-show{
+  opacity: 1;
+  z-index: 1;
+}
+.mine-body .ic-hide{
+  opacity: 0;
+  z-index: -1;
+}
+.mine-body .box-image-cropper .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 690rpx;
+  height: 90rpx;
+  font-size: 32rpx;
+  letter-spacing: 2rpx;
+}
+.mine-body .box-image-cropper .btn-save {
+  position: fixed;
+  bottom: 120rpx; left: 30rpx;
+  color: #337ab7;
+  background: #fff;
+  border: 1px solid #337ab7;
+  font-weight: 700;
+  z-index: 100;
+}
+.mine-body .box-image-cropper .btn-cancel {
+  position: fixed;
+  bottom: 20rpx; left: 30rpx;
+  color: #fff;
+  background: transparent;
+  z-index: 100;
+}
+
 .btn-user{
   border-radius: 12rpx;
   margin-top: 320rpx;
@@ -93,26 +136,8 @@ page{
   background: rgba(255, 255, 255, .05);
 }
 
-.avatar-mask{
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  background: rgba(0, 0, 0, 0.88);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
 .admini{
   box-shadow: 0 0 20rpx black;
-}
-.avatar-detail{
-  width: 264rpx;
-  height: auto;
 }
 
 .record-label{
@@ -164,11 +189,27 @@ page{
   align-items: center;
   padding: 10rpx 20rpx;
 }
-
-.top-mine .avatar{
-  width: 128rpx;
-  height: 128rpx;
+.top-mine .box-avatar{
+  position: relative;
+  width: 132rpx;
+  height: 132rpx;
+  border: 3rpx solid #FFFFFF;
   border-radius: 50%;
+}
+.top-mine .icon-cam{
+  position: absolute;
+  bottom: -6rpx; right: -12rpx;
+  height: 42rpx;
+  width: 42rpx;
+  opacity: .5;
+  z-index: 10;
+}
+
+.top-mine .box-avatar .avatar{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  z-index: 8;
 }
 
 .top-mine .relation{
@@ -376,7 +417,7 @@ page{
 
 .non-tips{
   height: 120rpx;
-  color: #ddd;
+  color: #CCCCCC;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -439,6 +480,23 @@ page{
   font-size: 28rpx;
   padding: 10rpx 50rpx 0 20rpx;
   border-left: 6rpx solid #ddd;
+}
+.about-uv{
+  margin-left: 30rpx;
+  color: #888;
+  font-size: 28rpx;
+  padding: 10rpx 50rpx 0 20rpx;
+  border-left: 6rpx solid #ddd;
+}
+
+.mini-ex {
+  transform: rotateY(180deg);
+  width: 220rpx;
+  height: 220rpx;
+  position: absolute;
+  bottom: 120rpx; right: 60rpx;
+  box-shadow: 0 0 20rpx #FFFFFF inset;
+  opacity: 0.9;
 }
 
 .text-del{

@@ -15,7 +15,6 @@ App({
     this.checkUpdate();
     // iPhone X 设置
     this.setIpx()
-    this.initOpenid()
     // 获取用户信息
     wx.getSetting({
       success: res => {
@@ -35,10 +34,11 @@ App({
           })
         } else{
           console.log('false:!')
-          this.globalData.hasLogin = false
+          this.globalData.hasLogin = !!this.globalData.hasRegist
         }
       }
     })
+    this.initOpenid()
   },
   setIpx() {
     this.globalData.sysInfo = wx.getSystemInfoSync();
@@ -98,12 +98,17 @@ App({
             success: res => {
               if (res && res.data) {
                 let userInfo = res.data[0]
+                console.log('regist', userInfo)
+                this.globalData.hasLogin = userInfo.nick_name && userInfo.avatar_url
+                this.globalData.hasRegist = userInfo.nick_name && userInfo.avatar_url
                 this.globalData.userInfo = userInfo
                 this.globalData.openid = userInfo.openid
                 return resolve(userInfo.openid)
               }
             },
             fail: (err)=>{
+              let time = new Date().getTime()
+              this.report(`fail_regist_${time}`, err)
               reject(err)
             }
           })
@@ -115,7 +120,7 @@ App({
     console.log('initAvatar', userInfo)
     return new Promise((resolve, reject)=>{
       let { avatarUrl } = userInfo
-      avatarUrl = avatarUrl || this.globalData.avatarUrl
+      avatarUrl = avatarUrl || this.globalData.avatarUrl || userInfo.avatar_url || ''
       userInfo['nickName'] = userInfo.nickName || userInfo.nick_name
       userInfo['nick_name'] = userInfo.nickName
       userInfo['showName'] = userInfo.show_name
@@ -140,6 +145,7 @@ App({
         },
         fail: err =>{
           console.log('download avatar fail!!!', err)
+          this.report(`fail_download_avatar_${openid}`, err)
           this.globalData.hasLogin = true
           this.updateUser(userInfo).then((res) => {
             resolve(res)
@@ -192,6 +198,18 @@ App({
           resolve(data)
         }
       })
+    })
+  },
+  report(key, value) {
+    wx.request({
+      method: 'post',
+      url: `${host}/report`,
+      data: { key, value },
+      success: res => {
+        if (res && res.data) {
+          console.log('report', res.data)
+        }
+      }
     })
   },
   cosDelete(recordId){

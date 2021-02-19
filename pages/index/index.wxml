@@ -69,7 +69,7 @@
 <template name="an-list">
   
     <view class="cell__hd">
-      <image class="item-cover" mode="aspectFill" src="{{item.src_image}}" alt=""/>
+      <image class="item-cover" mode="aspectFill" src="{{item.src_image+'?imageView2/1/w/120/h/120'}}" alt=""/>
     </view>
     <view class="cell__bd">
       <view class="name">{{item.c_name}}</view>

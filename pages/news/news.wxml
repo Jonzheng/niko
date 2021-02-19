@@ -59,7 +59,7 @@
 
 </view>
 <template name="an-list">
-  <image class="avatar" mode="aspectFill" src="{{item.avatar_url || item.deAvatar}}" bindtap="toPerson" data-uid="{{item.openid}}"/>
+  <image class="avatar" mode="aspectFit" src="{{item.avatar_url || item.deAvatar}}" bindtap="toPerson" data-uid="{{item.openid}}"/>
   <view class="box-middle" catchtap="{{item.type == 'fans' || item.level == 'fans' || item.level=='follow' ? 'toPerson':'toDetail'}}"
     data-id="{{item.file_id}}" data-uid="{{item.openid}}">
     <view class="name" catchtap="toPerson" data-uid="{{item.openid}}">{{item.show_name || item.nick_name}}</view>
@@ -82,7 +82,7 @@
   <view class="right"
     catchtap="{{item.skCover ? 'toDetail': (item.level=='news' || item.level=='heart') ? 'toPerson':''}}"
     data-id="{{item.file_id}}" data-uid="{{item.openid}}">
-    <image wx:if="{{item.skCover}}" class="avatar-sk" src="{{item.skCover}}"></image>
+    <image wx:if="{{item.skCover}}" class="avatar-sk" src="{{item.skCover+'?imageView2/1/w/120/h/120'}}" mode="aspectFit"></image>
     <view wx:if="{{news != -1 && item.level == 'follow' && item.both == 0}}" class="btn-follow-un"
       catchtap="unFollow" data-uid="{{item.openid}}" data-idx="{{index}}">已关注</view>
     <view wx:if="{{news != -1 && item.level == 'follow' && item.both == 1}}" class="btn-follow-un"

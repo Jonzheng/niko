@@ -65,9 +65,11 @@ Page({
       while (avatars.length < 18) {
         avatars.push({ url: '', openid: '' })
       }
+      let spCount = 0
       this._loadSpin = setInterval(() => {
-        if (this.data.pageList.length == 0) {
+        if (this.data.pageList.length == 0 && spCount < 6) {
           this.avatarTap(true)
+          spCount += 1
         } else {
           clearInterval(this._loadSpin)
         }
@@ -125,6 +127,9 @@ Page({
 
   onHide: function () {
     wx.hideNavigationBarLoading()
+    if (this._loadSpin != undefined){
+      clearInterval(this._loadSpin)
+    }
   },
 
   onUnload: function () {

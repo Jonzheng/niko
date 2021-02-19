@@ -7,6 +7,7 @@
     "pages/person/person",
     "pages/news/news",
     "pages/edit/edit",
+    "pages/hat/hat",
     "pages/record/record"
   ],
   "tabBar": {

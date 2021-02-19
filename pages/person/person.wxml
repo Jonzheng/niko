@@ -9,8 +9,9 @@
 </view>
 <view class="box">
   <view class="top-mine">
-    <image class="avatar" src="{{userInfo.avatar_url || userInfo.deAvatar}}" bindtap="showAvatar"></image>
-
+    <view class="box-avatar">
+      <image class="avatar" src="{{userInfo.avatar_url || userInfo.deAvatar}}" bindtap="showAvatar"></image>
+    </view>
     <view class="relation">
       <view class="mine-menu">
         <view class="menu" bindtap="toNews" data-level="heart">
@@ -40,8 +41,7 @@
 </view>
 
 <view class="mine-body">
-  <button wx:if="{{!hasLogin && canIUse}}" class="get-user"
-    size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
+  <button wx:if="{{!hasLogin}}" class="get-user" size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
   </button>
 
 <scroll id="scroll"
@@ -142,7 +142,12 @@
                   <view hidden="{{item.status == 1}}" class="bg-pri comm-author">私密</view>
                 </view>
                 <view class="box-line">
-                  <view class="menu-comm" bindtap='updateHeart'
+                  <button wx:if="{{!hasLogin}}" class="menu-comm"
+                    size="mini" open-type="getUserInfo" bindgetuserinfo="getUserInfo">
+                    <view class="text-heart">{{item.heart}}</view>
+                    <image src="../../images/heart-{{item.heartStatus == 1 ? 'on' : 'off'}}.png" class="sm-icon"></image>
+                  </button>
+                  <view wx:else class="menu-comm" bindtap='updateHeart'
                     data-idx="{{index}}" data-pdx="{{pageIndex}}" data-fid="{{item.file_id}}" data-status="{{item.heartStatus}}">
                     <view class="text-heart">{{item.heart}}</view>
                     <image src="../../images/heart-{{item.heartStatus == 1 ? 'on' : 'off'}}.png" class="sm-icon"></image>
@@ -176,10 +181,6 @@
 </scroll>
 
 
-</view>
-
-<view wx:if="{{avatarShow}}" class="avatar-mask" catchtap="hideAvatar">
-  <image class="avatar-detail" src="{{userInfo.avatar_url || userInfo.deAvatar}}" mode="widthFix"></image>
 </view>
 
 <action-sheet formShow="{{commShow}}" bind:clickMask="closeMask" bind:confirmInput="confirmInput" bind:blur="clearInput"

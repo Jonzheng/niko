@@ -1,0 +1,61 @@
+.box{
+  padding: 40rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1rpx solid gold;
+  z-index: 1;
+  overflow: hidden;
+}
+.box0{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.box-image{
+  width: 180px;
+  height: 180px;
+  background: rgba(39, 220, 111, 0.10);
+  border: 6rpx solid salmon;
+  overflow: visible;
+}
+.box-image .img{
+  width: 100%;
+  height: 100%;
+}
+.box-cav{
+  margin-left: 10rpx;
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border: 3rpx dotted darkblue;
+  z-index: 1;
+}
+.box-cav .i-cav{
+  position: absolute;
+  left: 0; top: 0;
+}
+
+.btns{
+  padding: 30rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 10;
+}
+.btns .btn{
+  border: 1px solid #ededed;
+  border-radius: 8rpx;
+  margin: 3rpx 0;
+  font-weight: bold;
+  width: 520rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
