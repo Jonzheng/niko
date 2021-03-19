@@ -2,8 +2,8 @@ const COS = require('./lib/cos-sdk.js')
 const { host } = require('./utils/util')
 
 const Cos = new COS({
-  SecretId: 'AKIDWibBTXGkvtZx6yIqtfCPLzLYP5ORQlrg',
-  SecretKey: 'f2B2ZolRouiETQFeCSQ6UbVKjtuLUWHl',
+  SecretId: '',
+  SecretKey: '',
 })
 const AvatarBucket = 'avatar-1256378396'
 const RecordBucket = 'record-1256378396'
