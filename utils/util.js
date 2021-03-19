@@ -18,7 +18,7 @@ const formatNumber = n => {
 
 const trim = (str) => {
   if (!str) return ''
-  return str.replace(/\(.*?\)/g, '').replace('　', '')
+  return str.replace(/\(.*?\)/g, '').replace(/[　]+/g, "")
 }
 
 /**

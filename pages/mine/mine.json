@@ -5,6 +5,7 @@
   "navigationStyle": "custom",
   "usingComponents": {
     "scroll": "/modules/scroll/scroll",
+    "tab": "/modules/tab/tab",
     "image-cropper": "/modules/image-cropper/image-cropper",
     "action-sheet": "/modules/action-sheet/action-sheet"
   }

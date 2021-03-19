@@ -36,7 +36,7 @@
       bind:refresh="refresh"
       bind:more="more">
       <view class="record-list box-pd">
-        <image wx:if="{{preLoad && pageList.length == 0}}" class="{{preLoad ? 'i-loading':'i-hide'}}" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-0.png"></image>
+        <image wx:if="{{!isReady && pageList.length == 0}}" class="{{!isReady ? 'i-loading':'i-hide'}}" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-1.png"></image>
 
         <view wx:for="{{ pageList }}" id="wrp_{{pageIndex}}" wx:for-index="pageIndex" wx:for-item="listSingleItem" wx:key="index">
           <block wx:if="{{listSingleItem.length > 0}}">
@@ -55,7 +55,7 @@
   hasInput="{{true}}" boxHeight="{{isIpx ? 920 : 720}}" inputValue="{{inputValue}}"
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="id">
-    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url || item.deAvatar}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
+    <image class="comm-avatar" mode="aspectFill" src="{{item.avatar_url || item.deAvatar}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
     <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
       data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">
       <view class="comm-top">

@@ -61,7 +61,7 @@
 <template name="an-list">
   <image class="avatar" mode="aspectFit" src="{{item.avatar_url || item.deAvatar}}" bindtap="toPerson" data-uid="{{item.openid}}"/>
   <view class="box-middle" catchtap="{{item.type == 'fans' || item.level == 'fans' || item.level=='follow' ? 'toPerson':'toDetail'}}"
-    data-id="{{item.file_id}}" data-uid="{{item.openid}}">
+    data-id="{{item.file_id}}" data-rid="{{item.record_id}}" data-type="{{item.type}}">
     <view class="name" catchtap="toPerson" data-uid="{{item.openid}}">{{item.show_name || item.nick_name}}</view>
     <view wx:if="{{item.level == 'follow' || item.level == 'fans'}}" class="content">{{item.motto}}</view>
     <view wx:if="{{item.type == 'fans'}}" class="content-line">
@@ -74,6 +74,13 @@
     </view>
     <view wx:if="{{item.type == 'comment'}}" class="content">
       <view class="content-label">评论了{{news == -1 ? 'ta':'你'}}</view>
+      <view class="content-line">
+        <text class="comm-pre">{{item.pre}}</text>
+        <text class="content-label">@{{item.dateStr}}</text></view>
+    </view>
+
+    <view wx:if="{{item.type == 'chat' && news != -1}}" class="content">
+      <view class="content-label">私信留言</view>
       <view class="content-line">
         <text class="comm-pre">{{item.pre}}</text>
         <text class="content-label">@{{item.dateStr}}</text></view>

@@ -67,7 +67,7 @@ Page({
       }
       let spCount = 0
       this._loadSpin = setInterval(() => {
-        if (this.data.pageList.length == 0 && spCount < 6) {
+        if (this.data.pageList.length == 0 && spCount < 5) {
           this.avatarTap(true)
           spCount += 1
         } else {

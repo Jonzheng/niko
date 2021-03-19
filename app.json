@@ -8,6 +8,7 @@
     "pages/news/news",
     "pages/edit/edit",
     "pages/hat/hat",
+    "pages/chat/chat",
     "pages/record/record"
   ],
   "tabBar": {

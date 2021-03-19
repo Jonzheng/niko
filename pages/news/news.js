@@ -102,7 +102,15 @@ Page({
   },
   toDetail(e) {
     let fileId = e.currentTarget.dataset.id
+    let type = e.currentTarget.dataset.type
+    let recordId = e.currentTarget.dataset.rid
+    let sp = recordId.split('_and_')
+    sp = sp.filter(it=>it != App.globalData.openid)
+    let userId = sp[0]
     let url = `../detail/detail?fileId=${fileId}`
+    if (type == 'chat') {
+      url = `../chat/chat?userId=${userId}`
+    }
     App.toPage(url)
   },
   toPerson(e) {
@@ -192,7 +200,7 @@ Page({
         pre = (item.content.length > 5) ? pre + '...' : pre
         item['pre'] = pre
       }
-      if (item.file_id) {
+      if (item.file_id && item.file_id != 'chat') {
         let sps = item.file_id.split('_')
         let fname = sps[0] + '_' + sps[1] + '_0.png'
         item['skCover'] = `https://image-1256378396.cos.ap-guangzhou.myqcloud.com/${fname}`
@@ -200,7 +208,21 @@ Page({
     })
     if ('news' == level) {
       list.sort((a, b)=>{return b.times - a.times})
-      let newsList = type === 'more' ? this.data.newsList.concat(list) : list
+
+      // 私信留言缩进
+      let arr = []
+      list.forEach((it, idx)=>{
+        if (it.type != 'chat') {
+          arr.push(it)
+        }else {
+          let pre = list[idx - 1]
+          if (!pre || pre.type != 'chat' || (pre.type == 'chat' && pre.record_id != it.record_id)){
+            arr.push(it)
+          }
+        }
+      })
+
+      let newsList = type === 'more' ? this.data.newsList.concat(list) : arr
       this.setData({
         newsPage: pageNo + 1,
         end: true,

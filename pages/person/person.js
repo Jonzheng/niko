@@ -159,6 +159,7 @@ Page({
       success: res => {
         if (res && res.data) {
           let userInfo = res.data
+          this.initPormpt(userInfo.prompt)
           userInfo["deAvatar"] = deAvatar(openid)
           userInfo = this.computeCvLevel(userInfo)
           this.setData({
@@ -668,6 +669,7 @@ Page({
       data: { openid, followId },
       success: (res) => {
         console.log(res)
+        App.globalData.hasUpdate = true
         let userInfo = this.data.userInfo
         userInfo['isFollow'] = (suffix == 'follow')
         this.setData({
@@ -680,6 +682,7 @@ Page({
     wx.showActionSheet({
       itemList: ['取消关注'],
       success:(res)=> {
+        App.globalData.hasUpdate = true
         if(res.tapIndex == 0){
           this.follow('unFollow')
         }
@@ -729,5 +732,48 @@ Page({
         scrollTop: 0,
       })
     }, 0)
+  },
+  toMsgBoard() {
+    let url = `/pages/chat/chat?userId=${this._masterId}`
+    App.toPage(url)
+  },
+  prompt(){
+    let { avatar_url, openid } = App.globalData.userInfo
+    console.log(this._masterId, App.globalData.userInfo)
+    if (!avatar_url || !this._masterId || this._inPrompt) return;
+    this._inPrompt = true
+    let masterId = this._masterId
+    wx.request({
+      method: 'post',
+      url: `${host}/prompt`,
+      data: { openid, masterId, avatarUrl: avatar_url },
+      success: res => {
+        console.log('data', res.data)
+        this._promptList.unshift(res.data)
+        this.initPormpt(this._promptList)
+        this.setData({ hasPrompt:true })
+      }
+    })
+  },
+  initPormpt(list){
+    this._promptOpenid = new Set()
+    let promptList = []
+    list.forEach(it=>{
+      let user = it
+      if(typeof(it) == 'string'){
+        user = JSON.parse(it)
+      }
+      if (!this._promptOpenid.has(user.openid)){
+        this._promptOpenid.add(user.openid)
+        promptList.push(user)
+      }
+    })
+    promptList.reverse()
+    this._promptList = [].concat(promptList)
+    let promptSize = promptList.length
+    promptList = promptList.slice(promptSize-7 ,promptSize)
+    console.log('=====', promptList)
+    let hasPrompt = (this._promptOpenid.has(App.globalData.openid))
+    this.setData({ promptList, hasPrompt, promptSize })
   },
 })

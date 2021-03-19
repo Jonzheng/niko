@@ -5,6 +5,10 @@ const cvColor = ['#dfdfdf', '#dfdfbf', '#95ddb2', '#92d1e5', '#ffb37c', '#ff6c00
 
 const Levels = [{ 'uv': 0, 'pv': -1 }, { 'uv': 1, 'pv': 1 }, { 'uv': 4, 'pv': 15 }, { 'uv': 9, 'pv': 53 }, { 'uv': 16, 'pv': 127 }, { 'uv': 25, 'pv': 249 }, { 'uv': 36, 'pv': 431 }, { 'uv': 49, 'pv': 685 }, { 'uv': 64, 'pv': 1023 }, { 'uv': 81, 'pv': 1457 }]
 const pageSize = 20
+const tabData = [
+  { value: "mine",name: "我的录音"},
+  { value: "follow",name: "关注的人"}
+]
 
 Page({
 
@@ -32,13 +36,24 @@ Page({
     hasTop: true,
     curData: 0,
     total: 0,
-    pageList: []
+    pageList: [],
+    tabData,
+    tabCur: 0,
+    size: 90,
+    tabName: 'mine',
+    promptList: []
   },
 
   onLoad: function (options) {
+    this._tab = 'mine'
+    this._pageData = {
+      'mine': {globalIndex:0, pageNo:1, globalList:[], arr:[],curData:0},
+      'follow': {globalIndex:0, pageNo:1, globalList:[], arr:[],curData:0}
+    }
     this._globalIndex = 0
     this._globalList = []
     this.pageHeightArr = []
+    this._pageNo = 1
     wx.getSystemInfo({
       success: (res) => {
         let { windowHeight } = res;
@@ -46,7 +61,6 @@ Page({
       }
     })
 
-    this._pageNo = 1
     this._lockHearts = []
     if (!App.globalData.openid) {
       setTimeout(() => {
@@ -59,8 +73,9 @@ Page({
     } else {
       let openid = App.globalData.openid
       this.init()
-      this.getUser(openid)
-      this.getRecords(openid)
+      this.getUser(openid).then(()=>{
+        this.getRecords()
+      })
       App.getHeartSrc()
     }
   },
@@ -104,9 +119,9 @@ Page({
           App.globalData.showName = false
           App.globalData.motto = false
           this.getUser(openid)
-          this.getRecords(openid)
+          this.refresh()
         } else if (App.globalData.hasUpdate){
-          this.getRecords(openid)
+          this.refresh()
         }
       }
       App.globalData.hasUpdate = false
@@ -153,33 +168,38 @@ Page({
    * 自定函数
    */
   getUser(openid) {
-    wx.request({
-      method: 'post',
-      url: `${host}/getUser`,
-      data: { openid },
-      success: res => {
-        if (res && res.data) {
-          let userInfo = res.data
-          if (!userInfo.avatar_url || userInfo.avatar_url.indexOf('qlogo.cn') > -1){
-            console.log('avatar_url empty!!!', userInfo)
-            this.updateAvatar(userInfo)
-          } else{
-            userInfo = this.computeCvLevel(userInfo)
-            this.setData({
-              cv: userInfo.cv,
-              userInfo
-            })
-          }
+    return new Promise((resolve, reject) => {
+      wx.request({
+        method: 'post',
+        url: `${host}/getUser`,
+        data: { openid },
+        success: res => {
+          if (res && res.data) {
+            let userInfo = res.data
+            this.initPormpt(userInfo.prompt || [])
+            if (!userInfo.avatar_url || userInfo.avatar_url.indexOf('qlogo.cn') > -1){
+              console.log('avatar_url empty!!!', userInfo)
+              this.updateAvatar(userInfo)
+            } else{
+              userInfo = this.computeCvLevel(userInfo)
+              this._cv = userInfo.cv
+              this.setData({
+                cv: userInfo.cv,
+                userInfo
+              })
+            }
 
+          }
+          resolve()
         }
-      }
-    })
-    let admini = App.globalData.admini
-    admini = admini ? admini : false
-    this.setData({
-      admini,
-      isIpx: App.globalData.isIpx,
-      hasLogin: App.globalData.hasLogin
+      })
+      let admini = App.globalData.admini
+      admini = admini ? admini : false
+      this.setData({
+        admini,
+        isIpx: App.globalData.isIpx,
+        hasLogin: App.globalData.hasLogin
+      })
     })
   },
 
@@ -192,6 +212,10 @@ Page({
   },
   // 刷新数据
   refresh() {
+    this._pageData = {
+      'mine': {globalIndex:0, pageNo:1, globalList:[], arr:[],curData:0},
+      'follow': {globalIndex:0, pageNo:1, globalList:[], arr:[],curData:0}
+    }
     this._globalIndex = 0
     this._globalList = []
     this.pageHeightArr = []
@@ -204,21 +228,22 @@ Page({
       pageList: [],
     })
     this.init()
-    this.getUser(App.globalData.openid)
-    this.getRecords(App.globalData.openid)
+    this.getUser(App.globalData.openid).then(()=>{
+      this.getRecords()
+    })
   },
   // 加载更多
   more() {
-    this._pageNo += 1
-    this._globalIndex += 1
-    this.getRecords(App.globalData.openid, 'more')
+    this._pageData[this._tab].pageNo += 1
+    this._pageData[this._tab].globalIndex += 1
+    this.getRecords('more')
   },
   setHeight() {
-    let globalIdx = this._globalIndex
+    let globalIdx = this._pageData[this._tab].globalIndex
     this.query = wx.createSelectorQuery();
     this.query.select(`#wrp_${globalIdx}`).boundingClientRect()
     this.query.exec((res) => {
-      this.pageHeightArr[globalIdx] = res[0] && res[0].height;
+      this._pageData[this._tab].arr[globalIdx] = res[0] && res[0].height;
     });
     this.observePage(globalIdx);
   },
@@ -228,12 +253,13 @@ Page({
     observerObj.observe(`#wrp_${pageIndex}`, (res) => {
       if (res.intersectionRatio <= 0) {
         this.setData({
-          ['pageList[' + pageIndex + ']']: { height: this.pageHeightArr[pageIndex] },
+          ['pageList[' + pageIndex + ']']: { height: this._pageData[this._tab].arr[pageIndex] },
         })
 
       } else {
+        let globalList = this._pageData[this._tab].globalList
         this.setData({
-          ['pageList[' + pageIndex + ']']: this._globalList[pageIndex],
+          ['pageList[' + pageIndex + ']']: globalList[pageIndex],
         })
       }
     });
@@ -298,16 +324,18 @@ Page({
       }
     })
   },
-  getRecords(openid, type = 'refresh') {
+  getRecords(type = 'refresh') {
     if (this._loading) return
     this._loading = true
-    let masterId = openid
-    let pageNo = this._pageNo
+    let openid = App.globalData.openid
+    let masterId = this._tab == 'mine' ? App.globalData.openid : ''
+    let follow = this._tab == 'follow'
+    let pageNo = this._pageData[this._tab].pageNo
     this.setData({ showLoading: true })
     wx.request({
       url: `${host}/queryRecord`,
       method: 'post',
-      data: { masterId, openid, pageNo, pageSize, mine:1 },
+      data: { masterId, openid, pageNo, pageSize, mine:1, follow },
       success: (res) => {
         let { records, total } = res.data        
         records = records || []
@@ -322,12 +350,13 @@ Page({
           requesting: false,
           isReady: true,
         })
-        let curData = this.data.curData
+        let curData = this._pageData[this._tab].curData
         let total = this.data.total
         if (this._itPage > -1) clearInterval(this._itPage)
         this._itPage = setInterval(() => {
           if (curData < pageNo * pageSize && curData < total) {
             curData += 1
+            this._pageData[this._tab].curData = curData
             this.setData({ curData })
           } else {
             clearInterval(this._itPage)
@@ -339,11 +368,13 @@ Page({
   },
 
   initRecords(recordList, type) {
+    let globalIndex = this._pageData[this._tab].globalIndex
     for (let record of recordList) {
       record["listenStatus"] = "listen-off"
       record["boxStyle"] = "btn-play-box"
       record["btnShow"] = false
       record["btnRt"] = ""
+      record["cv"] = record["cv"] || this._cv
       record["dateStr"] = formatDate(record.c_date)
       record["ser"] = trim(record.serifu)
       if (record.heart_ud) {
@@ -354,16 +385,16 @@ Page({
       record["isListen"] = false
     }
     if (type == 'more') {
-      this._globalList[this._globalIndex] = recordList
-      let globalIdx = this._globalIndex
+      this._pageData[this._tab].globalList[globalIndex] = recordList
+      let globalIdx = globalIndex
       let datas = {}
       datas['pageList[' + globalIdx + ']'] = recordList
       this.setData(datas, () => {
         this.setHeight();
       })
     } else {
-      this._globalList[this._globalIndex] = recordList
-      this.setData({ ['pageList[' + this._globalIndex + ']']: recordList }, () => {
+      this._pageData[this._tab].globalList[globalIndex] = recordList
+      this.setData({ ['pageList[' + globalIndex + ']']: recordList }, () => {
         this.setHeight();
       })
     }
@@ -837,6 +868,50 @@ Page({
     wx.navigateTo({
       url: '/pages/hat/hat',
     })
-  }
+  },
+  tabChange(e) {
+    let { index, value } = e.detail
+    if(value == this._tab) return;
+    this._tab = value
+    this.setData({ tabName: value })
+    this.refresh()
+  },
+  prompt(masterId){
+    let { avatar_url, openid } = App.globalData.userInfo
+    if (!avatar_url) return;
+    masterId = openid
+    openid += '__' + Math.random() * 100
+    wx.request({
+      method: 'post',
+      url: `${host}/prompt`,
+      data: { openid, masterId, avatarUrl: avatar_url },
+      success: res => {
+        console.log('data', res.data)
+        this._promptList.unshift(res.data)
+        this.initPormpt(this._promptList)
+        this.setData({ hasPrompt:true })
+      }
+    })
+  },
+  initPormpt(list){
+    let st = new Set()
+    let promptList = []
+    list.forEach(it=>{
+      let user = it
+      if(typeof(it) == 'string'){
+        user = JSON.parse(it)
+      }
+      if (!st.has(user.openid)){
+        st.add(user.openid)
+        promptList.push(user)
+      }
+    })
+    promptList.reverse()
+    this._promptList = [].concat(promptList)
+    let promptSize = promptList.length
+    promptList = promptList.slice(promptSize-11 ,promptSize)
+    console.log('=====', promptList)
+    this.setData({ promptList, promptSize })
+  },
 
 })

@@ -6,7 +6,7 @@
 	<view class="tabs-wrap">
 		<view class="tabs {{scroll ? 'tabs--scroll' : ''}}" style="height: {{size}}rpx">
 			<view class="tabs__item {{index === tabCur ? 'tabs__item--cur': ''}}"
-						style="height: {{size}}rpx;line-height: {{size}}rpx"
+						style="height: {{size}}rpx;line-height: {{size}}rpx; color:{{index === tabCur ? color: ''}};"
 						wx:for="{{tabData}}"
 						wx:key="*this"
 						bindtap="toggleTab"

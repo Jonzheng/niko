@@ -115,7 +115,15 @@
 
               </view>
           </view>
-    </view>  <!-- box-tag-end -->
+        </view>  <!-- box-tag-end -->
+        <view wx:if="{{promptSize > 0}}" class="box-prompt">
+          <block wx:for="{{promptList}}" wx:key="openid">
+            <image class="avatar" src="{{item.avatarUrl}}" style="left:{{index*-9}}rpx"></image>
+          </block>
+          <view class="box-desc" style="width: 220rpx;">
+            <text>{{promptSize}}人在催产的队列</text>
+          </view>
+        </view>
   </view>
 
   <view class="box-records">
@@ -124,8 +132,16 @@
       {{userInfo.news}}条未读信息
       <image class="icon-next" src="../../images/news-next.png"></image>
     </view>
+    <!-- <view class="record-label">cv模仿录音：</view> -->
+    <view class="tab-wrap">
+      <tab tab-cur="{{tabCur}}"
+          tab-data="{{tabData}}"
+          color="{{cvColor[userInfo.cv]}}"
+          size="{{size}}"
+          bindchange="tabChange">
+      </tab>
+    </view>
   <view class="cells">
-    <view class="record-label">cv模仿录音：</view>
     <view wx:if="{{isReady && total == 0}}" class="non-tips"> ※ 没有录音 ※</view>
     <image wx:if="{{showLoading}}" class="i-loading" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-1.png"></image>
     <view wx:for="{{ pageList }}" id="wrp_{{pageIndex}}" wx:for-index="pageIndex" wx:for-item="listSingleItem" wx:key="index">
@@ -134,19 +150,26 @@
           <view class="item-record">
             <view class="box-col">
               <view class="serifu" bindtap="toDetail" data-id="{{item.file_id}}"><text class="page-re">p{{pageIndex+1}}.</text>{{item.ser || '* * *'}}</view>
-
+              <view wx:if="{{tabName == 'follow'}}" class="box-line">
+                <view class="nickname" style="color: {{cvColor[item.cv]}};font-weight: 500;">{{item.show_name || item.nick_name}}</view>
+                <view class="date">{{item.dateStr}}</view>
+              </view>
               <view class="box-line">
+                <view wx:if="{{tabName == 'follow'}}" class="box-re-avatar level-border-{{item.cv}}">
+                  <view class="avatar-frame level-{{item.cv}}"></view>
+                  <image src="{{item.avatar_url || deAvatar}}" class="{{item.cv > 0 ?'frame-avatar':'re-avatar'}}" bindtap="toPerson" data-uid="{{item.openid}}"></image>
+                </view>
                 <view class="re-width">
                   <view class="re-tri"></view>
                   <view class="btn-listen {{item.isListen?'an-listen-on':''}}"
-                    style="width: {{item.btnRt=='rt-90' ? 100 : 320}}rpx;border:3rpx solid {{cvColor[cv]}}"
+                    style="width: {{item.btnRt=='rt-90' ? 100 : 320}}rpx;border:3rpx solid {{cvColor[item.cv]}}"
                     catchtap="listen" data-idx="{{index}}" data-pdx="{{pageIndex}}" data-rid="{{item.record_id}}">
                     <view class='box-paly-btn'>
-                      <view hidden="{{isListen}}" class="btn-one" style="background: {{cvColor[cv]}}"></view>
-                      <view class="btn-two {{isListen?'listen-on':'listen-off'}}" style="background: {{cvColor[cv]}}"></view>
-                      <view hidden="{{isListen}}" class="btn-three" style="background: {{cvColor[cv]}}"></view>
+                      <view hidden="{{isListen}}" class="btn-one" style="background: {{cvColor[item.cv]}}"></view>
+                      <view class="btn-two {{isListen?'listen-on':'listen-off'}}" style="background: {{cvColor[item.cv]}}"></view>
+                      <view hidden="{{isListen}}" class="btn-three" style="background: {{cvColor[item.cv]}}"></view>
                     </view>
-                    <view wx:if="{{item.isListen}}" class="re-idx" style="height:{{rePos>0 ? 56:0}}rpx;left:{{rePos}}%;background: {{cvColor[cv]}}"></view>
+                    <view wx:if="{{item.isListen}}" class="re-idx" style="height:{{rePos>0 ? 56:0}}rpx;left:{{rePos}}%;background: {{cvColor[item.cv]}}"></view>
                   </view>
                   <block wx:if="{{item.btnShow}}">
                     <view wx:if="{{item.status == 1}}" class="text-pub {{item.btnShow ? 'btn-red':'btn-red-hidden'}}"
@@ -157,7 +180,7 @@
                       data-idx="{{index}}" data-pdx="{{pageIndex}}" data-rid="{{item.record_id}}">删除</view>
                   </block>
                 </view>
-                <image src="../../images/more.png" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}" data-pdx="{{pageIndex}}"></image>
+                <image wx:if="{{tabName == 'mine'}}" src="../../images/more.png" class="sm-icon {{item.btnRt}}" bindtap='showMore' data-idx="{{index}}" data-pdx="{{pageIndex}}"></image>
               </view>
 
               <view class="box-line flex-space">
@@ -203,7 +226,7 @@
   hasInput="{{true}}" boxHeight="{{isIpx ? 920 : 720}}" inputValue="{{inputValue}}"
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="id">
-    <image class="re-avatar" mode="aspectFit" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
+    <image class="comm-avatar" mode="aspectFit" src="{{item.avatar_url}}" bindtap="toPerson" data-uid="{{item.user_id}}"/>
     <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
       data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">
       <view class="comm-top">
@@ -228,14 +251,17 @@
   <view class="non-tips end-pd" wx:if="{{commentList.length > 0}}">-- end --</view>
 </action-sheet>
 
-<action-sheet formShow="{{aboutShow}}" bind:clickMask="closeAbout" boxHeight="{{isIpx ? 800 : 720}}"
+<action-sheet formShow="{{aboutShow}}" bind:clickMask="closeAbout" boxHeight="{{isIpx ? 830 : 780}}"
   formTitle="关于『式神录』" scroll="{{false}}">
   <view class="about-label">简介</view>
   <view class="about-desc">式神录是我业余时间开发的一个小程序，纯粹是兴趣和技术实践，发现Bug或者台词纠错，可以点下面的按钮反馈给我。玩得开心。</view>
-  <view class="about-uv">式神录今日访问量：{{userInfo.nikoUv}}</view>
-  <view class="about-uv" wx:if="{{userInfo.nikoUv < 20}}">冷清 (๑°⌓°๑)</view>
-  <view class="about-uv" wx:else>热闹? ٩(•̤̀ᵕ•̤́๑)ᵒᵏᵎᵎᵎᵎ</view>
-  <view class="about-uv" wx:if="{{userInfo.prepare}}">版本审核中...(ó﹏ò｡)</view>
+  <view class="about-sm">关于翻译，大部分是从psychosun大佬的帖子扒来的。</view>
+  <view class="about-sm">关于素材，一部分是自己用手机录的、一部分是游戏导出的，喜欢小程序就多录点配音吧。</view>
+  <view class="about-sp">ー</view>
+  <view class="about-sm">式神录今日访问量：{{userInfo.nikoUv}}</view>
+  <view class="about-sm" wx:if="{{userInfo.nikoUv < 30}}">冷清 (๑°⌓°๑)</view>
+  <view class="about-sm" wx:else>热闹? ٩(•̤̀ᵕ•̤́๑)ᵒᵏᵎᵎᵎᵎ</view>
+  <view class="about-sm" wx:if="{{userInfo.prepare}}">版本审核中...(ó﹏ò｡)</view>
   <view class="about-label">传火</view>
   <view class="about-desc" style="text-indent:0">
     <button class="out-share" open-type="share" size="mini" bindtap="closeAbout">
@@ -248,6 +274,6 @@
       <image class="btn-contact" src="../../images/talk.png"></image>
     </button>
   </view>
-  <view class="non-tips end-pd">※ 2020-12-11 update by 狂気の三刀 ※</view>
+  <view class="non-tips end-pd">※ 2021-03-18 update by 狂気の三刀 ※</view>
   <image class="mini-ex" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/ajln-w-idel.gif"></image>
 </action-sheet>

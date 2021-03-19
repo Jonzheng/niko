@@ -1,0 +1,25 @@
+<scroll-view scroll-y="{{true}}" class="box-all" catchtap="delModeOff" scroll-into-view="{{toLast}}" style="height:{{boxHeight}}px;">
+
+    <view class="msg-item" wx:for="{{msgList}}" wx:key="id" id="item{{index+1}}">
+      <view wx:if="{{item.desc}}" class="desc">{{item.desc}}</view>
+      <view wx:if="{{item.isMe}}" class="box-msg msg-me">
+        <view class="content-me" catchlongpress="setDelMode" data-midx="{{index}}" data-date="{{item.c_date}}">
+          <view wx:if="{{delMode && midx == index}}" class="cancel" catchtap="delMessage" data-id="{{item.id}}">撤回</view>
+          {{item.content}}
+        </view>
+        <image class="avatar" mode="aspectFit" src="{{item.avatar_url}}"/>
+      </view>
+      <view wx:else class="box-msg">
+        <image class="avatar" mode="aspectFit" src="{{item.avatar_url}}"/>
+        <view class="content">{{item.content}}</view>
+      </view>
+    </view>
+    <view class="last-child"></view>
+
+</scroll-view>
+
+<view class="footer">
+  <input class="comm-input" placeholder="{{inputPh}}" confirm-type="send" focus="{{inFocus}}"
+    bindconfirm="confirmInput" bindblur="blur" value="{{inputValue}}">
+  </input>
+</view>

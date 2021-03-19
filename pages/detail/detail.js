@@ -269,6 +269,7 @@ Page({
   },
 
   onShareAppMessage() {
+    this._bgmOnPlay = false
     this._itBgm = setInterval(()=>{
       console.log('it_bgmOnPlay', this._bgmOnPlay)
       if (!this._bgmOnPlay){
@@ -276,7 +277,7 @@ Page({
       } else {
         clearInterval(this._itBgm)
       }
-    }, 1000)
+    }, 3000)
     let fileId = this.data.fileId
     let cname = this.data.cname
     return {
@@ -875,6 +876,14 @@ Page({
       }
     })
   },
+  initSerComment(recordId){
+    let userId = App.globalData.openid
+    this.setData({
+      inputPh: `台词纠正或者随便说点什么`,
+      commShow: true
+    })
+
+  },
   initCommentList(commentList){
     let curMaster = this.data.curMaster
     for (let item of commentList) {
@@ -891,7 +900,8 @@ Page({
   showComment: function (e) {
     wx.vibrateShort()
     let currData = e.currentTarget.dataset
-    let { idx } = currData
+    let { idx, rid } = currData
+    if (rid) return this.initSerComment(rid);
     let userId = App.globalData.openid
     let recordList = this.data.recordList
     let curMaster = recordList[idx]
@@ -1090,7 +1100,7 @@ Page({
   },
   playBGM(){
     console.log('this._bgmOnPlay', this._bgmOnPlay)
-    if (!this.data.fileId || this.data.fileId.indexOf('sp_wxsn') == -1 || this._bgmOnPlay) return
+    if (!this.data.fileId || this.data.fileId.indexOf('m_wxsn') == -1 || this._bgmOnPlay) return
     if (!this._audioContextBgm) this._audioContextBgm = wx.createInnerAudioContext()
     App.getBgmSrc().then(bgmSrc => {
       this._audioContextBgm.src = bgmSrc

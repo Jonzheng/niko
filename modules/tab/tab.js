@@ -110,9 +110,11 @@ Component({
 		 */
 		init() {
 			const {windowWidth} = wx.getSystemInfoSync();
+			console.log(wx.getSystemInfoSync())
 			this.setData({windowWidth: windowWidth || 375});
 
 			this.createSelectorQuery().selectAll(".tabs__item-child").boundingClientRect((res) => {
+				console.log(windowWidth, res)
 				this.setData({
 					scrolling: true,
 					tabItems: res

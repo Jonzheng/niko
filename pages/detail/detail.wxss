@@ -784,12 +784,19 @@
   color: #bbbbbb;
 }
 
-.re-avatar, .comm-avatar{
+.box-records .re-avatar{
   position: relative;
   width: 86rpx;
   height: 86rpx;
   border-radius: 8rpx;
   z-index: 9;
+}
+.comm-avatar{
+  margin: 8rpx 0;
+  margin-right: 8rpx;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 8rpx;
 }
 
 .frame-avatar {
@@ -1114,7 +1121,7 @@
 
 .my-progress-box{
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   background: rgba(255, 240, 240, 0.95);
   padding-bottom: 1rpx;
   height: 0;

@@ -27,8 +27,23 @@
   border: 1rpx solid #bbb;
   font-size: 26rpx;
   width: 120rpx;
-  padding: 8rpx 0;
+  padding: 5rpx 0;
   color: #bbb;
   background: rgba(bb,bb,bb,0.1);
   border-radius: 8rpx;
+}
+
+.btn-chat{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120rpx;
+  padding: 5rpx 0;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  letter-spacing: 3rpx;
+  color: #666;
+  border: 1rpx solid #666;
+  margin-right: 20rpx;
 }

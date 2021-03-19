@@ -64,6 +64,7 @@
   <view class="profile" style="border-bottom: 3rpx solid {{cvColor[userInfo.cv]}};">
     <view class="box-line" wx:if="{{isReady}}">
       <view class="mine-name">{{userInfo.show_name || userInfo.nick_name}}</view>
+      <view class="btn-chat" bindtap="toMsgBoard">私信</view>
       <view wx:if="{{!userInfo.isFollow}}" class="btn-follow" bindtap="follow">+ 关注</view>
       <view wx:if="{{userInfo.isFollow}}" class="btn-follow-un" bindtap="unFollow">已关注</view>
     </view>
@@ -100,10 +101,22 @@
                 <view class="text-sp">※满足以上两个条件时cv等级up</view>
               </view>
           </view>
-    </view>  <!-- box-tag-end -->
+      </view>  <!-- box-tag-end -->
+      <view class="box-prompt">
+          <block wx:for="{{promptList}}" wx:key="openid">
+            <image class="avatar" src="{{item.avatarUrl}}" style="left:{{index*-9}}rpx"></image>
+          </block>
+          <view class="box-desc">
+            <text wx:if="{{promptSize > 0}}">{{promptSize}}人加入了催产队列</text>
+            <text wx:else></text>
+            <view wx:if="{{!hasPrompt && isReady}}" class="btn-prompt" catchtap="prompt" style="color: {{cvColor[userInfo.cv]}};border: 3rpx solid {{cvColor[userInfo.cv]}};">催产</view>
+            <view wx:else class="btn-prompt" style="font-size: 22rpx;letter-spacing:0;">已催产</view>
+          </view>
+        </view>
   </view>
 
   <view class="box-records">
+    <view class="cells">
     <view class="record-label">cv模仿录音：</view>
     <view wx:if="{{isReady && total == 0}}" class="non-tips"> ※ 没有录音 ※</view>
     <image wx:if="{{showLoading}}" class="i-loading" src="https://systems-1256378396.cos.ap-guangzhou.myqcloud.com/loading-1.png"></image>
@@ -176,6 +189,7 @@
       <view wx:else style="height:{{listSingleItem.height}}px" ></view>
     </view>
   </view>
+  </view>
 
 </view>
 </scroll>
@@ -187,7 +201,7 @@
   hasInput="{{true}}" boxHeight="{{isIpx ? 920 : 720}}" inputValue="{{inputValue}}"
   inputPh="{{inputPh}}" formTitle="评论" empty="{{commentList.length == 0}}">
   <view class="comm-item" wx:for="{{commentList}}" wx:key="id">
-    <image class="re-avatar" mode="aspectFill" src="{{item.avatar_url || item.deAvatar}}"/>
+    <image class="comm-avatar" mode="aspectFill" src="{{item.avatar_url || item.deAvatar}}"/>
     <view class="comm-right" catchtap="replyUser" data-cid="{{item.id}}"
       data-nickname="{{item.show_name || item.nick_name}}" data-content="{{item.content}}">
       <view class="comm-top">
